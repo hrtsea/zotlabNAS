@@ -132,7 +132,6 @@ void WAVESHARE_349_lvgl_port_task(void *arg)
 
   for(;;) {
     if (WAVESHARE_349_lvgl_lock(-1)) {
-      process_ui_status_queue();
       task_delay_ms = lv_timer_handler();
       WAVESHARE_349_lvgl_unlock();
     }

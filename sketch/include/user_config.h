@@ -1,6 +1,8 @@
 #ifndef USER_CONFIG_H
 #define USER_CONFIG_H
 
+#include <Arduino.h>
+
 // ============================================================
 // ESP32-S3 Hardware Configuration
 // Target: Waveshare ESP32-S3-Touch-LCD-3.49
@@ -121,7 +123,7 @@ ESP32 RX ← ES7210 (ADC)
 // ============================================================
 // 11. TCA9554 IO 扩展器引脚定义
 // ============================================================
-#define EXIO6_BIT 6  // 电源控制
-#define EXIO7_BIT 7  // 功放控制
+const uint8_t EXIO6_BIT = 6;  // 电源控制
+const uint8_t EXIO7_BIT = 7;  // 功放控制
 
 #endif // USER_CONFIG_H

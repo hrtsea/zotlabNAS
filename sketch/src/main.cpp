@@ -24,7 +24,7 @@
 #include "lvgl_port/lvgl_port.h"
 #include "pcf85063/pcf85063.h"
 #include "tca9554/tca9554.h"
-#include "touch/touch.h"
+#include "touch/esp_lcd_touch.h"
 #include "user_config.h"
 
 #include <Arduino.h>
@@ -52,57 +52,12 @@ TCA9554 *io = nullptr;
 // Audio command queue
 QueueHandle_t audio_cmd_queue = NULL;
 
-// ############################################################
-// Audio info callback
-void my_audio_info(const char *info) {
-  Serial.print("Audio Info: ");
-  Serial.println(info);
-}
-
-// ############################################################
-// Audio loop task
-void audio_loop_task(void *pvParameters) {
-  while (1) {
-    audio.loop();
-    vTaskDelay(pdMS_TO_TICKS(1));
-  }
-}
-
-// ############################################################
-// RTC read task
-void rtc_read_task(void *pvParameters) {
-  while (1) {
-    // Read RTC and print time
-    // Example: pcf85063_read_time();
-    vTaskDelay(pdMS_TO_TICKS(1000));
-  }
-}
-
-// ############################################################
-// Button input task
-void button_input_task(void *pvParameters) {
-  while (1) {
-    // Read BOOT button and power button
-    if (digitalRead(BOOT) == LOW) {
-      Serial.println("BOOT button pressed");
-      vTaskDelay(pdMS_TO_TICKS(200));  // Debounce
-    }
-    if (digitalRead(SYS_OUT) == LOW) {
-      Serial.println("Power button pressed");
-    }
-    vTaskDelay(pdMS_TO_TICKS(50));
-  }
-}
-
-// ############################################################
-// Battery level read task
-void batt_level_read_task(void *pvParameters) {
-  while (1) {
-    // Read battery level from ADC
-    // Example: int bat = analogRead(BAT_ADC_PIN);
-    vTaskDelay(pdMS_TO_TICKS(5000));
-  }
-}
+// External task declarations (defined in xtask.cpp)
+extern void my_audio_info(Audio::_msg msg);
+extern void audio_loop_task(void *pvParameters);
+extern void rtc_read_task(void *pvParameters);
+extern void button_input_task(void *pvParameters);
+extern void batt_level_read_task(void *pvParameters);
 
 // ############################################################
 void setup() {
