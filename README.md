@@ -1,93 +1,263 @@
-# 🎧🕺💃👯💫[ TuneBar ]💫👯🕺💃🎧
-![Version](https://img.shields.io/badge/version-1.2.1-blue)
+# TuneBar Hardware Development Template
 
-**TuneBar** is a custom-engineered, palm-sized media bar powered by the ESP32-S3. Its compact, stick-like design allows it to sit on your table or travel with you anywhere. Developed with a focus on original software design, it features a unique, self-designed UI/UX and custom code implementations tailored for performance.
+## 项目概述
 
-This project integrates a versatile music player and internet radio with practical daily utilities—including real-time weather, air quality monitoring, and a digital clock—offering a functional and aesthetically unique experience whether stationary or on the go.
+这是一个基于 ESP32-S3 的硬件开发模板，适用于 Waveshare ESP32-S3-Touch-LCD-3.49 开发板。
 
-![TuneBar Example](document/showcase.jpg)
-![Climate](document/weather.jpg)
+**修改日期**: 2026-05-03  
+**基础版本**: TuneBar v1.1.0  
+**修改内容**: 移除应用逻辑，保留硬件驱动和 UI 框架
 
+---
 
-## [🎬 Youtube](https://www.youtube.com/watch?v=7HEO5P5ezfM) Recommend watch the YouTube video for usage instructions.
+## 硬件平台
 
-## ✅ Features
+- **开发板**: Waveshare ESP32-S3-Touch-LCD-3.49
+  - 3.49″ IPS 电容触摸屏，172 × 640 分辨率，QSPI 显示接口
+  - 参考: https://www.waveshare.com/product/arduino/boards-kits/esp32-s3/esp32-s3-touch-lcd-3.49.htm?sku=32374
+- **Flash 大小**: 16 MB
+  - 分区: 7MB app + 2MB LittleFS
+- **PSRAM**: OPI PSRAM (已启用)
+- **USB CDC on Boot**: 已启用
 
-*   **Internet Radio**: Stream online radio stations via WiFi.
-*   **Audio Player**: Supports playback of MP3, FLAC, and AAC audio formats.
-*   **Weather Station**: Location-based real-time weather condition display, updated every 15 minutes.
-*   **Air Quality Display**: Location-based air quality monitoring, updated every 15 minutes.
-*   **Digital Clock**: Precise timekeeping and display (Note: Time resets on power loss due to hardware design).
+---
 
-*   **Interactive UI**: A smooth, responsive graphical user interface built with [LVGL](https://lvgl.io/), designed using SquareLine Studio.
-*   **Torch**: Built-in light functionality.
-*   **OTA Firmware Update**: Wireless firmware updates.
-*   **Planned feature for a future update.🚧 (not yet implemented)**
-    - AI Voice Chat
-    - Games
+## 软件栈
 
+- **开发环境**: PlatformIO (pioArduino)
+- **ESP32 Core**: 3.3.3
+- **LVGL**: 8.3.11 (已恢复)
+- **显示框架**: esp32_display_panel (包含依赖)
+- **音频**: ESP32 Audio I2S 3.4.4 (已恢复)
+  - 参考: https://github.com/schreibfaul1/ESP32-audioI2S
 
-## 💻 Hardware Specifications
+---
 
-*   **Board**: Waveshare ESP32-S3-Touch-LCD-3.49
-*   **Microcontroller**: ESP32-S3R8 (Dual-core Xtensa® 32-bit LX7, 240MHz)
-*   **Memory**: 16MB Flash, 8MB PSRAM
-*   **Display**: 3.49-inch Capacitive Touch Screen
-*   **Audio**: ES8311 Codec (I2S)
-*   **Connectivity**: 2.4GHz Wi-Fi & Bluetooth 5 (LE)
-*   Core audio functionality is powered by the [ESP32-audioI2S](https://github.com/schreibfaul1/ESP32-audioI2S) library.
-*   IDE: VSCode + pioarduino IDE extension
-*   UI/UX: [SquareLine-Studio-1.6.0](https://squareline.io/)
+## 项目结构
 
-## 🛒 Where to Buy (affiliate) [AliExpress](https://s.click.aliexpress.com/e/_c3F0TxcJ)
-
-## ℹ️ Resources [Waveshare Wiki](http://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-3.49)
-
-## 💾 Customizing Radio & Music (SD Card)
-
-### 📻 Radio Stations
-
-To manage your radio station list, you can create a `station.csv` file and upload it via the SD card.
-
-An example `station.csv` is available in the `/sketch/data` folder.
-
-### CSV Format
-The file should contain one station per line in the format: `Station Name,URL`.
-**Note:** Only `http` URLs are supported; `https` is not allowed.
-
-**Example [stations.csv](https://github.com/VaAndCob/TuneBar/blob/main/sketch/data/stations.csv):**
-```csv
-BBC Radio 1,http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one
-Smooth Chill,http://media-the.musicradio.com/SmoothChillMP3
+```
+TuneBar-main/
+├── sketch/                      # PlatformIO 项目目录
+│   ├── include/                 # 头文件
+│   │   ├── lv_conf.h          # LVGL 配置文件 (已恢复)
+│   │   ├── user_config.h      # 硬件配置文件
+│   │   └── xtask.h           # FreeRTOS 任务定义
+│   ├── src/                    # 源代码
+│   │   ├── main.cpp          # 主程序 (已恢复)
+│   │   ├── i2c_bsp/         # I2C 总线驱动
+│   │   ├── lcd_bl_bsp/      # LCD 背光驱动
+│   │   ├── pcf85063/         # PCF85063 RTC 驱动
+│   │   ├── tca9554/          # TCA9554 IO 扩展器驱动
+│   │   ├── touch/             # 触摸驱动
+│   │   ├── lvgl_port/        # LVGL 移植层 (已恢复)
+│   │   ├── ui/               # LVGL UI 代码 (已恢复)
+│   │   ├── ESP32-audioI2S-master/  # 音频库 (已恢复)
+│   │   ├── es7210/           # ES7210 麦克风驱动 (已恢复)
+│   │   ├── es8311/           # ES8311 音频编解码器驱动 (已恢复)
+│   │   └── axs15231b/       # AXS15231B 显示驱动 (已恢复)
+│   ├── lib/                   # 库文件
+│   │   ├── lvgl/            # LVGL 库 (已恢复)
+│   │   └── ArduinoJson/     # ArduinoJson 库
+│   ├── platformio.ini         # PlatformIO 配置 (已恢复)
+│   └── partitions/            # 分区表
+├── squareline/                 # SquareLine Studio 项目 (已恢复)
+└── README.md                  # 本文件
 ```
 
-### How to Upload
-1.  Create or Edit the `station.csv` file on your computer.
-2.  Copy the file to the root directory of a FAT32 formatted microSD card.
-3.  Insert the SD card into the TuneBar device.
-4.  To upload, go to the **Config -> Radio** tab and click **UPLOAD**.
+---
 
+## 已移除的组件
 
-### 🎶 Media Player Support
+以下应用逻辑已被移除，以简化项目作为硬件开发模板：
 
-TuneBar supports playback of MP3, AAC, FLAC, and WAV files.
+- ❌ `src/network/` - 网络数据获取 (NAS 监控)
+- ❌ `src/weather/` - 天气获取
+- ❌ `src/updater/` - OTA 更新
+- ❌ `src/file/` - 文件系统操作
+- ❌ `src/task_msg/` - 任务消息定义
 
-To use this feature, copy your media files to the SD card. The system supports folder structures up to 5 levels deep.
-Go to the **Config -> Music** tab, then click **LOAD** to index the music files.
+---
 
-## 🧘 Quick start, flash and go, no code needed
+## 保留的组件
 
-Is your idea of a "good time" *not* debugging C++? Just want the shiny gadget to work?
-We did the nerd stuff so you don't have to.
+### 硬件驱动
+- ✅ `i2c_bsp/` - I2C 总线驱动
+- ✅ `lcd_bl_bsp/` - LCD 背光驱动
+- ✅ `pcf85063/` - PCF85063 RTC 驱动
+- ✅ `tca9554/` - TCA9554 IO 扩展器驱动
+- ✅ `touch/` - 触摸驱动
 
-- [Flash TuneBar here](https://vaandcob.github.io/webpage/src/index.html?tab=tunebar)
+### UI 框架
+- ✅ `lvgl_port/` - LVGL 移植层
+- ✅ `ui/` - LVGL UI 代码
+- ✅ `lib/lvgl/` - LVGL 库
+- ✅ `include/lv_conf.h` - LVGL 配置
 
-## License
+### 音频驱动
+- ✅ `ESP32-audioI2S-master/` - 音频库
+- ✅ `es7210/` - ES7210 麦克风驱动
+- ✅ `es8311/` - ES8311 音频编解码器驱动
+- ✅ `axs15231b/` - AXS15231B 显示驱动
 
-This project is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) license.
-You are free to use, modify, and distribute this software for **non-commercial purposes only**.
+### 配置文件
+- ✅ `include/user_config.h` - 完整硬件配置
+- ✅ `sketch/platformio.ini` - PlatformIO 配置
+- ✅ `include/xtask.h` - FreeRTOS 任务定义
 
-This project uses open-source libraries. Please refer to the specific license files for LVGL, ArduinoJson, and the ES8311 driver.
+---
 
------
-[![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=☕&slug=vaandcob&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/vaandcob)
+## 使用方法
+
+### 1. 编译项目
+
+```bash
+cd f:/nasmonitor/TuneBar-main/sketch
+pio run
+```
+
+### 2. 上传固件
+
+```bash
+cd f:/nasmonitor/TuneBar-main/sketch
+pio run --target upload
+```
+
+### 3. 上传 LittleFS 文件系统
+
+```bash
+cd f:/nasmonitor/TuneBar-main/sketch
+pio run --target uploadfs
+```
+
+### 4. 监视串口输出
+
+```bash
+cd f:/nasmonitor/TuneBar-main/sketch
+pio device monitor
+```
+
+---
+
+## 硬件配置
+
+所有硬件配置都在 `include/user_config.h` 中定义：
+
+### 引脚定义
+- **LCD 引脚**: `WAVESHARE_349_PIN_NUM_LCD_*`
+- **触摸引脚**: `TOUCH_*`
+- **I2C 引脚**: `I2C_MASTER_*`
+- **SPI 引脚**: `SPI_*`
+- **I2S 引脚**: `I2S_*`
+- **ADC 引脚**: `ADC_BATT`
+- **GPIO**: `BOOT`, `SYS_OUT`, `LCD_BL`
+
+### I2C 设备地址
+- **RTC**: `WAVESHARE_349_RTC_ADDR` (0x51)
+- **IO 扩展器**: `WAVESHARE_349_EXPANDER_ADDR` (0x20)
+- **音频编解码器**: `WAVESHARE_349_CODEC_ADDR` (0x18)
+- **麦克风**: `WAVESHARE_349_ADC_ADDR` (0x40)
+- **IMU**: `WAVESHARE_349_IMU_ADDR` (0x6b)
+
+---
+
+## LVGL UI 开发
+
+### 使用 SquareLine Studio
+
+1. 打开 `squareline/tune_bar.spj`
+2. 设计 UI
+3. 导出代码到 `src/ui/`
+4. 编译上传
+
+### 手动编辑 UI
+
+直接编辑 `src/ui/ui.c` 和 `src/ui/ui.h`
+
+---
+
+## 音频功能
+
+### 播放音频
+
+```cpp
+#include "ESP32-audioI2S-master/Audio.h"
+
+Audio audio;
+
+void setup() {
+  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DSOUT, I2S_MCLK, I2S_DSIN);
+  audio.connecttoFS(SD, "music.mp3");
+}
+
+void loop() {
+  audio.loop();
+}
+```
+
+### 录制音频
+
+```cpp
+#include "es7210/es7210.h"
+
+ES7210 mic;
+
+void setup() {
+  mic.init();
+  mic.start();
+}
+
+void loop() {
+  // 读取麦克风数据
+}
+```
+
+---
+
+## Git 提交历史
+
+```
+963e6eb Restore LVGL and audio drivers
+a4210b8 Restore hardware configuration
+547c45f Refactor: Transform to hardware development template
+06ff68b Update sketch/.gitignore: Add packages to ignore list
+e7682e2 Clean up: Remove unnecessary files
+183a439 Initial commit: TuneBar NAS Monitor v1.1.0
+```
+
+---
+
+## 常见问题
+
+### 1. 编译失败
+
+**原因**: 缺少依赖库  
+**解决**: 检查 `lib/` 目录是否完整
+
+### 2. 上传失败 (COM 端口被占用)
+
+**原因**: Serial Monitor 未关闭  
+**解决**: 关闭 Serial Monitor，或关闭占用 COM 端口的程序
+
+### 3. LVGL 不显示
+
+**原因**: LCD 引脚配置错误  
+**解决**: 检查 `user_config.h` 中的 LCD 引脚定义
+
+### 4. 触摸不响应
+
+**原因**: 触摸控制器未初始化  
+**解决**: 检查 `touch/touch.h` 和 I2C 地址
+
+---
+
+## 作者信息
+
+- **原始项目**: TuneBar by Va&Cob
+- **修改**: 移除应用逻辑，保留硬件驱动和 UI 框架
+- **日期**: 2026-05-03
+
+---
+
+## 许可证
+
+参考原始项目许可证。

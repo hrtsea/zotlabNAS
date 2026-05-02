@@ -1,147 +1,189 @@
 /**
+ * @brief ESP32-S3 Hardware Development Template
  * @details
- *  - **Application Name:** TuneBar
- *  - **Developed By:** Va&Cob
+ *  - **Target Hardware:** Waveshare ESP32-S3-Touch-LCD-3.49
+ *  - **Display:** AXS15231B (QSPI, 172x640)
+ *  - **Touch:** I2C capacitive touch
+ *  - **Audio:** ES8311 (DAC) + ES7210 (ADC)
+ *  - **RTC:** PCF85063
+ *  - **IO Expander:** TCA9554
  *
- *  **Software Stack**
+ * **Software Stack**
  *  - PlatformIO pioArduino
- *  - ESP32 Core 3.3.3
- *  - LVGL 8.4.0
- *  - Display Framework: esp32_display_panel (including required dependencies)
- *  - ESP32 Audio I2S 3.4.4 https://github.com/schreibfaul1/ESP32-audioI2S
- *
- * Target Hardware
- *  - **Board Model:** Waveshare ESP32-S3-Touch-LCD-3.49
- *     (3.49″ IPS capacitive touch, 172 × 640 resolution, QSPI display interface)
- *     Reference: https://www.waveshare.com/product/arduino/boards-kits/esp32-s3/esp32-s3-touch-lcd-3.49.htm?sku=32374
- *
- *  - **Flash Size:** 16 MB
-    - **Parition -> Custom 16M Flash (6MB APP/3.9MB SPIFFS)
- *  - **PSRAM:** OPI PSRAM (enabled)
- *  - **USB CDC on Boot:** Enabled
- * !!! IMPORTANT !!!  user must upload files in folder "data" to LittleFS parition
- *
- * This documentation block provides an authoritative configuration reference
- * to ensure alignment across development, testing, and system integration workflows.
+ *  - ESP32 Core 3.x
+ *  - LVGL 8.3.x (optional UI)
+ *  - ESP32 Audio I2S library
  */
+
 #include "esp_heap_caps.h"
 #include "mbedtls/platform.h"
 
-
+// Hardware drivers
 #include "i2c_bsp/i2c_bsp.h"
 #include "lcd_bl_bsp/lcd_bl_pwm_bsp.h"
 #include "lvgl_port/lvgl_port.h"
-#include "ui/ui.h"
+#include "pcf85063/pcf85063.h"
+#include "tca9554/tca9554.h"
+#include "touch/touch.h"
 #include "user_config.h"
+
 #include <Arduino.h>
 #include <stdio.h>
-#include "ESP32-audioI2S-master/Audio.h" //https://github.com/schreibfaul1/ESP32-audioI2S
-#include "es7210/es7210.h" // mic
-#include "es8311/es8311.h" // audio codec
-#include "file/file.h" // file system
-#include "pcf85063/pcf85063.h" // real time clock
-#include "tca9554/tca9554.h" // io expander
-#include "weather/weather.h" // weather air quality widget
-#include "network/network.h" // wifi network
-#include "updater/updater.h"
-//#include "qmi8658/qmi8658.h" // imu
 
+// Audio drivers
+#include "ESP32-audioI2S-master/Audio.h"
+#include "es7210/es7210.h"
+#include "es8311/es8311.h"
 
-extern Audio audio;
-ES8311 speaker; // ES8322 (DAC)  →  I2S_NUM_0  (TX)
-ES7210 mic; // ES7210 (ADC)  →  I2S_NUM_1  (RX)
+// FreeRTOS
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
+#include "freertos/task.h"
 
+// Audio global objects
+Audio audio;
+ES8311 speaker;
+ES7210 mic;
 
-// expander
+// IO Expander
 extern i2c_master_dev_handle_t tca9554_dev_handle;
 TCA9554 *io = nullptr;
 
-#include "xtask.h" //all tasks
-
-// rtos message que handle
-QueueHandle_t ui_status_queue = NULL;
+// Audio command queue
 QueueHandle_t audio_cmd_queue = NULL;
 
 // ############################################################
-void setup() {
-  
-  // message que init
-  ui_status_queue = xQueueCreate(20, sizeof(UIStatusPayload));
-  assert(ui_status_queue != NULL);
-  audio_cmd_queue = xQueueCreate(20, sizeof(AudioCommandPayload));
-  assert(audio_cmd_queue != NULL);
+// Audio info callback
+void my_audio_info(const char *info) {
+  Serial.print("Audio Info: ");
+  Serial.println(info);
+}
 
-  randomSeed(esp_random());
+// ############################################################
+// Audio loop task
+void audio_loop_task(void *pvParameters) {
+  while (1) {
+    audio.loop();
+    vTaskDelay(pdMS_TO_TICKS(1));
+  }
+}
+
+// ############################################################
+// RTC read task
+void rtc_read_task(void *pvParameters) {
+  while (1) {
+    // Read RTC and print time
+    // Example: pcf85063_read_time();
+    vTaskDelay(pdMS_TO_TICKS(1000));
+  }
+}
+
+// ############################################################
+// Button input task
+void button_input_task(void *pvParameters) {
+  while (1) {
+    // Read BOOT button and power button
+    if (digitalRead(BOOT) == LOW) {
+      Serial.println("BOOT button pressed");
+      vTaskDelay(pdMS_TO_TICKS(200));  // Debounce
+    }
+    if (digitalRead(SYS_OUT) == LOW) {
+      Serial.println("Power button pressed");
+    }
+    vTaskDelay(pdMS_TO_TICKS(50));
+  }
+}
+
+// ############################################################
+// Battery level read task
+void batt_level_read_task(void *pvParameters) {
+  while (1) {
+    // Read battery level from ADC
+    // Example: int bat = analogRead(BAT_ADC_PIN);
+    vTaskDelay(pdMS_TO_TICKS(5000));
+  }
+}
+
+// ############################################################
+void setup() {
+  // Initialize serial
   Serial.begin(115200);
   delay(100);
-  log_i("[TuneBar] by Va&Cob | V%s - %s", current_version, compile_date);
+  Serial.println("ESP32-S3 Hardware Template Starting...");
 
-  // input pin
-  pinMode(BOOT, INPUT_PULLUP); // BOOT button
-  pinMode(SYS_OUT, INPUT_PULLUP); // Check Power Button Pressed
+  // Input pins
+  pinMode(BOOT, INPUT_PULLUP);
+  pinMode(SYS_OUT, INPUT_PULLUP);
 
-  // setup ADC
-  analogReadResolution(12); // 9–13 bits supported
-  analogSetAttenuation(ADC_11db); // Full-scale ~3.3V
+  // Setup ADC
+  analogReadResolution(12);
+  analogSetAttenuation(ADC_11db);
 
-  i2c_master_Init(); // init i2c
+  // Initialize I2C
+  i2c_master_Init();
 
-   // audio library
-  Audio::audio_info_callback = my_audio_info;
-  audio.setAudioTaskCore(1); // audio default run on core 1 (lvgl run on core 0 in lvgl_port.c)
-  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DSOUT, I2S_MCLK, I2S_DSIN);
-  audio.forceMono(true);
-  audio.setConnectionTimeout(2000, 4000); // connection timeout ms, ms_ssl
-  // audio.setVolume(audio_volume);  // default 0...21
-
-  // exapnder init
+  // Initialize IO expander
   io = new TCA9554(tca9554_dev_handle);
   io->begin();
-  io->setPinMode(EXIO6_BIT, 0); // set output mode
+  io->setPinMode(EXIO6_BIT, 0);  // Output: power hold
+  io->setPinMode(EXIO7_BIT, 0);  // Output: power amp
 
-  // turn on power button
+  // Power on hold
   if (digitalRead(SYS_OUT) == LOW) {
-    log_d("< POWER ON >");
-    io->digitalWrite(EXIO6_BIT, 1); // hold turn on
+    Serial.println("Power ON");
+    io->digitalWrite(EXIO6_BIT, 1);
   }
 
-  // init lvgl
+  // Initialize LVGL (display + touch)
   lvgl_port_init();
-  lcd_bl_pwm_bsp_init(LCD_PWM_MODE_255); // max out the brightness
 
-  // power amp control
-  io->setPinMode(EXIO7_BIT, 0); // 0 = OUTPUT
-  delay(100);
-  io->digitalWrite(EXIO7_BIT, 1); // enable amp
+  // Initialize LCD backlight
+  lcd_bl_pwm_bsp_init(LCD_PWM_MODE_255);
+
+  // Enable power amplifier
+  io->digitalWrite(EXIO7_BIT, 1);
   delay(100);
   if (io->digitalRead(EXIO7_BIT) == 0)
-    log_e("Power Amp not turn on!");
+    Serial.println("Power Amp ERROR!");
   else
-    log_i("Power Amp -> ON");
+    Serial.println("Power Amp OK");
 
-  // es8311 audio codec
-  speaker.setVolume(80); // 80 is best max
+  // Initialize ES8311 (audio DAC)
+  speaker.setVolume(80);
   if (!speaker.begin())
-    log_e("ES8311 begin failed");
+    Serial.println("ES8311 ERROR!");
   else
-    log_i("ES8311 OK");
+    Serial.println("ES8311 OK");
 
-
- if (mic.init()) {
-    log_i("ES7210 OK");
+  // Initialize ES7210 (microphone ADC)
+  if (mic.init()) {
+    Serial.println("ES7210 OK");
   } else {
-    log_e("ES7210 FAILED to Initialize");
+    Serial.println("ES7210 ERROR!");
   }
 
-  // Free RTOS Task
+  // Initialize Audio library
+  Audio::audio_info_callback = my_audio_info;
+  audio.setAudioTaskCore(1);
+  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DSOUT, I2S_MCLK, I2S_DSIN);
+  audio.forceMono(true);
+  audio.setConnectionTimeout(2000, 4000);
+
+  // Create audio command queue
+  audio_cmd_queue = xQueueCreate(10, sizeof(int));
+  assert(audio_cmd_queue != NULL);
+
+  // Create FreeRTOS tasks
   xTaskCreatePinnedToCore(audio_loop_task, "audio_loop", 5 * 1024, NULL, 4, NULL, 1);
-  xTaskCreatePinnedToCore(rtc_read_task, "getDateTimeTask", 3 * 1024, NULL, 3, NULL, 1);
-  xTaskCreatePinnedToCore(button_input_task, "buttonInputTask", 2 * 1024, NULL, 2, NULL, 1);
-  xTaskCreatePinnedToCore(batt_level_read_task, "readBatteryLevel", 2 * 1024, NULL, 1, NULL, 1);
-  //xTaskCreatePinnedToCore(imu_read_task, "imu_read_task", 2 * 1024, NULL , 1, NULL,1);
+  xTaskCreatePinnedToCore(rtc_read_task, "rtc_read", 3 * 1024, NULL, 3, NULL, 1);
+  xTaskCreatePinnedToCore(button_input_task, "button_input", 2 * 1024, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(batt_level_read_task, "batt_read", 2 * 1024, NULL, 1, NULL, 1);
 
-
+  Serial.println("Setup complete!");
 }
+
 // ############################################################
-void loop() {}
-//---------------------------------------------------
+void loop() {
+  // Main loop - LVGL tasks run in separate task (lvgl_port)
+  vTaskDelay(pdMS_TO_TICKS(1000));
+}

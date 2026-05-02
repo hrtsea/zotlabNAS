@@ -15,8 +15,6 @@
 #include "user_config.h"
 
 #include "esp_task_wdt.h"
-#include "task_msg/task_msg.h"
-#include "ui/ui.h"
 
 #define LCD_BIT_PER_PIXEL (16)
 
@@ -256,9 +254,5 @@ void lvgl_port_init(void) {
   lvgl_mux = xSemaphoreCreateMutex();
   assert(lvgl_mux);
   xTaskCreatePinnedToCore(WAVESHARE_349_lvgl_port_task, "LVGL", 6 * 1024, NULL, 5, NULL, 0); // Run Core 0
-  if (WAVESHARE_349_lvgl_lock(-1)) {
-
-    ui_init();
-    WAVESHARE_349_lvgl_unlock();
-  }
+  ESP_LOGI(TAG, "LVGL port initialized successfully");
 }
