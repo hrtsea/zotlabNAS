@@ -33,5 +33,8 @@ Thumbs.db
 # Packages (download separately)
 sketch/packages/
 
-# SquareLine cache
-squareline/cache/
+# ArduinoJson (if using git submodule)
+# lib/ArduinoJson/
+
+# ESP32 exceptions decoder
+exception_decoder/
