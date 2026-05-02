@@ -1,6 +1,8 @@
 #ifndef UI_SCREEN_OVERVIEW_H
 #define UI_SCREEN_OVERVIEW_H
 
+#include <lvgl.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

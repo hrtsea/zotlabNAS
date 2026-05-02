@@ -1,15 +1,7 @@
+#include "ui_Screen_Overview.h"
+#include "../ui.h"
+#include "../ui_events.h"
 #include <Arduino.h>
-#include "lvgl.h"
-
-// Forward declarations
-static void ui_event_Screen_Overview_gesture(lv_event_t * e);
-static void create_status_bar(lv_obj_t *parent);
-static void create_cpu_module(lv_obj_t *parent);
-static void create_mem_disk_module(lv_obj_t *parent);
-static void create_hdd_indicators(lv_obj_t *parent);
-void ui_Screen_Overview_screen_destroy(void);
-
-lv_obj_t * ui_Screen_Overview = NULL;
 
 // 自定义颜色定义（和原图保持一致）
 #define COLOR_BG        lv_color_hex(0x000000)      // 背景黑色
@@ -206,19 +198,12 @@ static void create_hdd_indicators(lv_obj_t *parent)
     }
 }
 
-/* -------------------------- 手势事件回调 -------------------------- */
-static void ui_event_Screen_Overview_gesture(lv_event_t * e)
-{
-    // 这里可以添加手势处理逻辑
-    printf("[Overview] Gesture event received\n");
-}
-
 /* -------------------------- 主界面初始化 -------------------------- */
 void ui_Screen_Overview_screen_init(void)
 {
     // 防止重复初始化
     if (ui_Screen_Overview != NULL) {
-        printf("[Overview] Screen already initialized, destroying first\n");
+        log_w("[Overview] Screen already initialized, destroying first");
         ui_Screen_Overview_screen_destroy();
     }
     

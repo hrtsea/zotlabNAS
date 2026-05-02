@@ -35,6 +35,7 @@
 #include "ESP32-audioI2S-master/Audio.h"
 #include "es7210/es7210.h"
 #include "es8311/es8311.h"
+#include "ui/ui.h"
 #include "ui/screens/ui_Screen_Boot.h"
 #include "ui/screens/ui_Screen_Overview.h"
 
@@ -98,10 +99,9 @@ void setup() {
   // Initialize LVGL (display + touch)
   lvgl_port_init();
 
-  // Show splash screen via LVGL timer (runs in LVGL main thread, no lock needed)
+  // Initialize UI system
   lv_timer_create([](lv_timer_t *timer) {
-    ui_Screen_Boot_screen_init();
-    lv_scr_load(ui_Screen_Boot);
+    ui_init();
     lv_timer_del(timer);
   }, 1, NULL);
 
