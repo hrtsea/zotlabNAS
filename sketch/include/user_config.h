@@ -2,89 +2,126 @@
 #define USER_CONFIG_H
 
 // ============================================================
-// ESP32 Hardware Development Template - 硬件配置文件
-// ============================================================
-// 根据你的硬件平台修改以下配置
-// 示例配置基于: Waveshare ESP32-S3-Touch-LCD-3.49
+// ESP32-S3 Hardware Configuration
+// Target: Waveshare ESP32-S3-Touch-LCD-3.49
 // ============================================================
 
 // ============================================================
-// 1. 通信接口配置
+// 1. SPI & I2C 配置
 // ============================================================
-
-// SPI 主机配置 (用于 LCD 等外设)
 #define LCD_HOST SPI3_HOST
 
-// I2C 配置 (用于传感器、RTC、IO 扩展器等)
-#define I2C_MASTER_SCL_IO GPIO_NUM_18  // I2C SCL 引脚
-#define I2C_MASTER_SDA_IO GPIO_NUM_17  // I2C SDA 引脚
-#define I2C_MASTER_FREQ_HZ 400000      // I2C 频率 (100kHz / 400kHz)
-#define I2C_MASTER_TIMEOUT_MS 1000      // I2C 超时时间 (ms)
+// 触摸 I2C 引脚
+#define Touch_SCL_NUM (GPIO_NUM_18)
+#define Touch_SDA_NUM (GPIO_NUM_17)
 
-// SPI 配置 (用于 SD 卡等)
-#define SD_CS   38  // SD 卡片选引脚
-#define SPI_MOSI 39 // SPI MOSI 引脚
-#define SPI_MISO 40 // SPI MISO 引脚
-#define SPI_SCK  41 // SPI SCK 引脚
+// ESP I2C 引脚 (用于 IO 扩展器等)
+#define ESP_SCL_NUM  (GPIO_NUM_48)
+#define ESP_SDA_NUM  (GPIO_NUM_47)
 
 // ============================================================
-// 2. 显示屏配置 (如硬件支持)
+// 2. LCD 引脚定义 (Waveshare 3.49)
+// ============================================================
+#define WAVESHARE_349_PIN_NUM_LCD_CS     (GPIO_NUM_9)
+#define WAVESHARE_349_PIN_NUM_LCD_PCLK   (GPIO_NUM_10)
+#define WAVESHARE_349_PIN_NUM_LCD_DATA0  (GPIO_NUM_11)
+#define WAVESHARE_349_PIN_NUM_LCD_DATA1  (GPIO_NUM_12)
+#define WAVESHARE_349_PIN_NUM_LCD_DATA2  (GPIO_NUM_13)
+#define WAVESHARE_349_PIN_NUM_LCD_DATA3  (GPIO_NUM_14)
+#define WAVESHARE_349_PIN_NUM_LCD_RST    (GPIO_NUM_21)
+#define WAVESHARE_349_PIN_NUM_BK_LIGHT   (GPIO_NUM_8)
+
+// 触摸控制器配置
+#define I2C_TOUCH_ADDR                    0x3b
+#define WAVESHARE_349_PIN_NUM_TOUCH_RST  (-1)
+#define WAVESHARE_349_PIN_NUM_TOUCH_INT  (-1)
+
+// ============================================================
+// 3. LVGL 配置 (如需要)
+// ============================================================
+#define WAVESHARE_349_LVGL_TICK_PERIOD_MS    5
+#define WAVESHARE_349_LVGL_TASK_MAX_DELAY_MS  50
+#define WAVESHARE_349_LVGL_TASK_MIN_DELAY_MS  5  // 越小越灵敏
+
+// ============================================================
+// 4. I2C 设备地址
+// ============================================================
+#define WAVESHARE_349_RTC_ADDR    0x51  // PCF85063
+#define WAVESHARE_349_IMU_ADDR    0x6b  // QMI8658 (如适用)
+#define WAVESHARE_349_CODEC_ADDR  0x18  // ES8311 (如适用)
+#define WAVESHARE_349_EXPANDER_ADDR 0x20  // TCA9554
+#define WAVESHARE_349_ADC_ADDR    0x40  // ES7210 (如适用)
+
+// ============================================================
+// 5. 显示屏分辨率配置
+// ============================================================
+#define USER_DISP_ROT_90    0
+#define USER_DISP_ROT_NONO  0
+#define Rotated USER_DISP_ROT_NONO   // 软件实现旋转
+
+#if (Rotated != USER_DISP_ROT_NONO)
+#define WAVESHARE_349_LCD_H_RES 172
+#define WAVESHARE_349_LCD_V_RES 640
+#else
+#define WAVESHARE_349_LCD_H_RES 640
+#define WAVESHARE_349_LCD_V_RES 172
+#endif
+
+#define LCD_NOROT_HRES     172
+#define LCD_NOROT_VRES     640
+#define LVGL_DMA_BUFF_LEN (LCD_NOROT_HRES * 64 * 2)
+#define LVGL_SPIRAM_BUFF_LEN (WAVESHARE_349_LCD_H_RES * WAVESHARE_349_LCD_V_RES * 2)
+
+// ============================================================
+// 6. I2S 音频引脚 (如需要)
 // ============================================================
 /*
-// LCD 引脚定义示例 (根据您的硬件修改)
-#define LCD_PIN_CS    GPIO_NUM_9   // 片选
-#define LCD_PIN_PCLK  GPIO_NUM_10  // 像素时钟
-#define LCD_PIN_DATA0 GPIO_NUM_11  // 数据线 0
-#define LCD_PIN_DATA1 GPIO_NUM_12  // 数据线 1
-#define LCD_PIN_DATA2 GPIO_NUM_13  // 数据线 2
-#define LCD_PIN_DATA3 GPIO_NUM_14  // 数据线 3
-#define LCD_PIN_RST   GPIO_NUM_21  // 复位
-#define LCD_PIN_BL    GPIO_NUM_8   // 背光控制
-
-// LCD 分辨率
-#define LCD_H_RES 320  // 水平分辨率
-#define LCD_V_RES 240  // 垂直分辨率
+Audio I2S pins
+ES8311 → Audio DAC / playback
+ES7210 → Audio ADC / microphone
+They are on the SAME physical I2S bus
+There is one master (ESP32), and:
+ESP32 TX → ES8311 (DAC)
+ESP32 RX ← ES7210 (ADC)
 */
+#define I2S_DSIN  6  // data in from (es7210)
+#define I2S_DSOUT 45 // data out to (es8311)
+#define I2S_BCLK  15 // SCLK
+#define I2S_MCLK  7
+#define I2S_LRC   46 // LRCK
 
 // ============================================================
-// 3. 触摸配置 (如硬件支持)
+// 7. SD 卡引脚
 // ============================================================
-/*
-#define TOUCH_SCL_NUM GPIO_NUM_18  // 触摸 I2C SCL
-#define TOUCH_SDA_NUM GPIO_NUM_17  // 触摸 I2C SDA
-#define TOUCH_INT_PIN  -1           // 触摸中断引脚 (-1 表示不使用)
-#define TOUCH_RST_PIN  -1           // 触摸复位引脚 (-1 表示不使用)
-#define TOUCH_I2C_ADDR 0x3b         // 触摸控制器 I2C 地址
-*/
+#define SD_CS  38
+#define SPI_MOSI 39
+#define SPI_MISO 40
+#define SPI_SCK  41
 
 // ============================================================
-// 4. ADC 配置
+// 8. ADC 配置
 // ============================================================
-#define ADC_BATT 4  // 电池电压检测 ADC 通道 (ADC1_CHANNEL_4)
+#define ADC_BATT 4  // 电池电压检测 ADC 通道
 
 // ============================================================
-// 5. GPIO 配置
+// 9. GPIO 配置
 // ============================================================
-#define BOOT 0  // BOOT 按钮引脚
-#define SYS_OUT 16  // 系统电源控制引脚
+#define SYS_OUT 16  // 电源按钮检测
+#define BOOT    0    // BOOT 按钮
+#define LCD_BL  8    // LCD 背光
 
 // ============================================================
-// 6. I2C 设备地址 (根据您的硬件修改)
+// 10. LCD 背光 PWM 模式
 // ============================================================
-#define RTC_I2C_ADDR    0x51  // PCF85063 RTC 地址
-#define IO_EXP_I2C_ADDR 0x20  // TCA9554 IO 扩展器地址
-// #define IMU_I2C_ADDR   0x6b  // QMI8658 IMU 地址 (如适用)
-// #define CODEC_I2C_ADDR 0x18  // ES8311 音频编解码器地址 (如适用)
+#define LCD_PWM_MODE_0    0
+#define LCD_PWM_MODE_100  100
+#define LCD_PWM_MODE_150  150
+#define LCD_PWM_MODE_255  255
 
 // ============================================================
-// 7. 其他配置
+// 11. TCA9554 IO 扩展器引脚定义
 // ============================================================
-#define CORE_DEBUG_LEVEL 3  // 调试级别 (1=ERROR, 2=WARN, 3=INFO, 4=DEBUG, 5=VERBOSE)
-
-// ============================================================
-// 8. 项目信息 (可选)
-// ============================================================
-// const char *PROJECT_NAME = "MyProject";
-// const char *PROJECT_VERSION = "1.0.0";
+#define EXIO6_BIT 6  // 电源控制
+#define EXIO7_BIT 7  // 功放控制
 
 #endif // USER_CONFIG_H
