@@ -1,0 +1,30 @@
+# PlatformIO
+.pio/
+.libdeps/
+platformio.ini.backup
+
+# Build output
+build/
+*.bin
+*.elf
+*.map
+
+# IDE
+.vscode/settings.json
+.vscode/ipch/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary
+*.tmp
+*.bak
+~$*
