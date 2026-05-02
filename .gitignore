@@ -8,6 +8,7 @@ build/
 *.bin
 *.elf
 *.map
+sketch/.cache/
 
 # IDE
 .vscode/settings.json
@@ -28,3 +29,9 @@ Thumbs.db
 *.tmp
 *.bak
 ~$*
+
+# Packages (download separately)
+sketch/packages/
+
+# SquareLine cache
+squareline/cache/
