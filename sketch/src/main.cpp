@@ -1,123 +1,147 @@
 /**
  * @details
- *  - **Application Name:** TuneBar Hardware Template
- *  - **Developed By:** Va&Cob (modified)
+ *  - **Application Name:** TuneBar
+ *  - **Developed By:** Va&Cob
  *
- *  **Hardware Platform**
+ *  **Software Stack**
+ *  - PlatformIO pioArduino
+ *  - ESP32 Core 3.3.3
+ *  - LVGL 8.4.0
+ *  - Display Framework: esp32_display_panel (including required dependencies)
+ *  - ESP32 Audio I2S 3.4.4 https://github.com/schreibfaul1/ESP32-audioI2S
+ *
+ * Target Hardware
  *  - **Board Model:** Waveshare ESP32-S3-Touch-LCD-3.49
  *     (3.49″ IPS capacitive touch, 172 × 640 resolution, QSPI display interface)
  *     Reference: https://www.waveshare.com/product/arduino/boards-kits/esp32-s3/esp32-s3-touch-lcd-3.49.htm?sku=32374
  *
  *  - **Flash Size:** 16 MB
+    - **Parition -> Custom 16M Flash (6MB APP/3.9MB SPIFFS)
  *  - **PSRAM:** OPI PSRAM (enabled)
  *  - **USB CDC on Boot:** Enabled
+ * !!! IMPORTANT !!!  user must upload files in folder "data" to LittleFS parition
  *
- * This is a hardware development template with all UI and audio logic removed.
- * Retained: I2C, SPI, GPIO, ADC, LCD backlight, touch, RTC, IO expander.
+ * This documentation block provides an authoritative configuration reference
+ * to ensure alignment across development, testing, and system integration workflows.
  */
 #include "esp_heap_caps.h"
 #include "mbedtls/platform.h"
 
-// 硬件驱动
+
 #include "i2c_bsp/i2c_bsp.h"
 #include "lcd_bl_bsp/lcd_bl_pwm_bsp.h"
-#include "pcf85063/pcf85063.h"
-#include "tca9554/tca9554.h"
-#include "touch/touch.h"
-
-// 配置文件
+#include "lvgl_port/lvgl_port.h"
+#include "ui/ui.h"
 #include "user_config.h"
-#include "xtask.h"
+#include <Arduino.h>
+#include <stdio.h>
+#include "ESP32-audioI2S-master/Audio.h" //https://github.com/schreibfaul1/ESP32-audioI2S
+#include "es7210/es7210.h" // mic
+#include "es8311/es8311.h" // audio codec
+#include "file/file.h" // file system
+#include "pcf85063/pcf85063.h" // real time clock
+#include "tca9554/tca9554.h" // io expander
+#include "weather/weather.h" // weather air quality widget
+#include "network/network.h" // wifi network
+#include "updater/updater.h"
+//#include "qmi8658/qmi8658.h" // imu
 
-// 全局对象
+
+extern Audio audio;
+ES8311 speaker; // ES8322 (DAC)  →  I2S_NUM_0  (TX)
+ES7210 mic; // ES7210 (ADC)  →  I2S_NUM_1  (RX)
+
+
+// expander
 extern i2c_master_dev_handle_t tca9554_dev_handle;
 TCA9554 *io = nullptr;
-PCF85063 rtc;
 
-// FreeRTOS 队列
-QueueHandle_t sensor_queue = NULL;
+#include "xtask.h" //all tasks
+
+// rtos message que handle
+QueueHandle_t ui_status_queue = NULL;
+QueueHandle_t audio_cmd_queue = NULL;
 
 // ############################################################
 void setup() {
-  // 初始化串口
+  
+  // message que init
+  ui_status_queue = xQueueCreate(20, sizeof(UIStatusPayload));
+  assert(ui_status_queue != NULL);
+  audio_cmd_queue = xQueueCreate(20, sizeof(AudioCommandPayload));
+  assert(audio_cmd_queue != NULL);
+
+  randomSeed(esp_random());
   Serial.begin(115200);
   delay(100);
-  Serial.println("========================================");
-  Serial.println("ESP32-S3 Hardware Template");
-  Serial.println("Waveshare ESP32-S3-Touch-LCD-3.49");
-  Serial.println("========================================");
+  log_i("[TuneBar] by Va&Cob | V%s - %s", current_version, compile_date);
 
-  // 初始化随机种子
-  randomSeed(esp_random());
+  // input pin
+  pinMode(BOOT, INPUT_PULLUP); // BOOT button
+  pinMode(SYS_OUT, INPUT_PULLUP); // Check Power Button Pressed
 
-  // 配置输入引脚
-  pinMode(BOOT, INPUT_PULLUP);  // BOOT 按钮
-  pinMode(SYS_OUT, INPUT_PULLUP); // 电源按钮检测
+  // setup ADC
+  analogReadResolution(12); // 9–13 bits supported
+  analogSetAttenuation(ADC_11db); // Full-scale ~3.3V
 
-  // 配置 ADC
-  analogReadResolution(12);       // 9–13 bits 支持
-  analogSetAttenuation(ADC_11db); // 满量程 ~3.3V
+  i2c_master_Init(); // init i2c
 
-  // 初始化 I2C
-  i2c_master_Init();
-  Serial.println("I2C initialized");
+   // audio library
+  Audio::audio_info_callback = my_audio_info;
+  audio.setAudioTaskCore(1); // audio default run on core 1 (lvgl run on core 0 in lvgl_port.c)
+  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DSOUT, I2S_MCLK, I2S_DSIN);
+  audio.forceMono(true);
+  audio.setConnectionTimeout(2000, 4000); // connection timeout ms, ms_ssl
+  // audio.setVolume(audio_volume);  // default 0...21
 
-  // 初始化 IO 扩展器 (TCA9554)
+  // exapnder init
   io = new TCA9554(tca9554_dev_handle);
   io->begin();
-  io->setPinMode(EXIO6_BIT, 0); // 设置输出模式
-  Serial.println("TCA9554 IO Expander initialized");
+  io->setPinMode(EXIO6_BIT, 0); // set output mode
 
-  // 电源按钮处理
+  // turn on power button
   if (digitalRead(SYS_OUT) == LOW) {
-    Serial.println("< POWER ON >");
-    io->digitalWrite(EXIO6_BIT, 1); // 保持开机
+    log_d("< POWER ON >");
+    io->digitalWrite(EXIO6_BIT, 1); // hold turn on
   }
 
-  // 初始化 RTC (PCF85063)
-  if (rtc.begin()) {
-    Serial.println("PCF85063 RTC initialized");
-    if (!rtc.isRunning()) {
-      rtc.setDateTime(__DATE__, __TIME__);
-      Serial.println("RTC time set to compile time");
-    }
+  // init lvgl
+  lvgl_port_init();
+  lcd_bl_pwm_bsp_init(LCD_PWM_MODE_255); // max out the brightness
+
+  // power amp control
+  io->setPinMode(EXIO7_BIT, 0); // 0 = OUTPUT
+  delay(100);
+  io->digitalWrite(EXIO7_BIT, 1); // enable amp
+  delay(100);
+  if (io->digitalRead(EXIO7_BIT) == 0)
+    log_e("Power Amp not turn on!");
+  else
+    log_i("Power Amp -> ON");
+
+  // es8311 audio codec
+  speaker.setVolume(80); // 80 is best max
+  if (!speaker.begin())
+    log_e("ES8311 begin failed");
+  else
+    log_i("ES8311 OK");
+
+
+ if (mic.init()) {
+    log_i("ES7210 OK");
   } else {
-    Serial.println("PCF85063 RTC initialization failed");
+    log_e("ES7210 FAILED to Initialize");
   }
 
-  // 初始化 LCD 背光
-  lcd_bl_pwm_bsp_init(LCD_PWM_MODE_255); // 最大亮度
-  Serial.println("LCD backlight initialized");
+  // Free RTOS Task
+  xTaskCreatePinnedToCore(audio_loop_task, "audio_loop", 5 * 1024, NULL, 4, NULL, 1);
+  xTaskCreatePinnedToCore(rtc_read_task, "getDateTimeTask", 3 * 1024, NULL, 3, NULL, 1);
+  xTaskCreatePinnedToCore(button_input_task, "buttonInputTask", 2 * 1024, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(batt_level_read_task, "readBatteryLevel", 2 * 1024, NULL, 1, NULL, 1);
+  //xTaskCreatePinnedToCore(imu_read_task, "imu_read_task", 2 * 1024, NULL , 1, NULL,1);
 
-  // 初始化触摸 (如硬件支持)
-  // touch_init();
-  // Serial.println("Touch controller initialized");
 
-  // 创建 FreeRTOS 任务示例
-  // xTaskCreatePinnedToCore(rtc_read_task, "RTC_Task", 3 * 1024, NULL, 3, NULL, 1);
-  // xTaskCreatePinnedToCore(button_input_task, "Button_Task", 2 * 1024, NULL, 2, NULL, 1);
-  // xTaskCreatePinnedToCore(batt_level_read_task, "Battery_Task", 2 * 1024, NULL, 1, NULL, 1);
-
-  Serial.println("Setup complete. Entering main loop...");
 }
-
 // ############################################################
-void loop() {
-  // 示例: 读取 BOOT 按钮
-  if (digitalRead(BOOT) == LOW) {
-    Serial.println("BOOT button pressed");
-    delay(500);  // 简单防抖
-  }
-
-  // 示例: 读取 ADC (电池电压)
-  // int adcValue = analogRead(ADC_BATT);
-  // float voltage = adcValue * 3.3f / 4095.0f;
-  // Serial.printf("ADC: %d, Voltage: %.2fV\n", adcValue, voltage);
-
-  // 示例: 读取 RTC 时间
-  // if (rtc.getDateTime()) {
-  //   Serial.printf("Time: %02d:%02d:%02d\n", rtc.hour, rtc.minute, rtc.second);
-  // }
-
-  delay(1000);  // 延时 (避免串口输出过快)
-}
+void loop() {}
+//---------------------------------------------------
