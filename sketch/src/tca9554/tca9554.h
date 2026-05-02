@@ -7,9 +7,7 @@
 #define OUTPUT_REGISTER  0x01
 #define CONFIG_REGISTER  0x03
 
-extern const uint8_t EXIO1_BIT; // backlight
-extern const uint8_t EXIO6_BIT; // Power
-extern const uint8_t EXIO7_BIT; // audio amp
+// IO 位定义已移至 user_config.h
 
 class TCA9554 {
 public:

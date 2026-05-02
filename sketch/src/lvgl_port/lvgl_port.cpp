@@ -123,6 +123,16 @@ static void WAVESHARE_349_lvgl_unlock(void) {
   xSemaphoreGive(lvgl_mux);
 }
 
+void lvgl_port_lock(void) {
+  assert(lvgl_mux && "lvgl_port_init must be called first");
+  xSemaphoreTake(lvgl_mux, portMAX_DELAY);
+}
+
+void lvgl_port_unlock(void) {
+  assert(lvgl_mux && "lvgl_port_init must be called first");
+  xSemaphoreGive(lvgl_mux);
+}
+
 // ##########################################################
 
 

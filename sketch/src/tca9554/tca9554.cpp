@@ -1,14 +1,7 @@
 #include "TCA9554.h"
 
-// --- TCA9554 IO Expander DEFINITIONS ---
-
-
-// Pin mapping: EXIO7 corresponds to the Most Significant Bit (MSB) P7
-const uint8_t EXIO1_BIT = 0b00000001; // backlight
-
-const uint8_t EXIO6_BIT = 0b01000000; // Power
-const uint8_t EXIO7_BIT = 0b10000000; // audio amp
-
+// --- TCA9554 IO Expander ---
+// IO 位定义已移至 user_config.h
 
 TCA9554::TCA9554(i2c_master_dev_handle_t handle) {
     dev = handle;

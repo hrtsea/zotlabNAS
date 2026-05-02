@@ -113,17 +113,10 @@ ESP32 RX ← ES7210 (ADC)
 #define LCD_BL  8    // LCD 背光
 
 // ============================================================
-// 10. LCD 背光 PWM 模式
+// 10. TCA9554 IO 扩展器引脚定义 (原 user_config.cpp 合并至此)
 // ============================================================
-#define LCD_PWM_MODE_0    0
-#define LCD_PWM_MODE_100  100
-#define LCD_PWM_MODE_150  150
-#define LCD_PWM_MODE_255  255
-
-// ============================================================
-// 11. TCA9554 IO 扩展器引脚定义
-// ============================================================
-const uint8_t EXIO6_BIT = 6;  // 电源控制
-const uint8_t EXIO7_BIT = 7;  // 功放控制
+#define EXIO1_BIT 0b00000001  // backlight
+#define EXIO6_BIT 0b01000000  // power hold
+#define EXIO7_BIT 0b10000000  // audio_amp
 
 #endif // USER_CONFIG_H

@@ -29,11 +29,14 @@
 
 #include <Arduino.h>
 #include <stdio.h>
+#include "lvgl.h"
 
 // Audio drivers
 #include "ESP32-audioI2S-master/Audio.h"
 #include "es7210/es7210.h"
 #include "es8311/es8311.h"
+#include "ui/screens/ui_Screen_Boot.h"
+#include "ui/screens/ui_Screen_Overview.h"
 
 // FreeRTOS
 #include "freertos/FreeRTOS.h"
@@ -45,6 +48,9 @@ Audio audio;
 ES8311 speaker;
 ES7210 mic;
 
+// RTC object
+PCF85063 rtc;
+
 // IO Expander
 extern i2c_master_dev_handle_t tca9554_dev_handle;
 TCA9554 *io = nullptr;
@@ -53,7 +59,7 @@ TCA9554 *io = nullptr;
 QueueHandle_t audio_cmd_queue = NULL;
 
 // External task declarations (defined in xtask.cpp)
-extern void my_audio_info(Audio::_msg msg);
+extern void my_audio_info(Audio::msg_t msg);
 extern void audio_loop_task(void *pvParameters);
 extern void rtc_read_task(void *pvParameters);
 extern void button_input_task(void *pvParameters);
@@ -91,6 +97,13 @@ void setup() {
 
   // Initialize LVGL (display + touch)
   lvgl_port_init();
+
+  // Show splash screen via LVGL timer (runs in LVGL main thread, no lock needed)
+  lv_timer_create([](lv_timer_t *timer) {
+    ui_Screen_Boot_screen_init();
+    lv_scr_load(ui_Screen_Boot);
+    lv_timer_del(timer);
+  }, 1, NULL);
 
   // Initialize LCD backlight
   lcd_bl_pwm_bsp_init(LCD_PWM_MODE_255);
@@ -131,8 +144,8 @@ void setup() {
   // Create FreeRTOS tasks
   xTaskCreatePinnedToCore(audio_loop_task, "audio_loop", 5 * 1024, NULL, 4, NULL, 1);
   xTaskCreatePinnedToCore(rtc_read_task, "rtc_read", 3 * 1024, NULL, 3, NULL, 1);
-  xTaskCreatePinnedToCore(button_input_task, "button_input", 2 * 1024, NULL, 2, NULL, 1);
-  xTaskCreatePinnedToCore(batt_level_read_task, "batt_read", 2 * 1024, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(button_input_task, "button_input", 4 * 1024, NULL, 2, NULL, 1);
+  xTaskCreatePinnedToCore(batt_level_read_task, "batt_read", 4 * 1024, NULL, 1, NULL, 1);
 
   Serial.println("Setup complete!");
 }

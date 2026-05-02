@@ -11,7 +11,7 @@
 #include <Arduino.h>
 
 extern TCA9554 *io;
-QueueHandle_t audio_cmd_queue = NULL;
+extern QueueHandle_t audio_cmd_queue;
 
 //==============================================
 // BUTTON INPUT TASK - Core 1
@@ -62,8 +62,16 @@ void rtc_read_task(void *param) {
 }
 
 //==============================================
-// AUDIO LOOP TASK - Core 1
+// AUDIO INFO CALLBACK
 #include "ESP32-audioI2S-master/Audio.h"
+void my_audio_info(Audio::msg_t msg) {
+  if (msg.msg) {
+    Serial.printf("Audio [%d]: %s\n", msg.e, msg.msg);
+  }
+}
+
+//==============================================
+// AUDIO LOOP TASK - Core 1
 extern Audio audio;
 void audio_loop_task(void *param) {
   for (;;) {
