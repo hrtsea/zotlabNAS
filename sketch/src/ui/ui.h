@@ -26,6 +26,7 @@ LV_FONT_DECLARE(ui_font_NotoSanThai16);
 // ═══════════════════════════════════════════════════════════
 extern lv_obj_t* ui_Screen_Boot;
 extern lv_obj_t* ui_Screen_Overview;
+extern lv_obj_t* ui_Screen_Storage;
 extern lv_obj_t* ui_Screen_Settings;
 
 // ═══════════════════════════════════════════════════════════
@@ -38,6 +39,7 @@ void ui_init(void);
 // ═══════════════════════════════════════════════════════════
 void ui_Screen_Boot_screen_init(void);
 void ui_Screen_Overview_screen_init(void);
+void ui_Screen_Storage_screen_init(void);
 void ui_Screen_Settings_screen_init(void);
 
 // ═══════════════════════════════════════════════════════════
