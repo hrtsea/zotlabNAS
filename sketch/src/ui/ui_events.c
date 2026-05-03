@@ -68,7 +68,7 @@ void ui_event_Screen_Overview_gesture(lv_event_t *e) {
         lv_indev_wait_release(lv_indev_get_act());
         log_i("Overview: swipe down from top, switching to Settings");
         if (ui_Screen_Settings != NULL) {
-            lv_scr_load_anim(ui_Screen_Settings, LV_SCR_LOAD_ANIM_MOVE_TOP, 300, 0, false);
+            lv_scr_load_anim(ui_Screen_Settings, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 300, 0, false);
         }
     }
 }

@@ -276,27 +276,41 @@ void ui_event_MainMenu_Button_closeConfig(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_flag_modify(ui_MainMenu_Button_closeConfig, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
-        _ui_flag_modify(ui_MainMenu_Tabview_ConfigPanel, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
         saveConfig(e);
+        // 切换到 Overview 页面
+        if (ui_Screen_Overview != NULL) {
+            lv_scr_load_anim(ui_Screen_Overview, LV_SCR_LOAD_ANIM_MOVE_TOP, 300, 0, false);
+        }
     }
 }
 
 void ui_event_MainMenu_Keyboard_Keyboard1(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t* keyboard = lv_event_get_target(e);
 
-    if(event_code == LV_EVENT_PRESSED) {
-        readKeyboard(e);
+    if(event_code == LV_EVENT_READY) {
+        // 按对号按钮：隐藏键盘
+        lv_obj_add_flag(keyboard, LV_OBJ_FLAG_HIDDEN);
+    }
+    else if(event_code == LV_EVENT_CANCEL) {
+        // 按取消按钮：隐藏键盘
+        lv_obj_add_flag(keyboard, LV_OBJ_FLAG_HIDDEN);
     }
 }
 
 void ui_event_MainMenu_Keyboard_Number(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t* keyboard = lv_event_get_target(e);
 
-    if(event_code == LV_EVENT_PRESSED) {
-        readNumpad(e);
+    if(event_code == LV_EVENT_READY) {
+        // 按对号按钮：隐藏键盘
+        lv_obj_add_flag(keyboard, LV_OBJ_FLAG_HIDDEN);
+    }
+    else if(event_code == LV_EVENT_CANCEL) {
+        // 按取消按钮：隐藏键盘
+        lv_obj_add_flag(keyboard, LV_OBJ_FLAG_HIDDEN);
     }
 }
 
@@ -747,7 +761,7 @@ void ui_Screen_Settings_screen_init(void)
     lv_obj_set_width(ui_MainMenu_Button_closeConfig, 50);
     lv_obj_set_height(ui_MainMenu_Button_closeConfig, 50);
     lv_obj_set_align(ui_MainMenu_Button_closeConfig, LV_ALIGN_TOP_RIGHT);
-    lv_obj_add_flag(ui_MainMenu_Button_closeConfig, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_add_flag(ui_MainMenu_Button_closeConfig, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_MainMenu_Button_closeConfig, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(ui_MainMenu_Button_closeConfig, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_MainMenu_Button_closeConfig, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -833,8 +847,10 @@ void ui_Screen_Settings_screen_init(void)
     lv_obj_add_event_cb(ui_MainMenu_Keyboard_Number, ui_event_MainMenu_Keyboard_Number, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MainMenu_Panel_blindPanel, ui_event_MainMenu_Panel_blindPanel, LV_EVENT_ALL, NULL);
 
-    // 注册手势事件回调 - 下滑返回 Overview
-    lv_obj_add_event_cb(ui_Screen_Settings, ui_event_Screen_Settings_gesture, LV_EVENT_GESTURE, NULL);
+    // 注册手势事件回调到 tabview - 下边缘上滑返回 Overview
+    // 重新启用 GESTURE_BUBBLE，确保手势事件能传递到 tabview
+    lv_obj_add_flag(ui_MainMenu_Tabview_ConfigPanel, LV_OBJ_FLAG_GESTURE_BUBBLE);
+    lv_obj_add_event_cb(ui_MainMenu_Tabview_ConfigPanel, ui_event_Screen_Settings_gesture, LV_EVENT_GESTURE, NULL);
 
 }
 
