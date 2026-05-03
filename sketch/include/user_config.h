@@ -22,6 +22,42 @@
 #define ESP_SDA_NUM  (GPIO_NUM_47)
 
 // ============================================================
+// 1.1 NAS Monitor 配置 (从 board_config.h 合并)
+// ============================================================
+// Display dimensions (AXS15231B QSPI 172x640)
+#ifndef TFT_HEIGHT
+#define TFT_HEIGHT          172     // Portrait mode height
+#endif
+
+#ifndef TFT_WIDTH
+#define TFT_WIDTH           640     // Portrait mode width
+#endif
+
+// Board info
+#define BOARD_NAME          "ESP32-S3-Touch-LCD-3.49"
+#define BOARD_HAS_PSRAM    1
+
+// I2C pins (NAS monitor compatible names)
+#define I2C_SDA_PIN        GPIO_NUM_41
+#define I2C_SCL_PIN        GPIO_NUM_42
+
+// SPI pins (if needed)
+#define SPI_MOSI_PIN       GPIO_NUM_47
+#define SPI_MISO_PIN       GPIO_NUM_48
+#define SPI_SCK_PIN        GPIO_NUM_21
+
+// Backlight pin
+#define BL_PIN             GPIO_NUM_45
+
+// Default configurations
+#define DEFAULT_SATA_DISK_COUNT  6
+#define DEFAULT_M2_DISK_COUNT    3
+
+// UART2 pins (for serial client)
+#define UART2_RX_PIN        GPIO_NUM_16
+#define UART2_TX_PIN        GPIO_NUM_17
+
+// ============================================================
 // 2. LCD 引脚定义 (Waveshare 3.49)
 // ============================================================
 #define WAVESHARE_349_PIN_NUM_LCD_CS     (GPIO_NUM_9)
