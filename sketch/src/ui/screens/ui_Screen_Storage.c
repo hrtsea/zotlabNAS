@@ -37,14 +37,14 @@ static void create_storage_status_bar(lv_obj_t *parent)
     LV_OBJ_CHECK(label_title, "label_title");
     lv_label_set_text(label_title, "BOOL NAS");
     lv_obj_set_style_text_color(label_title, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_title, &lv_font_montserrat_18, 0);
-    lv_obj_align(label_title, LV_ALIGN_LEFT_MID, 15, 0);
+    lv_obj_set_style_text_font(label_title, &lv_font_montserrat_14, 0);
+    lv_obj_align(label_title, LV_ALIGN_LEFT_MID, 5, 0);
 
     lv_obj_t *label_time = lv_label_create(status_bar);
     LV_OBJ_CHECK(label_time, "label_time");
     lv_label_set_text(label_time, "22:10");
     lv_obj_set_style_text_color(label_time, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_time, &lv_font_montserrat_18, 0);
+    lv_obj_set_style_text_font(label_time, &lv_font_montserrat_14, 0);
     lv_obj_align(label_time, LV_ALIGN_LEFT_MID, 110, 0);
 
     // 中间上下行速度
@@ -52,14 +52,14 @@ static void create_storage_status_bar(lv_obj_t *parent)
     LV_OBJ_CHECK(label_up, "label_up");
     lv_label_set_text(label_up, "▲ 0.91MB/s");
     lv_obj_set_style_text_color(label_up, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_up, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(label_up, &lv_font_montserrat_14, 0);
     lv_obj_align(label_up, LV_ALIGN_CENTER, -70, 0);
 
     lv_obj_t *label_down = lv_label_create(status_bar);
     LV_OBJ_CHECK(label_down, "label_down");
     lv_label_set_text(label_down, "▼ 5.20MB/s");
     lv_obj_set_style_text_color(label_down, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_down, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(label_down, &lv_font_montserrat_14, 0);
     lv_obj_align(label_down, LV_ALIGN_CENTER, 70, 0);
 
     // 右侧IP
@@ -67,8 +67,18 @@ static void create_storage_status_bar(lv_obj_t *parent)
     LV_OBJ_CHECK(label_ip, "label_ip");
     lv_label_set_text(label_ip, "IP: 192.168.1.888");
     lv_obj_set_style_text_color(label_ip, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_ip, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(label_ip, &lv_font_montserrat_14, 0);
     lv_obj_align(label_ip, LV_ALIGN_RIGHT_MID, -15, 0);
+
+    // 分割线（状态栏下方）
+    lv_obj_t *divider = lv_obj_create(parent);
+    LV_OBJ_CHECK(divider, "divider");
+    lv_obj_set_size(divider, 640, 2);
+    lv_obj_set_style_bg_color(divider, COLOR_INACTIVE, 0);
+    lv_obj_set_style_border_width(divider, 0, 0);
+    lv_obj_set_style_radius(divider, 0, 0);
+    lv_obj_clear_flag(divider, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_align(divider, LV_ALIGN_TOP_MID, 0, 35);
 }
 
 /* -------------------------- 硬盘存储条区域 -------------------------- */

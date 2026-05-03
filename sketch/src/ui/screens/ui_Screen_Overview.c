@@ -25,147 +25,203 @@ static void create_status_bar(lv_obj_t *parent)
     lv_obj_t *label_title = lv_label_create(status_bar);
     lv_label_set_text(label_title, "BOOL NAS");
     lv_obj_set_style_text_color(label_title, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_title, &lv_font_montserrat_18, 0);
-    lv_obj_align(label_title, LV_ALIGN_LEFT_MID, 15, 0);
+    lv_obj_set_style_text_font(label_title, &lv_font_montserrat_14, 0);
+    lv_obj_align(label_title, LV_ALIGN_LEFT_MID, 5, 0);
 
     lv_obj_t *label_time = lv_label_create(status_bar);
     lv_label_set_text(label_time, "22:10");
     lv_obj_set_style_text_color(label_time, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_time, &lv_font_montserrat_18, 0);
+    lv_obj_set_style_text_font(label_time, &lv_font_montserrat_14, 0);
     lv_obj_align(label_time, LV_ALIGN_LEFT_MID, 110, 0);
 
     // 中间上下行速度
     lv_obj_t *label_up = lv_label_create(status_bar);
     lv_label_set_text(label_up, "▲ 0.91MB/s");
     lv_obj_set_style_text_color(label_up, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_up, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(label_up, &lv_font_montserrat_14, 0);
     lv_obj_align(label_up, LV_ALIGN_CENTER, -70, 0);
 
     lv_obj_t *label_down = lv_label_create(status_bar);
     lv_label_set_text(label_down, "▼ 5.20MB/s");
     lv_obj_set_style_text_color(label_down, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_down, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(label_down, &lv_font_montserrat_14, 0);
     lv_obj_align(label_down, LV_ALIGN_CENTER, 70, 0);
 
     // 右侧IP
     lv_obj_t *label_ip = lv_label_create(status_bar);
     lv_label_set_text(label_ip, "IP: 192.168.1.888");
     lv_obj_set_style_text_color(label_ip, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_ip, &lv_font_montserrat_16, 0);
+    lv_obj_set_style_text_font(label_ip, &lv_font_montserrat_14, 0);
     lv_obj_align(label_ip, LV_ALIGN_RIGHT_MID, -15, 0);
+
+    // 分割线（状态栏下方）
+    lv_obj_t *divider = lv_obj_create(parent);
+    lv_obj_set_size(divider, 640, 2);
+    lv_obj_set_style_bg_color(divider, COLOR_INACTIVE, 0);
+    lv_obj_set_style_border_width(divider, 0, 0);
+    lv_obj_set_style_radius(divider, 0, 0);
+    lv_obj_clear_flag(divider, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_align(divider, LV_ALIGN_TOP_MID, 0, 35);
 }
 
 /* -------------------------- 左侧CPU模块 -------------------------- */
 static void create_cpu_module(lv_obj_t *parent)
 {
     lv_obj_t *cpu_container = lv_obj_create(parent);
-    lv_obj_set_size(cpu_container, 220, 85);
+    lv_obj_set_size(cpu_container, 240, 100);
     lv_obj_set_style_bg_color(cpu_container, COLOR_BG, 0);
     lv_obj_set_style_border_width(cpu_container, 0, 0);
     lv_obj_set_style_radius(cpu_container, 0, 0);
     lv_obj_clear_flag(cpu_container, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_align(cpu_container, LV_ALIGN_TOP_LEFT, 10, 40);
+    lv_obj_align(cpu_container, LV_ALIGN_LEFT_MID, 0, 8);
+    lv_obj_set_flex_flow(cpu_container, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cpu_container, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    // 环形进度条（CPU使用率）
-    lv_obj_t *arc_cpu = lv_arc_create(cpu_container);
-    lv_obj_set_size(arc_cpu, 70, 70);
-    lv_arc_set_rotation(arc_cpu, 180);
-    lv_arc_set_bg_angles(arc_cpu, 0, 360);
-    lv_arc_set_value(arc_cpu, 70);
-    lv_obj_set_style_arc_color(arc_cpu, COLOR_INACTIVE, LV_PART_MAIN);
-    lv_obj_set_style_arc_color(arc_cpu, COLOR_PRIMARY, LV_PART_INDICATOR);
-    lv_obj_set_style_arc_width(arc_cpu, 8, LV_PART_MAIN);
-    lv_obj_set_style_arc_width(arc_cpu, 8, LV_PART_INDICATOR);
-    lv_obj_align(arc_cpu, LV_ALIGN_LEFT_MID, 0, 0);
+    // ------ 仪表盘（CPU使用率）------
+    lv_obj_t *meter_cpu = lv_meter_create(cpu_container);
+    lv_obj_set_size(meter_cpu, 90, 90);
 
-    // 环形中间文本
-    lv_obj_t *label_cpu_percent = lv_label_create(arc_cpu);
+    lv_meter_scale_t *scale_cpu = lv_meter_add_scale(meter_cpu);
+    lv_meter_set_scale_range(meter_cpu, scale_cpu, 0, 100, 240, 150);
+
+    lv_meter_indicator_t *cpu_arc_bg = lv_meter_add_arc(meter_cpu, scale_cpu, 6, COLOR_INACTIVE, 0);
+    lv_meter_set_indicator_start_value(meter_cpu, cpu_arc_bg, 0);
+    lv_meter_set_indicator_end_value(meter_cpu, cpu_arc_bg, 100);
+
+    lv_meter_indicator_t *cpu_arc_val = lv_meter_add_arc(meter_cpu, scale_cpu, 6, COLOR_PRIMARY, 0);
+    lv_meter_set_indicator_start_value(meter_cpu, cpu_arc_val, 0);
+    lv_meter_set_indicator_end_value(meter_cpu, cpu_arc_val, 70);
+
+    lv_meter_indicator_t *cpu_needle = lv_meter_add_needle_line(meter_cpu, scale_cpu, 2, COLOR_PRIMARY, 0);
+    lv_meter_set_indicator_value(meter_cpu, cpu_needle, 70);
+
+    lv_obj_set_style_bg_color(meter_cpu, COLOR_BG, 0);
+    lv_obj_set_style_border_width(meter_cpu, 0, 0);
+    lv_obj_set_style_pad_all(meter_cpu, 0, 0);
+
+    lv_obj_t *label_cpu_percent = lv_label_create(meter_cpu);
     lv_label_set_text(label_cpu_percent, "70%");
     lv_obj_set_style_text_color(label_cpu_percent, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_cpu_percent, &lv_font_montserrat_16, 0);
-    lv_obj_center(label_cpu_percent);
+    lv_obj_set_style_text_font(label_cpu_percent, &lv_font_montserrat_14, 0);
+    lv_obj_align(label_cpu_percent, LV_ALIGN_CENTER, 0, 20);
 
-    // CPU 信息文本
-    lv_obj_t *label_stale = lv_label_create(cpu_container);
-    lv_label_set_text(label_stale, "CPU STALE");
-    lv_obj_set_style_text_color(label_stale, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_stale, &lv_font_montserrat_14, 0);
-    lv_obj_align(label_stale, LV_ALIGN_TOP_RIGHT, 0, 5);
+    // ------ 仪表盘（CPU温度）------
+    lv_obj_t *meter_temp = lv_meter_create(cpu_container);
+    lv_obj_set_size(meter_temp, 90, 90);
 
-    lv_obj_t *label_temp = lv_label_create(cpu_container);
-    lv_label_set_text(label_temp, "58°C");
-    lv_obj_set_style_text_color(label_temp, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_temp, &lv_font_montserrat_18, 0);
-    lv_obj_align(label_temp, LV_ALIGN_TOP_RIGHT, 0, 30);
+    lv_meter_scale_t *scale_temp = lv_meter_add_scale(meter_temp);
+    lv_meter_set_scale_range(meter_temp, scale_temp, 0, 100, 240, 150);
 
-    lv_obj_t *label_temp_desc = lv_label_create(cpu_container);
-    lv_label_set_text(label_temp_desc, "处理器温度");
-    lv_obj_set_style_text_color(label_temp_desc, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_temp_desc, &lv_font_montserrat_12, 0);
-    lv_obj_align(label_temp_desc, LV_ALIGN_TOP_RIGHT, 0, 55);
+    lv_meter_indicator_t *temp_arc_bg = lv_meter_add_arc(meter_temp, scale_temp, 6, COLOR_INACTIVE, 0);
+    lv_meter_set_indicator_start_value(meter_temp, temp_arc_bg, 0);
+    lv_meter_set_indicator_end_value(meter_temp, temp_arc_bg, 100);
+
+    lv_color_t COLOR_TEMP = lv_color_hex(0xFF8C00); // 橙色表示温度
+    lv_meter_indicator_t *temp_arc_val = lv_meter_add_arc(meter_temp, scale_temp, 6, COLOR_TEMP, 0);
+    lv_meter_set_indicator_start_value(meter_temp, temp_arc_val, 0);
+    lv_meter_set_indicator_end_value(meter_temp, temp_arc_val, 58);
+
+    lv_meter_indicator_t *temp_needle = lv_meter_add_needle_line(meter_temp, scale_temp, 2, COLOR_TEMP, 0);
+    lv_meter_set_indicator_value(meter_temp, temp_needle, 58);
+
+    lv_obj_set_style_bg_color(meter_temp, COLOR_BG, 0);
+    lv_obj_set_style_border_width(meter_temp, 0, 0);
+    lv_obj_set_style_pad_all(meter_temp, 0, 0);
+
+    lv_obj_t *label_temp_val = lv_label_create(meter_temp);
+    lv_label_set_text(label_temp_val, "58°C");
+    lv_obj_set_style_text_color(label_temp_val, COLOR_TEXT, 0);
+    lv_obj_set_style_text_font(label_temp_val, &lv_font_montserrat_14, 0);
+    lv_obj_align(label_temp_val, LV_ALIGN_CENTER, 0, 20);
+
+    
 }
 
 /* -------------------------- 右侧内存/磁盘模块 -------------------------- */
 static void create_mem_disk_module(lv_obj_t *parent)
 {
     lv_obj_t *md_container = lv_obj_create(parent);
-    lv_obj_set_size(md_container, 390, 85);
+    lv_obj_set_size(md_container, 380, 100);
     lv_obj_set_style_bg_color(md_container, COLOR_BG, 0);
     lv_obj_set_style_border_width(md_container, 0, 0);
     lv_obj_set_style_radius(md_container, 0, 0);
+    lv_obj_set_style_pad_all(md_container, 0, 0);
     lv_obj_clear_flag(md_container, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_align(md_container, LV_ALIGN_TOP_RIGHT, -10, 40);
+    lv_obj_align(md_container, LV_ALIGN_TOP_RIGHT, 0, 37);
 
-    // 内存模块
-    lv_obj_t *label_mem_title = lv_label_create(md_container);
-    lv_label_set_text(label_mem_title, "MEMORY\n5.2 / 8GB");
+    // 父容器启用垂直 flex 自动布局
+    lv_obj_set_flex_flow(md_container, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(md_container, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    // 内存模块容器（上半部分）
+    lv_obj_t *mem_container = lv_obj_create(md_container);
+    lv_obj_set_size(mem_container, LV_PCT(100), LV_PCT(30));
+    lv_obj_set_style_bg_color(mem_container, COLOR_BG, 0);
+    lv_obj_set_style_border_width(mem_container, 0, 0);
+    lv_obj_set_style_radius(mem_container, 0, 0);
+    lv_obj_clear_flag(mem_container, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_flex_flow(mem_container, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(mem_container, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t *label_mem_title = lv_label_create(mem_container);
+    lv_label_set_text(label_mem_title, "MEMORY\n8GB");
     lv_obj_set_style_text_color(label_mem_title, COLOR_TEXT, 0);
     lv_obj_set_style_text_font(label_mem_title, &lv_font_montserrat_14, 0);
-    lv_obj_align(label_mem_title, LV_ALIGN_TOP_LEFT, 0, 5);
+    lv_obj_set_width(label_mem_title, LV_PCT(20));
 
-    lv_obj_t *bar_mem = lv_bar_create(md_container);
-    lv_obj_set_size(bar_mem, 240, 18);
+    lv_obj_t *bar_mem = lv_bar_create(mem_container);
+    lv_obj_set_size(bar_mem, LV_PCT(60), 18);
     lv_bar_set_value(bar_mem, 72, LV_ANIM_OFF);
     lv_obj_set_style_bg_color(bar_mem, COLOR_INACTIVE, LV_PART_MAIN);
     lv_obj_set_style_bg_color(bar_mem, COLOR_PRIMARY, LV_PART_INDICATOR);
     lv_obj_set_style_radius(bar_mem, 5, LV_PART_MAIN);
     lv_obj_set_style_radius(bar_mem, 5, LV_PART_INDICATOR);
-    lv_obj_align(bar_mem, LV_ALIGN_TOP_RIGHT, 0, 10);
 
-    lv_obj_t *label_mem_percent = lv_label_create(md_container);
+    lv_obj_t *label_mem_percent = lv_label_create(mem_container);
     lv_label_set_text(label_mem_percent, "72%");
     lv_obj_set_style_text_color(label_mem_percent, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_mem_percent, &lv_font_montserrat_16, 0);
-    lv_obj_align(label_mem_percent, LV_ALIGN_TOP_RIGHT, -5, 8);
+    lv_obj_set_style_text_font(label_mem_percent, &lv_font_montserrat_14, 0);
+    lv_obj_set_width(label_mem_percent, LV_PCT(10));
+    lv_obj_set_style_text_align(label_mem_percent, LV_TEXT_ALIGN_RIGHT, 0);
 
-    // 磁盘模块
-    lv_obj_t *label_disk_title = lv_label_create(md_container);
-    lv_label_set_text(label_disk_title, "DISK\n1024M / 2048GB");
+    // 磁盘模块容器（下半部分）
+    lv_obj_t *disk_container = lv_obj_create(md_container);
+    lv_obj_set_size(disk_container, LV_PCT(100), LV_PCT(30));
+    lv_obj_set_style_bg_color(disk_container, COLOR_BG, 0);
+    lv_obj_set_style_border_width(disk_container, 0, 0);
+    lv_obj_set_style_radius(disk_container, 0, 0);
+    lv_obj_clear_flag(disk_container, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_flex_flow(disk_container, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(disk_container, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t *label_disk_title = lv_label_create(disk_container);
+    lv_label_set_text(label_disk_title, "DISK\n2048GB");
     lv_obj_set_style_text_color(label_disk_title, COLOR_TEXT, 0);
     lv_obj_set_style_text_font(label_disk_title, &lv_font_montserrat_14, 0);
-    lv_obj_align(label_disk_title, LV_ALIGN_TOP_LEFT, 0, 45);
+    lv_obj_set_width(label_disk_title, LV_PCT(20));
 
-    lv_obj_t *bar_disk = lv_bar_create(md_container);
-    lv_obj_set_size(bar_disk, 240, 18);
+    lv_obj_t *bar_disk = lv_bar_create(disk_container);
+    lv_obj_set_size(bar_disk, LV_PCT(60), 18);
     lv_bar_set_value(bar_disk, 50, LV_ANIM_OFF);
     lv_obj_set_style_bg_color(bar_disk, COLOR_INACTIVE, LV_PART_MAIN);
     lv_obj_set_style_bg_color(bar_disk, COLOR_PRIMARY, LV_PART_INDICATOR);
     lv_obj_set_style_radius(bar_disk, 5, LV_PART_MAIN);
     lv_obj_set_style_radius(bar_disk, 5, LV_PART_INDICATOR);
-    lv_obj_align(bar_disk, LV_ALIGN_TOP_RIGHT, 0, 50);
 
-    lv_obj_t *label_disk_percent = lv_label_create(md_container);
+    lv_obj_t *label_disk_percent = lv_label_create(disk_container);
     lv_label_set_text(label_disk_percent, "50%");
     lv_obj_set_style_text_color(label_disk_percent, COLOR_TEXT, 0);
-    lv_obj_set_style_text_font(label_disk_percent, &lv_font_montserrat_16, 0);
-    lv_obj_align(label_disk_percent, LV_ALIGN_TOP_RIGHT, -5, 48);
+    lv_obj_set_style_text_font(label_disk_percent, &lv_font_montserrat_14, 0);
+    lv_obj_set_width(label_disk_percent, LV_PCT(10));
+    lv_obj_set_style_text_align(label_disk_percent, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_obj_align(label_disk_percent, LV_ALIGN_RIGHT_MID, 0, 0);
 }
 
 /* -------------------------- 底部硬盘指示灯 -------------------------- */
 static void create_hdd_indicators(lv_obj_t *parent)
 {
     lv_obj_t *hdd_container = lv_obj_create(parent);
-    lv_obj_set_size(hdd_container, 640, 40);
+    lv_obj_set_size(hdd_container, 640, 35);
     lv_obj_set_style_bg_color(hdd_container, COLOR_BG, 0);
     lv_obj_set_style_border_width(hdd_container, 0, 0);
     lv_obj_set_style_radius(hdd_container, 0, 0);
@@ -182,19 +238,23 @@ static void create_hdd_indicators(lv_obj_t *parent)
         lv_obj_set_style_bg_color(btn_hdd, COLOR_INACTIVE, 0);
         lv_obj_set_style_border_width(btn_hdd, 0, 0);
         lv_obj_set_style_radius(btn_hdd, 3, 0);
+        lv_obj_set_style_pad_all(btn_hdd, 0, 0);
         lv_obj_align(btn_hdd, LV_ALIGN_LEFT_MID, 8 + i * 103, 0);
+        
+        // 添加点击事件：进入 Storage 页面
+        lv_obj_add_event_cb(btn_hdd, ui_event_Screen_Overview_hdd_clicked, LV_EVENT_ALL, NULL);
 
         lv_obj_t *label_hdd = lv_label_create(btn_hdd);
         lv_label_set_text(label_hdd, hdd_labels[i]);
         lv_obj_set_style_text_color(label_hdd, COLOR_TEXT, 0);
-        lv_obj_set_style_text_font(label_hdd, &lv_font_montserrat_16, 0);
-        lv_obj_align(label_hdd, LV_ALIGN_LEFT_MID, 10, 0);
+        lv_obj_set_style_text_font(label_hdd, &lv_font_montserrat_14, 0);
+        lv_obj_center(label_hdd);
 
         lv_obj_t *led = lv_obj_create(btn_hdd);
         lv_obj_set_size(led, 14, 14);
         lv_obj_set_style_bg_color(led, hdd_active[i] ? COLOR_LED_GREEN : COLOR_LED_GRAY, 0);
         lv_obj_set_style_radius(led, LV_RADIUS_CIRCLE, 0);
-        lv_obj_align(led, LV_ALIGN_RIGHT_MID, -10, 0);
+        lv_obj_align(led, LV_ALIGN_RIGHT_MID, -5, 0);
     }
 }
 

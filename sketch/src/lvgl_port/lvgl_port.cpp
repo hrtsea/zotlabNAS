@@ -241,7 +241,7 @@ void lvgl_port_init(void) {
   disp_drv.ver_res = WAVESHARE_349_LCD_V_RES;
   disp_drv.flush_cb = WAVESHARE_349_lvgl_flush_cb;
   disp_drv.draw_buf = &disp_buf;
-  disp_drv.full_refresh = 1; // full_refresh must be 1
+  disp_drv.full_refresh = 0; // enable partial refresh for better performance
   disp_drv.user_data = panel;
   lv_disp_drv_register(&disp_drv);
 
