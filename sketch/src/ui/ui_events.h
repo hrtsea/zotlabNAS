@@ -51,7 +51,7 @@ void ui_event_Screen_Settings_gesture(lv_event_t * e);
 void ui_event_Screen_Storage_gesture(lv_event_t * e);
 
 #ifdef __cplusplus
-} /*extern "C"*/
+}
 #endif
 
 #endif
