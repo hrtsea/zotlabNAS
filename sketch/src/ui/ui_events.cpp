@@ -521,6 +521,12 @@ void appStart(lv_event_t* e) {
     // 创建屏幕关闭定时器（每秒检查一次）
     lv_timer_create(screen_off_timer_cb, 2000, NULL);
     
+    // 如果有保存的 WiFi 配置，自动连接
+    if (strlen(g_config.ssid) > 0) {
+        log_i("WiFi auto-connecting to %s", g_config.ssid);
+        g_wifi.connectNonBlocking(g_config.ssid, g_config.wifipass);
+    }
+    
     // 如果 WiFi 已连接，同步时间
     if (g_wifi.isConnected()) {
         g_wifi.syncTime(g_config.timezone);

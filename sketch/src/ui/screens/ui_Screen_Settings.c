@@ -469,6 +469,7 @@ void ui_Screen_Settings_screen_init(void)
     lv_obj_set_style_text_font(ui_MainMenu_Label_Label13, &lv_font_montserrat_32, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_MainMenu_Switch_Wifi = lv_switch_create(ui_MainMenu_Tabpage_network);
+    lv_obj_add_state(ui_MainMenu_Switch_Wifi, LV_STATE_CHECKED);
     lv_obj_set_width(ui_MainMenu_Switch_Wifi, 60);
     lv_obj_set_height(ui_MainMenu_Switch_Wifi, 29);
     lv_obj_set_x(ui_MainMenu_Switch_Wifi, 0);
