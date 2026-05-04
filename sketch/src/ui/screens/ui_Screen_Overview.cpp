@@ -2,6 +2,9 @@
 #include "../ui.h"
 #include "../ui_events.h"
 #include <Arduino.h>
+#include "../../data/config.h"  // 包含配置管理
+#include "../../data/nas_data.h"  // 包含数据模型
+#include "../../net/data_source.h"  // 包含数据源包装函数
 
 // 自定义颜色定义（和原图保持一致）
 #define COLOR_BG        lv_color_hex(0x000000)      // 背景黑色
@@ -10,6 +13,11 @@
 #define COLOR_INACTIVE  lv_color_hex(0x333333)      // 未激活/背景条灰色
 #define COLOR_LED_GREEN lv_color_hex(0x00FF00)      // 绿色指示灯
 #define COLOR_LED_GRAY  lv_color_hex(0x666666)      // 灰色指示灯
+
+// 全局指针，用于定时器回调访问时间标签和网络速度标签
+static lv_obj_t *s_label_time = NULL;
+static lv_obj_t *s_label_up = NULL;
+static lv_obj_t *s_label_down = NULL;
 
 /* -------------------------- 顶部状态栏 -------------------------- */
 static void create_status_bar(lv_obj_t *parent)
@@ -23,29 +31,48 @@ static void create_status_bar(lv_obj_t *parent)
 
     // 左侧标题+时间
     lv_obj_t *label_title = lv_label_create(status_bar);
-    lv_label_set_text(label_title, "BOOL NAS");
+    // 使用配置中存储的 NAS 用户名，若为空则使用 NAS 类型或默认值
+    static char title_str[32];
+    if (strlen(g_config.nas_user) > 0) {
+        snprintf(title_str, sizeof(title_str), "%s", g_config.nas_user);
+    } else if (strlen(g_config.nas_type) > 0 && strcmp(g_config.nas_type, "mock") != 0) {
+        snprintf(title_str, sizeof(title_str), "%s", g_config.nas_type);
+    } else {
+        snprintf(title_str, sizeof(title_str), "NAS Monitor");
+    }
+    lv_label_set_text(label_title, title_str);
     lv_obj_set_style_text_color(label_title, COLOR_TEXT, 0);
     lv_obj_set_style_text_font(label_title, &lv_font_montserrat_14, 0);
     lv_obj_align(label_title, LV_ALIGN_LEFT_MID, 5, 0);
 
     lv_obj_t *label_time = lv_label_create(status_bar);
-    lv_label_set_text(label_time, "22:10");
+    s_label_time = label_time;  // 保存到全局指针
+    static char time_str[9];  // HH:MM:SS + null terminator
+    snprintf(time_str, sizeof(time_str), "%02d:%02d:%02d", now.hour, now.minute, now.second);
+    lv_label_set_text(label_time, time_str);
     lv_obj_set_style_text_color(label_time, COLOR_TEXT, 0);
     lv_obj_set_style_text_font(label_time, &lv_font_montserrat_14, 0);
     lv_obj_align(label_time, LV_ALIGN_LEFT_MID, 110, 0);
 
     // 中间上下行速度
     lv_obj_t *label_up = lv_label_create(status_bar);
-    lv_label_set_text(label_up, "▲ 0.91MB/s");
+    static char up_str[16];
+    // 初始化显示默认值
+    snprintf(up_str, sizeof(up_str), "▲ 0.00KB/s");
+    lv_label_set_text(label_up, up_str);
     lv_obj_set_style_text_color(label_up, COLOR_TEXT, 0);
     lv_obj_set_style_text_font(label_up, &lv_font_montserrat_14, 0);
     lv_obj_align(label_up, LV_ALIGN_CENTER, -70, 0);
+    s_label_up = label_up;  // 保存到全局指针
 
     lv_obj_t *label_down = lv_label_create(status_bar);
-    lv_label_set_text(label_down, "▼ 5.20MB/s");
+    static char down_str[16];
+    snprintf(down_str, sizeof(down_str), "▼ 0.00KB/s");
+    lv_label_set_text(label_down, down_str);
     lv_obj_set_style_text_color(label_down, COLOR_TEXT, 0);
     lv_obj_set_style_text_font(label_down, &lv_font_montserrat_14, 0);
     lv_obj_align(label_down, LV_ALIGN_CENTER, 70, 0);
+    s_label_down = label_down;  // 保存到全局指针
 
     // 右侧IP
     lv_obj_t *label_ip = lv_label_create(status_bar);
@@ -62,6 +89,45 @@ static void create_status_bar(lv_obj_t *parent)
     lv_obj_set_style_radius(divider, 0, 0);
     lv_obj_clear_flag(divider, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_align(divider, LV_ALIGN_TOP_MID, 0, 35);
+    
+    // 创建网络速度更新定时器（每秒更新一次）
+    lv_timer_create([](lv_timer_t *timer) {
+        (void)timer;  // 未使用的参数
+        
+        // 更新上传速度（TX）
+        if (s_label_up != NULL) {
+            float tx_speed = data_source_get_tx_speed_mbps();
+            static char tx_str[16];
+            
+            if (tx_speed < 0.01f) {
+                snprintf(tx_str, sizeof(tx_str), "▲ 0.00KB/s");
+            } else if (tx_speed < 1.0f) {
+                // 小于 1 MB/s，显示为 KB/s
+                snprintf(tx_str, sizeof(tx_str), "▲ %.2fKB/s", tx_speed * 1024.0f);
+            } else {
+                // 大于等于 1 MB/s，显示为 MB/s
+                snprintf(tx_str, sizeof(tx_str), "▲ %.2fMB/s", tx_speed);
+            }
+            lv_label_set_text(s_label_up, tx_str);
+        }
+        
+        // 更新下载速度（RX）
+        if (s_label_down != NULL) {
+            float rx_speed = data_source_get_rx_speed_mbps();
+            static char rx_str[16];
+            
+            if (rx_speed < 0.01f) {
+                snprintf(rx_str, sizeof(rx_str), "▼ 0.00KB/s");
+            } else if (rx_speed < 1.0f) {
+                // 小于 1 MB/s，显示为 KB/s
+                snprintf(rx_str, sizeof(rx_str), "▼ %.2fKB/s", rx_speed * 1024.0f);
+            } else {
+                // 大于等于 1 MB/s，显示为 MB/s
+                snprintf(rx_str, sizeof(rx_str), "▼ %.2fMB/s", rx_speed);
+            }
+            lv_label_set_text(s_label_down, rx_str);
+        }
+    }, 1000, NULL);
 }
 
 /* -------------------------- 左侧CPU模块 -------------------------- */
@@ -278,6 +344,13 @@ void ui_Screen_Overview_screen_init(void)
     
     // 添加滑动手势事件
     lv_obj_add_event_cb(ui_Screen_Overview, ui_event_Screen_Overview_gesture, LV_EVENT_GESTURE, NULL);
+    
+    // 添加时间更新定时器（每秒更新一次）
+    lv_timer_create([](lv_timer_t *timer) {
+        static char time_str[9];
+        snprintf(time_str, sizeof(time_str), "%02d:%02d:%02d", now.hour, now.minute, now.second);
+        lv_label_set_text((lv_obj_t *)timer->user_data, time_str);
+    }, 1000, s_label_time);
 }
 
 void ui_Screen_Overview_screen_destroy(void)

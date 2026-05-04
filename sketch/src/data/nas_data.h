@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "nas_config.h"
+#include "../pcf85063/pcf85063.h"
 
 enum NasType {
     NAS_SYNOLOGY,
@@ -27,6 +28,10 @@ enum HealthStatus {
     HEALTH_CRITICAL,
     HEALTH_UNKNOWN
 };
+
+extern RTC_DateTime now;
+extern const char *monthNames[];
+extern const char *weekdayNames[];
 
 enum FanMode {
     FAN_MODE_AUTO = 0,

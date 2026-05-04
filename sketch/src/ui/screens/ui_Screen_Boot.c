@@ -50,7 +50,9 @@ void ui_Screen_Boot_screen_init(void)
 
     // Create logo label
     ui_LogoLabel = lv_label_create(ui_Screen_Boot);
-    lv_label_set_text(ui_LogoLabel, NAS_LOGO);
+    static char logo_str[32];
+    snprintf(logo_str, sizeof(logo_str), "%s %s", NAS_LOGO, NAS_TYPE);
+    lv_label_set_text(ui_LogoLabel, logo_str);
     lv_obj_set_style_text_font(ui_LogoLabel, &lv_font_montserrat_48, 0);
     lv_obj_set_style_text_color(ui_LogoLabel, lv_color_hex(0x00E676), 0);
     lv_obj_align(ui_LogoLabel, LV_ALIGN_CENTER, 0, -40);

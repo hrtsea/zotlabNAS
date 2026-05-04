@@ -65,3 +65,23 @@ DataSource* createDataSource(const char* nas_type_id);
 const char* getDisplayTypeName(const char* nas_type_id);
 NasType nasTypeFromString(const char* nas_type_id);
 const char* nasTypeToString(NasType type);
+
+// 全局数据源实例（由 appStart() 初始化）
+extern DataSource* g_data_source;
+
+// 安全切换数据源（先 disconnect + delete 旧实例，再创建新实例）
+// 返回 true 表示切换成功
+bool switchDataSource(const char* nas_type_id);
+
+// C 代码可用的包装函数
+#ifdef __cplusplus
+extern "C" {
+#endif
+    bool data_source_is_connected(void);
+    const char* data_source_get_type_name(void);
+    float data_source_get_rx_speed_mbps(void);  // 返回 MB/s
+    float data_source_get_tx_speed_mbps(void);  // 返回 MB/s
+    bool data_source_switch(const char* nas_type_id);  // C 包装函数
+#ifdef __cplusplus
+}
+#endif

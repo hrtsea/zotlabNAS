@@ -128,3 +128,88 @@ const char* nasTypeToString(NasType type) {
         default: return "linux_http";
     }
 }
+
+// ============================================================================
+// 全局数据源实例
+// ============================================================================
+DataSource* g_data_source = nullptr;
+
+// ============================================================================
+// C 代码可用的包装函数
+// ============================================================================
+bool data_source_is_connected(void) {
+    return g_data_source != nullptr && g_data_source->isConnected();
+}
+
+const char* data_source_get_type_name(void) {
+    if (g_data_source == nullptr) return "None";
+    return g_data_source->getTypeName();
+}
+
+float data_source_get_rx_speed_mbps(void) {
+    if (g_data_source == nullptr) return 0.0f;
+    const NasData& data = g_data_source->getData();
+    // rx_bps 是 bits per second, 转换为 MB/s (除以 8*1024*1024)
+    return data.network.rx_bps / 8388608.0f;
+}
+
+float data_source_get_tx_speed_mbps(void) {
+    if (g_data_source == nullptr) return 0.0f;
+    const NasData& data = g_data_source->getData();
+    // tx_bps 是 bits per second, 转换为 MB/s (除以 8*1024*1024)
+    return data.network.tx_bps / 8388608.0f;
+}
+
+// ============================================================================
+// 安全切换数据源（先 disconnect + delete 旧实例，再创建新实例）
+// ============================================================================
+bool switchDataSource(const char* nas_type_id) {
+    // 1. 如果当前有数据源，先断开并释放
+    if (g_data_source != nullptr) {
+        log_i("[DataSource] Switching from %s, disconnecting...", 
+              g_data_source->getTypeName());
+        g_data_source->disconnect();
+        delete g_data_source;
+        g_data_source = nullptr;
+    }
+    
+    // 2. 如果新类型为 empty，相当于关闭数据源
+    if (nas_type_id == nullptr || strlen(nas_type_id) == 0 || 
+        strcmp(nas_type_id, "none") == 0) {
+        log_i("[DataSource] Data source cleared (no type specified)");
+        return true;
+    }
+    
+    // 3. 创建新数据源
+    log_i("[DataSource] Creating new data source for type: %s", nas_type_id);
+    g_data_source = createDataSource(nas_type_id);
+    
+    if (g_data_source == nullptr) {
+        log_e("[DataSource] Failed to create data source for type: %s", nas_type_id);
+        return false;
+    }
+    
+    // 4. 初始化并连接
+    Preferences prefs;
+    prefs.begin("nasmon", false);
+    if (!g_data_source->init(prefs)) {
+        log_e("[DataSource] Failed to init data source");
+        delete g_data_source;
+        g_data_source = nullptr;
+        prefs.end();
+        return false;
+    }
+    prefs.end();
+    
+    log_i("[DataSource] Data source created successfully, connecting...");
+    g_data_source->connect();
+    
+    return true;
+}
+
+// ============================================================================
+// C 代码可用的包装函数
+// ============================================================================
+bool data_source_switch(const char* nas_type_id) {
+    return switchDataSource(nas_type_id);
+}

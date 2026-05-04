@@ -7,13 +7,19 @@
 #include "lcd_bl_bsp/lcd_bl_pwm_bsp.h"
 #include "data/config.h"
 #include "net/wifi_manager.h"
+#include "net/data_source.h"
 #include "nas_config.h"
+#include "pcf85063/pcf85063.h"
 #include <Arduino.h>
 #include <WiFi.h>
 
 // 外部变量声明
 extern WiFiManager g_wifi;
+extern PCF85063 rtc;
 extern AppConfig g_config;
+
+// 数据轮询任务声明
+void data_poll_task(void *param);
 
 // ═════════════════════════════════════════════════════════
 // Static callback pointers
@@ -210,6 +216,8 @@ void saveWiFiCredential(lv_event_t* e) {
     char ssid[64];
     lv_dropdown_get_selected_str(ui_MainMenu_Dropdown_NetworkList, ssid, sizeof(ssid));
     
+    log_d("Dropdown SSID raw: '%s'", ssid);
+    
     // 去除 SSID 中的 RSSI 后缀（如 "dd-wrt (-31 dBm)" → "dd-wrt"）
     char clean_ssid[64];
     char* rssi_pos = strstr(ssid, " (");
@@ -217,18 +225,27 @@ void saveWiFiCredential(lv_event_t* e) {
         int len = rssi_pos - ssid;
         strncpy(clean_ssid, ssid, len);
         clean_ssid[len] = '\0';
+        log_d("SSID with RSSI removed: '%s'", clean_ssid);
     } else {
         strncpy(clean_ssid, ssid, sizeof(clean_ssid));
         clean_ssid[sizeof(clean_ssid)-1] = '\0';
+        log_d("SSID without RSSI suffix: '%s'", clean_ssid);
     }
     
     if (strlen(clean_ssid) == 0 || strlen(password) == 0) {
         log_e("WiFi credential empty: SSID='%s', password_len=%d", clean_ssid, strlen(password));
+        lv_label_set_text(ui_MainMenu_Label_connectStatus, "Credential Error");
         return;
     }
     
     // 保存到配置
     config_save_wifi(clean_ssid, password);
+    log_i("WiFi config saved to NVS: SSID=%s, Password length=%d", 
+           clean_ssid, strlen(password));
+    
+    // 更新状态标签
+    lv_label_set_text(ui_MainMenu_Label_connectStatus, "Connecting...");
+    lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0x00FF00), 0);
     
     // 检查当前状态，避免重复连接
     if (g_wifi.getState() == WIFI_CONNECTING) {
@@ -245,6 +262,7 @@ void saveWiFiCredential(lv_event_t* e) {
     }
     
     // 触发 WiFi 连接
+    log_d("Calling connectNonBlocking with: SSID='%s', Password='%s'", clean_ssid, password);
     g_wifi.connectNonBlocking(clean_ssid, password);
     
     log_i("WiFi credential saved: SSID=%s", clean_ssid);
@@ -404,10 +422,11 @@ void saveConfig(lv_event_t* e) {
     
     pref.end();
     
-    // 如果 WiFi 已连接，同步时间
+    // 如果 WiFi 已连接，同步时间到外部RTC
     if (g_wifi.isConnected()) {
-        g_wifi.syncTime(g_config.timezone);
-        log_i("Time synced with timezone: UTC+%d", g_config.timezone);
+        int8_t tz_min = (timezone_minute_index < 3) ? TIMEZONE_MINUTE_OFFSETS[timezone_minute_index] : 0;
+        rtc.ntp_sync(g_config.timezone, tz_min);
+        log_i("Time synced with timezone: UTC+%d:%02d", g_config.timezone, tz_min);
     }
     
     log_i("Config saved: bl_state=%d, scroffdelay=%d, timezone=%d", 
@@ -527,12 +546,59 @@ void appStart(lv_event_t* e) {
         g_wifi.connectNonBlocking(g_config.ssid, g_config.wifipass);
     }
     
-    // 如果 WiFi 已连接，同步时间
+    // 如果 WiFi 已连接，同步时间到外部RTC
     if (g_wifi.isConnected()) {
-        g_wifi.syncTime(g_config.timezone);
-        log_i("Time synced with timezone: UTC+%d", g_config.timezone);
+        int8_t tz_min = (timezone_minute_index < 3) ? TIMEZONE_MINUTE_OFFSETS[timezone_minute_index] : 0;
+        rtc.ntp_sync(g_config.timezone, tz_min);
+        log_i("Time synced with timezone: UTC+%d:%02d", g_config.timezone, tz_min);
+    }
+    
+    // 初始化数据源（使用 switchDataSource 安全切换）
+    if (strlen(g_config.nas_type) > 0) {
+        log_i("Initializing data source for type: %s", g_config.nas_type);
+        
+        if (switchDataSource(g_config.nas_type)) {
+            // 创建数据轮询任务（在 Core 1 上运行）
+            xTaskCreatePinnedToCore(data_poll_task, "data_poll", 4 * 1024, NULL, 2, NULL, 1);
+            log_i("Data source initialized, poll task created");
+        } else {
+            log_e("Failed to initialize data source for type: %s", g_config.nas_type);
+        }
+    } else {
+        log_w("No NAS type configured, data source not created");
     }
     
     log_i("Config loaded: bl_state=%d, scroffdelay=%d, timezone=%d", 
            backlight_state, timeout_index, g_config.timezone);
+}
+
+// ============================================================================
+// 数据轮询任务（FreeRTOS Task - Core 1）
+// ============================================================================
+void data_poll_task(void *param) {
+    (void)param;  // 未使用的参数
+    
+    TickType_t last_wake_time = xTaskGetTickCount();
+    const TickType_t poll_interval = pdMS_TO_TICKS(1000);  // 默认1秒轮询一次
+    
+    for (;;) {
+        if (g_data_source != nullptr) {
+            // 调用 poll() 获取数据
+            bool updated = g_data_source->poll();
+            
+            if (updated) {
+                log_d("[DataPoll] Data updated successfully");
+            }
+            
+            // 检查连接状态
+            if (!g_data_source->isConnected()) {
+                log_w("[DataPoll] Data source disconnected, will retry in next poll");
+            }
+        } else {
+            log_w("[DataPoll] g_data_source is nullptr, skipping poll");
+        }
+        
+        // 等待下次轮询
+        vTaskDelayUntil(&last_wake_time, poll_interval);
+    }
 }

@@ -44,6 +44,13 @@
 #include "freertos/queue.h"
 #include "freertos/task.h"
 
+// NAS Data Source
+#include "net/data_source.h"
+#include "net/wifi_manager.h"
+
+// 外部变量声明
+extern WiFiManager g_wifi;
+
 // Audio global objects
 Audio audio;
 ES8311 speaker;
@@ -152,6 +159,28 @@ void setup() {
 
 // ############################################################
 void loop() {
+  // 定期检查 WiFi 连接状态（处理重连逻辑和连接进度）
+  g_wifi.check();
+  
+  // 检测 NAS 类型配置变化，动态切换数据源
+  static char s_last_nas_type[16] = {0};
+  
+  if (strcmp(g_config.nas_type, s_last_nas_type) != 0) {
+    // NAS 类型已更改，切换数据源
+    log_i("[Main] NAS type changed: '%s' -> '%s'", 
+          s_last_nas_type, g_config.nas_type);
+    
+    if (switchDataSource(g_config.nas_type)) {
+      log_i("[Main] Data source switched successfully");
+      // 更新缓存的类型
+      strlcpy(s_last_nas_type, g_config.nas_type, sizeof(s_last_nas_type));
+    } else {
+      log_e("[Main] Failed to switch data source to: %s", g_config.nas_type);
+      // 切换失败，恢复旧类型到 g_config（可选）
+      // strlcpy(g_config.nas_type, s_last_nas_type, sizeof(g_config.nas_type));
+    }
+  }
+  
   // Main loop - LVGL tasks run in separate task (lvgl_port)
   vTaskDelay(pdMS_TO_TICKS(1000));
 }
