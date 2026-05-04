@@ -90,6 +90,18 @@ void ui_Screen_Overview_event_handler(lv_event_t* e)
 }
 
 // ═════════════════════════════════════════════════════════
+// Overview screen HDD button click event handler
+// ═════════════════════════════════════════════════════════
+void ui_event_Screen_Overview_hdd_clicked(lv_event_t *e) {
+    if (lv_event_get_code(e) == LV_EVENT_CLICKED) {
+        if (ui_Screen_Storage != NULL) {
+            lv_scr_load_anim(ui_Screen_Storage, LV_SCR_LOAD_ANIM_MOVE_LEFT, 300, 0, false);
+            log_i("[Overview] HDD button clicked, switching to Storage");
+        }
+    }
+}
+
+// ═════════════════════════════════════════════════════════
 // Overview screen gesture event handler
 // ═════════════════════════════════════════════════════════
 void ui_event_Screen_Overview_gesture(lv_event_t *e) {
@@ -132,12 +144,12 @@ void ui_event_Screen_Settings_gesture(lv_event_t *e) {
 void ui_event_Screen_Storage_gesture(lv_event_t *e) {
     lv_event_code_t event_code = lv_event_get_code(e);
 
-    // 右滑 - 返回 Overview 页面
-    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+    // 上滑（LV_DIR_TOP）- 返回 Overview 页面
+    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP) {
         lv_indev_wait_release(lv_indev_get_act());
-        log_i("Storage: swipe right, switching back to Overview");
+        log_i("Storage: swipe up, switching back to Overview");
         if (ui_Screen_Overview != NULL) {
-            lv_scr_load_anim(ui_Screen_Overview, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 300, 0, false);
+            lv_scr_load_anim(ui_Screen_Overview, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 300, 0, false);
         }
     }
     // 左滑 - 进入 Settings 页面（如果需要）
@@ -198,13 +210,25 @@ void saveWiFiCredential(lv_event_t* e) {
     char ssid[64];
     lv_dropdown_get_selected_str(ui_MainMenu_Dropdown_NetworkList, ssid, sizeof(ssid));
     
-    if (strlen(ssid) == 0 || strlen(password) == 0) {
-        log_e("WiFi credential empty: SSID='%s', password_len=%d", ssid, strlen(password));
+    // 去除 SSID 中的 RSSI 后缀（如 "dd-wrt (-31 dBm)" → "dd-wrt"）
+    char clean_ssid[64];
+    char* rssi_pos = strstr(ssid, " (");
+    if (rssi_pos != NULL) {
+        int len = rssi_pos - ssid;
+        strncpy(clean_ssid, ssid, len);
+        clean_ssid[len] = '\0';
+    } else {
+        strncpy(clean_ssid, ssid, sizeof(clean_ssid));
+        clean_ssid[sizeof(clean_ssid)-1] = '\0';
+    }
+    
+    if (strlen(clean_ssid) == 0 || strlen(password) == 0) {
+        log_e("WiFi credential empty: SSID='%s', password_len=%d", clean_ssid, strlen(password));
         return;
     }
     
     // 保存到配置
-    config_save_wifi(ssid, password);
+    config_save_wifi(clean_ssid, password);
     
     // 检查当前状态，避免重复连接
     if (g_wifi.getState() == WIFI_CONNECTING) {
@@ -221,9 +245,9 @@ void saveWiFiCredential(lv_event_t* e) {
     }
     
     // 触发 WiFi 连接
-    g_wifi.connectNonBlocking(ssid, password);
+    g_wifi.connectNonBlocking(clean_ssid, password);
     
-    log_i("WiFi credential saved: SSID=%s", ssid);
+    log_i("WiFi credential saved: SSID=%s", clean_ssid);
     SCREEN_OFF_TIMER = millis();
 }
 void scanNetwork(lv_event_t* e) {
@@ -495,7 +519,7 @@ void appStart(lv_event_t* e) {
     SCREEN_OFF_TIMER = millis();  // 重置定时器
     
     // 创建屏幕关闭定时器（每秒检查一次）
-    lv_timer_create(screen_off_timer_cb, 1000, NULL);
+    lv_timer_create(screen_off_timer_cb, 2000, NULL);
     
     // 如果 WiFi 已连接，同步时间
     if (g_wifi.isConnected()) {
