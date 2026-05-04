@@ -15,6 +15,7 @@ extern "C" {
 // Screen event handlers
 void ui_Screen_Boot_event_handler(lv_event_t* e);
 void ui_Screen_Overview_event_handler(lv_event_t* e);
+void ui_event_Screen_Overview_hdd_clicked(lv_event_t* e);
 
 // UI event callbacks
 void appStart(lv_event_t * e);

@@ -57,10 +57,23 @@ void WiFiManager::connectNonBlocking(const char* ssid, const char* password) {
         return;
     }
 
+    // 检查当前状态，避免重复连接
+    if (state == WIFI_CONNECTING) {
+        Serial.println(F("[WiFi] Already connecting, skipping duplicate connect"));
+        return;
+    }
+
     Serial.printf("[WiFi] Starting non-blocking connection to %s...\n", ssid);
     state = WIFI_CONNECTING;
     connecting_nonblocking = true;
     connect_start_ms = millis();
+
+    // 如果已连接，先断开
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println(F("[WiFi] Disconnecting from current network..."));
+        WiFi.disconnect();
+        delay(200);  // 等待断开完成
+    }
 
     WiFi.mode(WIFI_STA);
     WiFi.setAutoReconnect(true);
@@ -184,9 +197,9 @@ void WiFiManager::syncTime(int8_t timezone_offset) {
 
 int WiFiManager::scanNetworks() {
     Serial.println(F("[WiFi] Scanning networks..."));
-    WiFi.disconnect();
-    delay(100);
-    network_count = WiFi.scanNetworks();
+    // 使用异步扫描模式，不断开当前连接
+    // 参数: async=false, show_hidden=true, passive=false, max_ms=100
+    network_count = WiFi.scanNetworks(false, true);
     Serial.printf("[WiFi] Found %d networks\n", network_count);
     return network_count;
 }

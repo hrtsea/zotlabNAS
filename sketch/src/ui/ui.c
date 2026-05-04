@@ -10,8 +10,8 @@
 // ═══════════════════════════════════════════════════════════
 lv_obj_t* ui_Screen_Boot        = NULL;
 lv_obj_t* ui_Screen_Overview    = NULL;
-// ui_Screen_Storage defined in ui_Screen_Storage.c
-// ui_Screen_Settings defined in ui_Screen_Settings.c
+// ui_Screen_Storage defined in ui_Screen_Storage.c (extern in ui.h)
+// ui_Screen_Settings defined in ui_Screen_Settings.c (extern in ui.h)
 
 void ui_init(void)
 {
