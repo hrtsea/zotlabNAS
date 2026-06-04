@@ -146,3 +146,59 @@ void audio_loop_task(void *param) {
     vTaskDelay(pdMS_TO_TICKS(1));
   }
 }
+
+//==============================================
+// CPU MONITOR TASK - Dual core usage
+#include <esp_freertos_hooks.h>
+
+static volatile uint64_t s_idle_count[2] = {0, 0};
+
+bool IRAM_ATTR idle_hook0(void) {
+  s_idle_count[0]++;
+  return false;
+}
+bool IRAM_ATTR idle_hook1(void) {
+  s_idle_count[1]++;
+  return false;
+}
+
+void cpu_monitor_task(void *param) {
+  esp_register_freertos_idle_hook_for_cpu(idle_hook0, 0);
+  esp_register_freertos_idle_hook_for_cpu(idle_hook1, 1);
+
+  uint64_t last_count[2] = {0, 0};
+  uint32_t last_ms = millis();
+  float max_idle_per_ms = 0;
+
+  for (;;) {
+    vTaskDelay(pdMS_TO_TICKS(2000));
+
+    uint32_t now_ms = millis();
+    uint32_t elapsed = now_ms - last_ms;
+    if (elapsed < 100) elapsed = 2000;
+
+    uint64_t curr[2] = {s_idle_count[0], s_idle_count[1]};
+    float idle_per_ms[2] = {
+      (float)(curr[0] - last_count[0]) / elapsed,
+      (float)(curr[1] - last_count[1]) / elapsed
+    };
+
+    for (int i = 0; i < 2; i++) {
+      if (idle_per_ms[i] > max_idle_per_ms) {
+        max_idle_per_ms = idle_per_ms[i];
+      }
+    }
+    if (max_idle_per_ms < 1.0f) max_idle_per_ms = 1.0f;
+
+    float cpu0 = 100.0f * (1.0f - idle_per_ms[0] / max_idle_per_ms);
+    float cpu1 = 100.0f * (1.0f - idle_per_ms[1] / max_idle_per_ms);
+    if (cpu0 < 0) cpu0 = 0; if (cpu0 > 100) cpu0 = 100;
+    if (cpu1 < 0) cpu1 = 0; if (cpu1 > 100) cpu1 = 100;
+
+    log_i("Core0: %.1f%%, Core1: %.1f%%", cpu0, cpu1);
+
+    last_ms = now_ms;
+    last_count[0] = curr[0];
+    last_count[1] = curr[1];
+  }
+}
