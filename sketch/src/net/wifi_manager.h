@@ -58,6 +58,18 @@ public:
     // Get RTC pointer
     ESP32Time* getRtc();
 
+    // Disconnect and reset state
+    void disconnect(bool stopWiFi = false);
+
+    // Handle STA disconnected event (called from event callback)
+    void onStaDisconnected();
+    
+    // Handle STA connected event (called from event callback)
+    void onStaConnected();
+    
+    // Handle STA got IP event (called from event callback)
+    void onStaGotIP(const String& ip_addr);
+
 private:
     WifiState state;
     ESP32Time rtc;

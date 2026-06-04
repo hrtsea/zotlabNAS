@@ -152,9 +152,9 @@ void MockDataSource::generateMockData() {
         data.services[i].is_docker = (i == 5);
     }
     
-    // 网络信息 (合理范围: 10-100 MB/s)
-    data.network.rx_bps = (10 + (counter % 90)) * 1000000;  // 10-99 MB/s
-    data.network.tx_bps = (5 + (counter % 45)) * 1000000;   // 5-49 MB/s
+    // 网络信息 (合理范围: 10-100 Mbps)
+    data.network.rx_bps = (10 + (counter % 90)) * 1000000;  // 10-99 Mbps (bits per second)
+    data.network.tx_bps = (5 + (counter % 45)) * 1000000;   // 5-49 Mbps
     strncpy(data.network.ip, "192.168.1.100", sizeof(data.network.ip));
     strncpy(data.network.interface, "eth0", sizeof(data.network.interface));
     

@@ -28,6 +28,9 @@ void wifi_event_callback(WiFiEvent_t event, WiFiEventInfo_t info) {
             Serial.printf("[WiFi Event] Channel: %d, Auth: %d\n",
                          info.wifi_sta_connected.channel,
                          info.wifi_sta_connected.authmode);
+            
+            // 物理连接成功，但尚未获得 IP
+            g_wifi.onStaConnected();
             break;
             
         case WIFI_EVENT_STA_DISCONNECTED: {
@@ -62,8 +65,10 @@ void wifi_event_callback(WiFiEvent_t event, WiFiEventInfo_t info) {
                 case WIFI_REASON_UNSPECIFIED: reason_str = "UNSPECIFIED"; break;
                 default: break;
             }
-            Serial.printf("[WiFi Event] STA Disconnected! Reason: %d - %s\n", 
+            Serial.printf("[WiFi Event] STA Disconnected! Reason: %d - %s\n",
                          info.wifi_sta_disconnected.reason, reason_str);
+            // Update WiFiManager state to match actual hardware state
+            g_wifi.onStaDisconnected();
             break;
         }
             
@@ -80,6 +85,9 @@ void wifi_event_callback(WiFiEvent_t event, WiFiEventInfo_t info) {
                          IPAddress(info.got_ip.ip_info.gw.addr).toString().c_str());
             Serial.printf("[WiFi Event] Netmask: %s\n",
                          IPAddress(info.got_ip.ip_info.netmask.addr).toString().c_str());
+            
+            // 关键：当成功获取 IP 时，状态变为 CONNECTED
+            g_wifi.onStaGotIP(IPAddress(info.got_ip.ip_info.ip.addr).toString());
             break;
             
         case IP_EVENT_STA_LOST_IP:
@@ -99,7 +107,7 @@ ESP32Time* wifi_get_rtc() {
 
 WiFiManager::WiFiManager()
     : state(WIFI_DISCONNECTED), last_reconnect_ms(0), connect_start_ms(0),
-      connect_timeout_ms(15000), connecting_nonblocking(false), reconnect_attempts(0), network_count(0) {
+      connect_timeout_ms(25000), connecting_nonblocking(false), reconnect_attempts(0), network_count(0) {
     ip_str[0] = '\0';
     
     // 注册 WiFi 事件回调
@@ -149,15 +157,63 @@ void WiFiManager::connectNonBlocking(const char* ssid, const char* password) {
         return;
     }
 
+    // 强制重置连接状态，防止之前卡死的状态阻塞新连接
+    if (connecting_nonblocking && WiFi.status() != WL_CONNECTED) {
+        Serial.println(F("[WiFi] Resetting stale connection state"));
+        connecting_nonblocking = false;
+    }
+
     // 检查当前状态，避免重复连接
-    if (state == WIFI_CONNECTING) {
+    if (state == WIFI_CONNECTING && connecting_nonblocking) {
         Serial.println(F("[WiFi] Already connecting, skipping duplicate connect"));
         return;
     }
 
     Serial.printf("[WiFi] Starting non-blocking connection to SSID: '%s'\n", ssid);
-    Serial.printf("[WiFi] Password length: %d characters\n", (password ? strlen(password) : 0));
+    if (password && strlen(password) > 0) {
+        Serial.printf("[WiFi] Password length: %d\n", strlen(password));
+        // 打印密码前4个字符和后4个字符，帮助调试
+        if (strlen(password) >= 8) {
+            Serial.printf("[WiFi] Password hint: %c%c%c%c....%c%c%c%c\n",
+                          password[0], password[1], password[2], password[3],
+                          password[strlen(password)-4], password[strlen(password)-3],
+                          password[strlen(password)-2], password[strlen(password)-1]);
+        }
+    } else {
+        Serial.println(F("[WiFi] No password (open network or WPS?)"));
+    }
     Serial.printf("[WiFi] Current WiFi status before begin: %d\n", WiFi.status());
+    
+    // 扫描网络，检查目标SSID是否存在以及加密方式
+    Serial.println(F("[WiFi] Scanning networks to check target SSID..."));
+    int n = WiFi.scanNetworks(false, true);  // async=false, show_hidden=true
+    bool target_found = false;
+    for (int i = 0; i < n; i++) {
+        String found_ssid = WiFi.SSID(i);
+        if (found_ssid == ssid) {
+            target_found = true;
+            Serial.printf("[WiFi] Target SSID found! RSSI: %d dBm, Encryption: %d\n",
+                          WiFi.RSSI(i), WiFi.encryptionType(i));
+            // 打印加密方式
+            const char* enc_str = "UNKNOWN";
+            switch (WiFi.encryptionType(i)) {
+                case WIFI_AUTH_OPEN: enc_str = "OPEN"; break;
+                case WIFI_AUTH_WEP: enc_str = "WEP"; break;
+                case WIFI_AUTH_WPA_PSK: enc_str = "WPA_PSK"; break;
+                case WIFI_AUTH_WPA2_PSK: enc_str = "WPA2_PSK"; break;
+                case WIFI_AUTH_WPA_WPA2_PSK: enc_str = "WPA_WPA2_PSK"; break;
+                case WIFI_AUTH_WPA2_ENTERPRISE: enc_str = "WPA2_ENTERPRISE"; break;
+                default: break;
+            }
+            Serial.printf("[WiFi] Encryption type: %s\n", enc_str);
+            break;
+        }
+    }
+    if (!target_found) {
+        Serial.printf("[WiFi] WARNING: Target SSID '%s' NOT FOUND in scan!\n", ssid);
+        Serial.println(F("[WiFi] Possible causes: 1) Wrong SSID 2) Router not broadcasting SSID 3) Out of range"));
+    }
+    WiFi.scanDelete();  // 释放扫描结果
     
     state = WIFI_CONNECTING;
     connecting_nonblocking = true;
@@ -175,11 +231,22 @@ void WiFiManager::connectNonBlocking(const char* ssid, const char* password) {
     WiFi.setAutoReconnect(true);
     WiFi.persistent(true);
     
+    // 打印 WiFi 配置信息
+    Serial.printf("[WiFi] [DEBUG] Mode: STA | AutoReconnect: %s | SSID: %s (%d chars)\n",
+                  WiFi.getAutoReconnect() ? "ON" : "OFF", ssid, strlen(ssid));
+    Serial.printf("[WiFi] [DEBUG] Password: %s (%d chars)\n", 
+                  password ? "********" : "NONE", password ? strlen(password) : 0);
+    
     Serial.println(F("[WiFi] Calling WiFi.begin()..."));
     WiFi.begin(ssid, password);
     
     // 立即检查状态
-    Serial.printf("[WiFi] WiFi status immediately after begin: %d\n", WiFi.status());
+    int status_after_begin = WiFi.status();
+    Serial.printf("[WiFi] [DEBUG] Status after begin: %d\n", status_after_begin);
+    
+    if (status_after_begin == WL_CONNECT_FAILED) {
+        Serial.println(F("[WiFi] ERROR: WiFi.begin() failed immediately! Check SSID/password"));
+    }
     
     Serial.println(F("[WiFi] Non-blocking connection started, will check progress with checkConnectionProgress()"));
 }
@@ -190,9 +257,9 @@ bool WiFiManager::checkConnectionProgress() {
         return true;  // 不在连接中，视为完成
     }
 
-    // 调试连接状态
+    // 详细的调试连接状态（每 500ms）
     static uint32_t last_debug_ms = 0;
-    if (millis() - last_debug_ms > 1000) {
+    if (millis() - last_debug_ms > 500) {
         last_debug_ms = millis();
         int status = WiFi.status();
         const char* status_str = "UNKNOWN";
@@ -205,24 +272,41 @@ bool WiFiManager::checkConnectionProgress() {
             case WL_CONNECTION_LOST: status_str = "CONNECTION_LOST"; break;
             case WL_DISCONNECTED: status_str = "DISCONNECTED"; break;
         }
-        Serial.printf("[WiFi] Connection status: %d - %s (elapsed: %ums)\n", 
-                      status, status_str, millis() - connect_start_ms);
+        
+        // 额外的连接信息
+        int8_t rssi = WiFi.RSSI();
+        Serial.printf("[WiFi] [DEBUG] Status: %d-%s | RSSI: %ddBm | Elapsed: %ums | Target: %s\n", 
+                      status, status_str, rssi, millis() - connect_start_ms, g_config.ssid);
+        
+        // 显示物理连接但IP获取中的状态
+        if (status != WL_CONNECTED && state == WIFI_CONNECTING) {
+            String bssid = WiFi.BSSIDstr();
+            int channel = WiFi.channel();
+            Serial.printf("[WiFi] [DEBUG] - Physical: BSSID=%s | Channel=%d | RSSI=%ddBm\n", 
+                          bssid.c_str(), channel, rssi);
+            if (millis() - connect_start_ms > 15000) {
+                Serial.printf("[WiFi] [DEBUG] - DHCP waiting... IP acquisition slow\n");
+            }
+        }
     }
 
     // 检查是否连接成功
     if (WiFi.status() == WL_CONNECTED) {
-        state = WIFI_CONNECTED;
-        connecting_nonblocking = false;
-        snprintf(ip_str, sizeof(ip_str), "%s", WiFi.localIP().toString().c_str());
-        Serial.printf("\n[WiFi] Non-blocking connected! IP: %s\n", ip_str);
-        Serial.printf("[WiFi] RSSI: %d dBm\n", WiFi.RSSI());
+        // 确保与事件回调同步
+        if (state != WIFI_CONNECTED) {
+            state = WIFI_CONNECTED;
+            connecting_nonblocking = false;
+            snprintf(ip_str, sizeof(ip_str), "%s", WiFi.localIP().toString().c_str());
+            Serial.printf("\n[WiFi] [DEBUG] Non-blocking connected! IP: %s\n", ip_str);
+            Serial.printf("[WiFi] RSSI: %d dBm\n", WiFi.RSSI());
+            Serial.printf("[WiFi] [DEBUG] State synced: CONNECTING -> CONNECTED (WiFi.status() check)\n");
+        }
         return true;
     }
 
-    // 检查是否超时
+    // 检查是否超时 - 更宽松的DHCP超时判断
     if (millis() - connect_start_ms >= connect_timeout_ms) {
-        state = WIFI_DISCONNECTED;
-        connecting_nonblocking = false;
+        // 检查WiFi底层状态，可能已物理连接但IP获取慢
         int status = WiFi.status();
         const char* status_str = "UNKNOWN";
         switch (status) {
@@ -234,8 +318,23 @@ bool WiFiManager::checkConnectionProgress() {
             case WL_CONNECTION_LOST: status_str = "CONNECTION_LOST"; break;
             case WL_DISCONNECTED: status_str = "DISCONNECTED"; break;
         }
-        Serial.printf("\n[WiFi] Non-blocking connection timeout! Status: %s\n", status_str);
-        return true;  // 超时也视为完成（失败）
+        
+        // 如果已物理连接但无IP，可能是DHCP慢，不要立即断开
+        if (status == WL_IDLE_STATUS || status == WL_DISCONNECTED) {
+            state = WIFI_DISCONNECTED;
+            connecting_nonblocking = false;
+            Serial.printf("\n[WiFi] [DEBUG] Connection TIMEOUT! Status: %s\n", status_str);
+            Serial.printf("[WiFi] [DEBUG] - Connect attempt duration: %ums\n", millis() - connect_start_ms);
+            Serial.printf("[WiFi] [DEBUG] - Target: SSID='%s', Pass=%d chars\n", g_config.ssid, strlen(g_config.wifipass));
+            Serial.printf("[WiFi] [DEBUG] - Possible causes: Password wrong, AP not available, signal weak\n");
+            return true;
+        } else {
+            // 物理连接已建立但IP获取慢，继续等待
+            Serial.printf("\n[WiFi] [DEBUG] DHCP waiting... Status: %s | Elapsed: %ums\n", 
+                          status_str, millis() - connect_start_ms);
+            Serial.printf("[WiFi] [DEBUG] - Physical connected but no IP yet\n");
+            return false;  // 不视为完成，继续等待
+        }
     }
 
     // 还在连接中
@@ -370,4 +469,59 @@ int32_t WiFiManager::getNetworkRSSI(int index) const {
 
 ESP32Time* WiFiManager::getRtc() {
     return &rtc;
+}
+
+void WiFiManager::disconnect(bool stopWiFi) {
+    WiFi.disconnect(stopWiFi);
+    state = WIFI_DISCONNECTED;
+    connecting_nonblocking = false;
+    reconnect_attempts = 0;
+    Serial.println(F("[WiFi] Disconnected and state reset"));
+}
+
+void WiFiManager::onStaConnected() {
+    // Only update if we thought we were disconnected
+    if (state == WIFI_DISCONNECTED) {
+        Serial.printf("[WiFi] [DEBUG] State synced: DISCONNECTED -> CONNECTING\n");
+        Serial.printf("[WiFi] [DEBUG] - Physical connection established\n");
+        
+        // 获取物理连接信息
+        int rssi = WiFi.RSSI();
+        int channel = WiFi.channel();
+        Serial.printf("[WiFi] [DEBUG] - RSSI: %ddBm | Channel: %d\n", rssi, channel);
+    }
+    state = WIFI_CONNECTING;
+    connecting_nonblocking = true;
+}
+
+void WiFiManager::onStaGotIP(const String& ip_addr) {
+    state = WIFI_CONNECTED;
+    connecting_nonblocking = false;
+    strncpy(ip_str, ip_addr.c_str(), sizeof(ip_str) - 1);
+    ip_str[sizeof(ip_str) - 1] = '\0';
+    
+    // 获取详细的网络信息
+    String gateway = WiFi.gatewayIP().toString();
+    String subnet = WiFi.subnetMask().toString();
+    String dns1 = WiFi.dnsIP(0).toString();
+    String dns2 = WiFi.dnsIP(1).toString();
+    int rssi = WiFi.RSSI();
+    
+    Serial.printf("[WiFi] [DEBUG] State synced: CONNECTING -> CONNECTED\n");
+    Serial.printf("[WiFi] [DEBUG] - IP Address: %s\n", ip_str);
+    Serial.printf("[WiFi] [DEBUG] - Gateway: %s\n", gateway.c_str());
+    Serial.printf("[WiFi] [DEBUG] - Subnet Mask: %s\n", subnet.c_str());
+    Serial.printf("[WiFi] [DEBUG] - DNS1: %s | DNS2: %s\n", dns1.c_str(), dns2.c_str());
+    Serial.printf("[WiFi] [DEBUG] - RSSI: %ddBm | Signal: %s\n", 
+                  rssi, (rssi > -60 ? "Strong" : rssi > -70 ? "Good" : "Weak"));
+    Serial.printf("[WiFi] [DEBUG] - Connection duration: %ums\n", millis() - connect_start_ms);
+}
+
+void WiFiManager::onStaDisconnected() {
+    // Only update if we thought we were connected or connecting
+    if (state == WIFI_CONNECTED || state == WIFI_CONNECTING || state == WIFI_RECONNECTING) {
+        Serial.printf("[WiFi] [DEBUG] State synced: %d -> DISCONNECTED\n", state);
+    }
+    state = WIFI_DISCONNECTED;
+    connecting_nonblocking = false;
 }

@@ -21,6 +21,9 @@ void ui_init(void)
     ui_Screen_Storage_screen_init();
     ui_Screen_Settings_screen_init();
 
+    // Load saved WiFi config into Settings UI
+    loadWiFiConfigToUI();
+
     // Load boot screen by default
     lv_scr_load(ui_Screen_Boot);
 }

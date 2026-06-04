@@ -6,7 +6,7 @@
 #include "screens/ui_Screen_Settings.h"
 #include "lcd_bl_bsp/lcd_bl_pwm_bsp.h"
 #include "data/config.h"
-#include "net/wifi_manager.h"
+#include "net/network.h"
 #include "net/data_source.h"
 #include "nas_config.h"
 #include "pcf85063/pcf85063.h"
@@ -14,7 +14,6 @@
 #include <WiFi.h>
 
 // 外部变量声明
-extern WiFiManager g_wifi;
 extern PCF85063 rtc;
 extern AppConfig g_config;
 
@@ -33,6 +32,46 @@ static void* g_boot_complete_user_data = NULL;
 #include <Preferences.h>
 Preferences pref;
 uint8_t timeout_index = 0;  // 屏幕关闭延迟索引
+
+#define WIFI_CHECK_INTERVAL 5000 //wifi connection checking interval 5 second.
+
+//wifi monitor call back from timer
+void lvgl_wifi_check_cb(lv_timer_t *t) {
+  if (wifiEnable) {//if enable
+    if (WiFi.status() != WL_CONNECTED && wifiTaskHandle == NULL) {//wifi disconnected
+        wifi_need_connect = true;
+        lv_timer_pause(wifi_check_timer);//pause the timer
+        wifiConnect();  // create task ONCE
+    }
+  }  
+}
+
+// WiFi status update function
+void updateWiFiStatus(const char *status, uint32_t text_color, uint32_t icon_color) {
+    if (ui_MainMenu_Label_connectStatus) {
+        lv_label_set_text(ui_MainMenu_Label_connectStatus, status);
+        lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(text_color), LV_PART_MAIN);
+    }
+}
+
+// WiFi dropdown option update function
+void updateWiFiOption(const char *ssid_list) {
+    if (ui_MainMenu_Dropdown_NetworkList) {
+        lv_dropdown_clear_options(ui_MainMenu_Dropdown_NetworkList);
+        
+        char *temp_list = strdup(ssid_list);
+        if (temp_list) {
+            char *token = strtok(temp_list, "\n");
+            int index = 0;
+            while (token != NULL) {
+                lv_dropdown_add_option(ui_MainMenu_Dropdown_NetworkList, token, index);
+                token = strtok(NULL, "\n");
+                index++;
+            }
+            free(temp_list);
+        }
+    }
+}
 
 // 时区配置
 const int8_t TIMEZONE_HOUR_OFFSETS[] = {14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12};
@@ -195,138 +234,106 @@ void resetScreenOffTimer(lv_event_t* e) {
     (void)e;  // 未使用的参数
     SCREEN_OFF_TIMER = millis();  // 重置定时器，防止屏幕关闭
 }
-void saveWiFiCredential(lv_event_t* e) {
-    (void)e;  // 未使用参数
-    
-    // 直接从全局变量获取 UI 对象（不依赖事件目标）
-    if (ui_MainMenu_Dropdown_NetworkList == NULL) {
-        log_e("Network dropdown not initialized");
+
+// Load saved WiFi config from g_config into Settings UI
+void loadWiFiConfigToUI(void) {
+    if (ui_MainMenu_Dropdown_NetworkList == NULL || ui_MainMenu_Textarea_Password == NULL) {
+        log_w("[WiFi] Settings UI not ready, skipping config load");
         return;
     }
-    
-    if (ui_MainMenu_Textarea_Password == NULL) {
-        log_e("Password textarea not initialized");
-        return;
-    }
-    
-    // 获取密码
-    const char *password = lv_textarea_get_text(ui_MainMenu_Textarea_Password);
-    
-    // 获取选中的 SSID
-    char ssid[64];
-    lv_dropdown_get_selected_str(ui_MainMenu_Dropdown_NetworkList, ssid, sizeof(ssid));
-    
-    log_d("Dropdown SSID raw: '%s'", ssid);
-    
-    // 去除 SSID 中的 RSSI 后缀（如 "dd-wrt (-31 dBm)" → "dd-wrt"）
-    char clean_ssid[64];
-    char* rssi_pos = strstr(ssid, " (");
-    if (rssi_pos != NULL) {
-        int len = rssi_pos - ssid;
-        strncpy(clean_ssid, ssid, len);
-        clean_ssid[len] = '\0';
-        log_d("SSID with RSSI removed: '%s'", clean_ssid);
+
+    if (strlen(g_config.ssid) > 0) {
+        // Set dropdown text to saved SSID (shows even if not in scanned list)
+        lv_dropdown_set_text(ui_MainMenu_Dropdown_NetworkList, g_config.ssid);
+        lv_textarea_set_text(ui_MainMenu_Textarea_Password, g_config.wifipass);
+
+        // Update status label
+        char status[64];
+        snprintf(status, sizeof(status), "Saved: %s", g_config.ssid);
+        lv_label_set_text(ui_MainMenu_Label_connectStatus, status);
+        lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0x088CFD), 0);
+
+        // Ensure WiFi switch is ON
+        lv_obj_add_state(ui_MainMenu_Switch_Wifi, LV_STATE_CHECKED);
+
+        log_i("[WiFi] Loaded saved config to UI: SSID='%s', Pass length=%d",
+              g_config.ssid, strlen(g_config.wifipass));
     } else {
-        strncpy(clean_ssid, ssid, sizeof(clean_ssid));
-        clean_ssid[sizeof(clean_ssid)-1] = '\0';
-        log_d("SSID without RSSI suffix: '%s'", clean_ssid);
+        lv_label_set_text(ui_MainMenu_Label_connectStatus, "Not configured");
+        lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0xFF0000), 0);
+        log_i("[WiFi] No saved config to load");
     }
-    
-    if (strlen(clean_ssid) == 0 || strlen(password) == 0) {
-        log_e("WiFi credential empty: SSID='%s', password_len=%d", clean_ssid, strlen(password));
-        lv_label_set_text(ui_MainMenu_Label_connectStatus, "Credential Error");
-        return;
+
+    // 创建 WiFi 状态监控定时器（每 2 秒检查一次并更新 UI 状态标签）
+    static bool wifi_status_timer_created = false;
+    if (!wifi_status_timer_created) {
+        wifi_status_timer_created = true;
+        lv_timer_create([](lv_timer_t *timer) {
+            (void)timer;
+            if (ui_MainMenu_Label_connectStatus == NULL) return;
+
+            wl_status_t status = WiFi.status();
+            if (status == WL_CONNECTED) {
+                char buf[64];
+                IPAddress ip = WiFi.localIP();
+                snprintf(buf, sizeof(buf), "IP: %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+                lv_label_set_text(ui_MainMenu_Label_connectStatus, buf);
+                lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0x00FF00), 0);
+            } else if (status == WL_CONNECT_FAILED) {
+                lv_label_set_text(ui_MainMenu_Label_connectStatus, "Connect failed");
+                lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0xFF0000), 0);
+            } else if (status == WL_DISCONNECTED) {
+                const char* cur = lv_label_get_text(ui_MainMenu_Label_connectStatus);
+                if (cur && strncmp(cur, "IP:", 3) == 0) {
+                    lv_label_set_text(ui_MainMenu_Label_connectStatus, "Disconnected");
+                    lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0xFF0000), 0);
+                }
+            }
+        }, 2000, NULL);
     }
-    
-    // 保存到配置
-    config_save_wifi(clean_ssid, password);
-    log_i("WiFi config saved to NVS: SSID=%s, Password length=%d", 
-           clean_ssid, strlen(password));
-    
-    // 更新状态标签
-    lv_label_set_text(ui_MainMenu_Label_connectStatus, "Connecting...");
-    lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0x00FF00), 0);
-    
-    // 检查当前状态，避免重复连接
-    if (g_wifi.getState() == WIFI_CONNECTING) {
-        log_w("WiFi is already connecting, skipping duplicate connect");
-        SCREEN_OFF_TIMER = millis();
-        return;
-    }
-    
-    // 如果已连接，先断开
-    if (g_wifi.getState() == WIFI_CONNECTED) {
-        log_i("Disconnecting from current WiFi before connecting to new one");
-        WiFi.disconnect();
-        delay(100);  // 等待断开完成
-    }
-    
-    // 触发 WiFi 连接
-    log_d("Calling connectNonBlocking with: SSID='%s', Password='%s'", clean_ssid, password);
-    g_wifi.connectNonBlocking(clean_ssid, password);
-    
-    log_i("WiFi credential saved: SSID=%s", clean_ssid);
-    SCREEN_OFF_TIMER = millis();
 }
-void scanNetwork(lv_event_t* e) {
-    if (e == NULL) return;
-    
-    log_i("Scanning WiFi networks...");
-    
-    // 扫描网络
-    int count = g_wifi.scanNetworks();
-    
-    if (count <= 0) {
-        log_w("No WiFi networks found");
-        lv_dropdown_clear_options(ui_MainMenu_Dropdown_NetworkList);
-        lv_dropdown_add_option(ui_MainMenu_Dropdown_NetworkList, "No networks found", 0);
-        return;
-    }
-    
-    // 更新 dropdown 选项
-    lv_dropdown_clear_options(ui_MainMenu_Dropdown_NetworkList);
-    for (int i = 0; i < count; i++) {
-        String ssid = g_wifi.getSSID(i);
-        int32_t rssi = g_wifi.getNetworkRSSI(i);
-        
-        // 格式化显示：SSID (RSSI)
-        char option[128];
-        snprintf(option, sizeof(option), "%s (%d dBm)", ssid.c_str(), rssi);
-        lv_dropdown_add_option(ui_MainMenu_Dropdown_NetworkList, option, i);
-    }
-    
-    log_i("Found %d networks", count);
-    SCREEN_OFF_TIMER = millis();
+
+void saveWiFiCredential(lv_event_t *e) {
+  char newSSID[64];
+  lv_dropdown_get_selected_str(ui_MainMenu_Dropdown_NetworkList, newSSID, sizeof(newSSID));
+  // read from your input box
+  const char *newPWD = lv_textarea_get_text(ui_MainMenu_Textarea_Password);
+  // Load → update → save
+  uint8_t wifiCount = loadWifiList(wifiList);
+  wifiCount = addOrUpdateWifi(newSSID, newPWD, wifiList, wifiCount);
+  saveWifiList(wifiList, wifiCount);
+  SCREEN_OFF_TIMER = millis(); // reset timer
 }
-void toggleWiFi(lv_event_t* e) {
-    if (e == NULL) return;
-    
-    lv_obj_t *sw = lv_event_get_target(e);
-    bool checked = lv_obj_has_state(sw, LV_STATE_CHECKED);
-    
-    if (checked) {
-        // 开启 WiFi
-        log_i("WiFi enabled");
-        
-        // 检查当前状态，避免重复连接
-        if (g_wifi.getState() == WIFI_CONNECTING) {
-            log_w("WiFi is already connecting, skipping duplicate connect");
-            SCREEN_OFF_TIMER = millis();
-            return;
-        }
-        
-        if (strlen(g_config.ssid) > 0) {
-            g_wifi.connectNonBlocking(g_config.ssid, g_config.wifipass);
-        } else {
-            log_w("No WiFi credential saved");
-        }
-    } else {
-        // 关闭 WiFi
-        log_i("WiFi disabled");
-        WiFi.disconnect(true);  // 断开连接并关闭 WiFi
+
+// Discovery wifi network into dropdown
+void scanNetwork(lv_event_t *e) {
+  SCREEN_OFF_TIMER = millis(); // reset timer
+  scanWiFi(true); // scan and update wifi list in dropdown
+}
+
+//toggle wifi on/off
+void toggleWiFi(lv_event_t * e) {
+  SCREEN_OFF_TIMER = millis(); // reset timer
+
+  if (wifiEnable) {//disabled
+    wifiEnable = false;
+    //delete wifi check timer
+    if (wifi_check_timer) lv_timer_del(wifi_check_timer);
+    if(wifiTaskHandle != NULL) {//kill wifi_connect_task
+      vTaskDelete(wifiTaskHandle);
+      wifiTaskHandle = NULL;
     }
-    
-    SCREEN_OFF_TIMER = millis();
+    WiFi.disconnectAsync();
+    lv_label_set_text(ui_MainMenu_Label_connectStatus, "Disconnected");
+    lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0xFF0000), LV_PART_MAIN);
+    log_d("WiFi Disconnected");
+
+  } else {//enabled
+
+    wifiEnable = true;
+    //start wifi check timer
+    wifi_check_timer = lv_timer_create(lvgl_wifi_check_cb, WIFI_CHECK_INTERVAL, NULL);//wifi status check interval timer
+  }
 }
 void setBrightness(lv_event_t* e) {
     lv_obj_t *widget = NULL;
@@ -423,7 +430,7 @@ void saveConfig(lv_event_t* e) {
     pref.end();
     
     // 如果 WiFi 已连接，同步时间到外部RTC
-    if (g_wifi.isConnected()) {
+    if (WiFi.status() == WL_CONNECTED) {
         int8_t tz_min = (timezone_minute_index < 3) ? TIMEZONE_MINUTE_OFFSETS[timezone_minute_index] : 0;
         rtc.ntp_sync(g_config.timezone, tz_min);
         log_i("Time synced with timezone: UTC+%d:%02d", g_config.timezone, tz_min);
@@ -471,8 +478,8 @@ void showSystemInfo(lv_event_t* e) {
         ESP.getCpuFreqMHz(),
         ESP.getFlashChipSize() / 1024 / 1024,
         ESP.getFreeHeap() / 1024,
-        g_wifi.isConnected() ? "Connected" : "Disconnected",
-        g_wifi.isConnected() ? g_wifi.getIP() : "N/A"
+        WiFi.isConnected() ? "Connected" : "Disconnected",
+        WiFi.isConnected() ? String(WiFi.localIP()).c_str() : "N/A"
     );
     
     // 假设 UI 有一个显示系统信息的 label
@@ -543,11 +550,11 @@ void appStart(lv_event_t* e) {
     // 如果有保存的 WiFi 配置，自动连接
     if (strlen(g_config.ssid) > 0) {
         log_i("WiFi auto-connecting to %s", g_config.ssid);
-        g_wifi.connectNonBlocking(g_config.ssid, g_config.wifipass);
+        WiFi.begin(g_config.ssid, g_config.wifipass);
     }
     
     // 如果 WiFi 已连接，同步时间到外部RTC
-    if (g_wifi.isConnected()) {
+    if (WiFi.status() == WL_CONNECTED) {
         int8_t tz_min = (timezone_minute_index < 3) ? TIMEZONE_MINUTE_OFFSETS[timezone_minute_index] : 0;
         rtc.ntp_sync(g_config.timezone, tz_min);
         log_i("Time synced with timezone: UTC+%d:%02d", g_config.timezone, tz_min);
@@ -579,7 +586,9 @@ void data_poll_task(void *param) {
     (void)param;  // 未使用的参数
     
     TickType_t last_wake_time = xTaskGetTickCount();
-    const TickType_t poll_interval = pdMS_TO_TICKS(1000);  // 默认1秒轮询一次
+    TickType_t poll_interval = pdMS_TO_TICKS(g_config.poll_sec * 1000UL);  // 使用配置的轮询间隔
+    
+    log_i("[DataPoll] Task started, poll interval: %ds", g_config.poll_sec);
     
     for (;;) {
         if (g_data_source != nullptr) {

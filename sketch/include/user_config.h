@@ -77,9 +77,9 @@
 // ============================================================
 // 3. LVGL 配置 (如需要)
 // ============================================================
-#define WAVESHARE_349_LVGL_TICK_PERIOD_MS    5
-#define WAVESHARE_349_LVGL_TASK_MAX_DELAY_MS  50
-#define WAVESHARE_349_LVGL_TASK_MIN_DELAY_MS  5  // 越小越灵敏
+#define WAVESHARE_349_LVGL_TICK_PERIOD_MS    10
+#define WAVESHARE_349_LVGL_TASK_MAX_DELAY_MS  100
+#define WAVESHARE_349_LVGL_TASK_MIN_DELAY_MS  10
 
 // ============================================================
 // 4. I2C 设备地址

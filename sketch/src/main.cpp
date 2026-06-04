@@ -46,10 +46,11 @@
 
 // NAS Data Source
 #include "net/data_source.h"
-#include "net/wifi_manager.h"
+#include "net/network.h"
+#include "data/config.h"
 
 // 外部变量声明
-extern WiFiManager g_wifi;
+extern AppConfig g_config;
 
 // Audio global objects
 Audio audio;
@@ -72,6 +73,7 @@ extern void audio_loop_task(void *pvParameters);
 extern void rtc_read_task(void *pvParameters);
 extern void button_input_task(void *pvParameters);
 extern void batt_level_read_task(void *pvParameters);
+extern void cpu_monitor_task(void *pvParameters);
 
 // ############################################################
 void setup() {
@@ -153,14 +155,34 @@ void setup() {
   xTaskCreatePinnedToCore(rtc_read_task, "rtc_read", 3 * 1024, NULL, 3, NULL, 1);
   xTaskCreatePinnedToCore(button_input_task, "button_input", 4 * 1024, NULL, 2, NULL, 1);
   xTaskCreatePinnedToCore(batt_level_read_task, "batt_read", 4 * 1024, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(cpu_monitor_task, "cpu_monitor", 3 * 1024, NULL, 1, NULL, 1);
+
+  // Load configuration from NVS
+  config_load();
+  Serial.printf("[Config] Loaded SSID: '%s', Pass length: %d\n",
+                g_config.ssid, strlen(g_config.wifipass));
+
+  // Auto-start WiFi if credentials are configured
+  if (strlen(g_config.ssid) > 0) {
+    Serial.printf("[WiFi] Auto-starting connection to '%s'...\n", g_config.ssid);
+    wifiEnable = true;
+    wifi_need_connect = true;
+    wifiConnect();
+  } else {
+    Serial.println(F("[WiFi] No SSID configured, skipping auto-connect"));
+    wifiEnable = false;
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect(true);
+  }
 
   Serial.println("Setup complete!");
 }
 
 // ############################################################
 void loop() {
-  // 定期检查 WiFi 连接状态（处理重连逻辑和连接进度）
-  g_wifi.check();
+  // WiFi 连接状态已由源项目的网络管理系统自动处理（wifi_connect_task）
+  // 我们只需要确保 LVGL 任务正常运行
+
   
   // 检测 NAS 类型配置变化，动态切换数据源
   static char s_last_nas_type[16] = {0};
@@ -182,5 +204,5 @@ void loop() {
   }
   
   // Main loop - LVGL tasks run in separate task (lvgl_port)
-  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(100));  // 减少延迟，提高 WiFi 检查频率
 }

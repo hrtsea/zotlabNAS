@@ -21,6 +21,7 @@ void button_input_task(void *param);
 void batt_level_read_task(void *param);
 void rtc_read_task(void *param);
 void audio_loop_task(void *param);
+void cpu_monitor_task(void *param);
 
 // Audio command queue (if audio is used)
 extern QueueHandle_t audio_cmd_queue;

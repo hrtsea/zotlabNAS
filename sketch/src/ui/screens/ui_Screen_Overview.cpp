@@ -90,7 +90,7 @@ static void create_status_bar(lv_obj_t *parent)
     lv_obj_clear_flag(divider, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_align(divider, LV_ALIGN_TOP_MID, 0, 35);
     
-    // 创建网络速度更新定时器（每秒更新一次）
+    // 创建网络速度更新定时器（与 Mock 数据更新频率同步）
     lv_timer_create([](lv_timer_t *timer) {
         (void)timer;  // 未使用的参数
         
@@ -127,7 +127,7 @@ static void create_status_bar(lv_obj_t *parent)
             }
             lv_label_set_text(s_label_down, rx_str);
         }
-    }, 1000, NULL);
+    }, 5000, NULL);  // 与 Mock 数据更新频率同步（5秒）以降低CPU负载
 }
 
 /* -------------------------- 左侧CPU模块 -------------------------- */
@@ -345,12 +345,12 @@ void ui_Screen_Overview_screen_init(void)
     // 添加滑动手势事件
     lv_obj_add_event_cb(ui_Screen_Overview, ui_event_Screen_Overview_gesture, LV_EVENT_GESTURE, NULL);
     
-    // 添加时间更新定时器（每秒更新一次）
+    // 添加时间更新定时器（5秒更新一次）
     lv_timer_create([](lv_timer_t *timer) {
         static char time_str[9];
         snprintf(time_str, sizeof(time_str), "%02d:%02d:%02d", now.hour, now.minute, now.second);
         lv_label_set_text((lv_obj_t *)timer->user_data, time_str);
-    }, 1000, s_label_time);
+    }, 5000, s_label_time);  // 降低更新频率以优化CPU负载
 }
 
 void ui_Screen_Overview_screen_destroy(void)

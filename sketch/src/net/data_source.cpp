@@ -149,15 +149,16 @@ const char* data_source_get_type_name(void) {
 float data_source_get_rx_speed_mbps(void) {
     if (g_data_source == nullptr) return 0.0f;
     const NasData& data = g_data_source->getData();
-    // rx_bps 是 bits per second, 转换为 MB/s (除以 8*1024*1024)
-    return data.network.rx_bps / 8388608.0f;
+    // rx_bps 是 bits per second, 正确转换为 MB/s (除以 8,000,000)
+    // 1 MB/s = 8,000,000 bps
+    return data.network.rx_bps / 8000000.0f;
 }
 
 float data_source_get_tx_speed_mbps(void) {
     if (g_data_source == nullptr) return 0.0f;
     const NasData& data = g_data_source->getData();
-    // tx_bps 是 bits per second, 转换为 MB/s (除以 8*1024*1024)
-    return data.network.tx_bps / 8388608.0f;
+    // tx_bps 是 bits per second, 正确转换为 MB/s (除以 8,000,000)
+    return data.network.tx_bps / 8000000.0f;
 }
 
 // ============================================================================
