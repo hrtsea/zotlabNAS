@@ -1,0 +1,135 @@
+{
+  "batches": [
+    {
+      "id": 0,
+      "files": [
+        "README.md",
+        ".gitignore"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 1,
+      "files": [
+        "sketch/platformio.ini",
+        "sketch/boards/esp32-s3-devkitc1-n16r8.json",
+        "sketch/partitions/7MB_app_ota_2MB_littlefs.csv"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 2,
+      "files": [
+        "sketch/include/lv_conf.h",
+        "sketch/include/user_config.h",
+        "sketch/include/xtask.h"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 3,
+      "files": [
+        "sketch/src/main.cpp",
+        "sketch/src/xtask.cpp"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 4,
+      "files": [
+        "sketch/src/i2c_bsp/i2c_bsp.h",
+        "sketch/src/i2c_bsp/i2c_bsp.c",
+        "sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.h",
+        "sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.c"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 5,
+      "files": [
+        "sketch/src/pcf85063/pcf85063.h",
+        "sketch/src/pcf85063/pcf85063.cpp",
+        "sketch/src/tca9554/tca9554.h",
+        "sketch/src/tca9554/tca9554.cpp"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 6,
+      "files": [
+        "sketch/src/es7210/es7210.h",
+        "sketch/src/es7210/es7210.cpp",
+        "sketch/src/es7210/es7210_reg.h",
+        "sketch/src/es8311/es8311.h",
+        "sketch/src/es8311/es8311.cpp"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 7,
+      "files": [
+        "sketch/src/axs15231b/esp_lcd_axs15231b.h",
+        "sketch/src/axs15231b/esp_lcd_axs15231b.c",
+        "sketch/src/touch/esp_lcd_touch.h",
+        "sketch/src/touch/esp_lcd_touch.c"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 8,
+      "files": [
+        "sketch/src/lvgl_port/lvgl_port.h",
+        "sketch/src/lvgl_port/lvgl_port.cpp"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 9,
+      "files": [
+        "sketch/src/ESP32-audioI2S-master/Audio.h",
+        "sketch/src/ESP32-audioI2S-master/Audio.cpp"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 10,
+      "files": [
+        "sketch/src/ui/ui.h",
+        "sketch/src/ui/ui.c",
+        "sketch/src/ui/ui_events.h",
+        "sketch/src/ui/ui_events.cpp",
+        "sketch/src/ui/ui_helpers.h",
+        "sketch/src/ui/ui_helpers.c"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    },
+    {
+      "id": 11,
+      "files": [
+        "sketch/src/ui/screens/ui_Screen_Boot.h",
+        "sketch/src/ui/screens/ui_Screen_Boot.c",
+        "sketch/src/ui/screens/ui_Screen_Overview.h",
+        "sketch/src/ui/screens/ui_Screen_Overview.cpp",
+        "sketch/src/ui/screens/ui_Screen_Settings.h",
+        "sketch/src/ui/screens/ui_Screen_Settings.c",
+        "sketch/src/ui/screens/ui_Screen_Storage.h",
+        "sketch/src/ui/screens/ui_Screen_Storage.c"
+      ],
+      "batchImportData": {},
+      "neighborMap": {}
+    }
+  ],
+  "totalBatches": 12,
+  "totalFiles": 42
+}

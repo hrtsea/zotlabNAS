@@ -1,0 +1,13 @@
+*.o
+*.d
+*.elf
+*.bin
+*.map
+.pio/
+build/
+compile_commands.json
+build_errors.txt
+build_output.txt
+link_errors.txt
+temp_test.cpp
+*.txt

@@ -1,0 +1,282 @@
+{
+  "projectName": "TuneBar",
+  "projectDescription": "基于 ESP32-S3 的硬件开发项目，具有 NAS 监控、LVGL UI 和音频功能",
+  "languages": ["C", "C++", "Python", "Markdown", "JSON", "YAML"],
+  "frameworks": ["PlatformIO", "LVGL", "Arduino", "ESP-IDF", "FreeRTOS"],
+  "files": [
+    {
+      "path": "README.md",
+      "sizeLines": 100,
+      "language": "markdown",
+      "fileCategory": "docs"
+    },
+    {
+      "path": "sketch/include/lv_conf.h",
+      "sizeLines": 200,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/include/user_config.h",
+      "sizeLines": 150,
+      "language": "c",
+      "fileCategory": "config"
+    },
+    {
+      "path": "sketch/include/xtask.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/main.cpp",
+      "sizeLines": 300,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ESP32-audioI2S-master/Audio.h",
+      "sizeLines": 100,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ESP32-audioI2S-master/Audio.cpp",
+      "sizeLines": 2000,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/axs15231b/esp_lcd_axs15231b.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/axs15231b/esp_lcd_axs15231b.c",
+      "sizeLines": 300,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/es7210/es7210.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/es7210/es7210.cpp",
+      "sizeLines": 200,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/es7210/es7210_reg.h",
+      "sizeLines": 100,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/es8311/es8311.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/es8311/es8311.cpp",
+      "sizeLines": 200,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/i2c_bsp/i2c_bsp.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/i2c_bsp/i2c_bsp.c",
+      "sizeLines": 150,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.c",
+      "sizeLines": 100,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/lvgl_port/lvgl_port.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/lvgl_port/lvgl_port.cpp",
+      "sizeLines": 300,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/pcf85063/pcf85063.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/pcf85063/pcf85063.cpp",
+      "sizeLines": 200,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/tca9554/tca9554.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/tca9554/tca9554.cpp",
+      "sizeLines": 200,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/touch/esp_lcd_touch.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/touch/esp_lcd_touch.c",
+      "sizeLines": 300,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/ui.h",
+      "sizeLines": 100,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/ui.c",
+      "sizeLines": 500,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/ui_events.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/ui_events.cpp",
+      "sizeLines": 200,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/ui_helpers.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/ui_helpers.c",
+      "sizeLines": 100,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/screens/ui_Screen_Boot.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/screens/ui_Screen_Boot.c",
+      "sizeLines": 200,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/screens/ui_Screen_Overview.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/screens/ui_Screen_Overview.cpp",
+      "sizeLines": 300,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/screens/ui_Screen_Settings.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/screens/ui_Screen_Settings.c",
+      "sizeLines": 200,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/screens/ui_Screen_Storage.h",
+      "sizeLines": 50,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/ui/screens/ui_Screen_Storage.c",
+      "sizeLines": 200,
+      "language": "c",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/src/xtask.cpp",
+      "sizeLines": 150,
+      "language": "cpp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "sketch/platformio.ini",
+      "sizeLines": 100,
+      "language": "ini",
+      "fileCategory": "config"
+    },
+    {
+      "path": "sketch/boards/esp32-s3-devkitc1-n16r8.json",
+      "sizeLines": 50,
+      "language": "json",
+      "fileCategory": "config"
+    },
+    {
+      "path": "sketch/partitions/7MB_app_ota_2MB_littlefs.csv",
+      "sizeLines": 20,
+      "language": "csv",
+      "fileCategory": "config"
+    },
+    {
+      "path": ".gitignore",
+      "sizeLines": 50,
+      "language": "text",
+      "fileCategory": "config"
+    }
+  ],
+  "importMap": {},
+  "filteredByIgnore": 1000,
+  "totalFiles": 42,
+  "complexityEstimate": "moderate"
+}

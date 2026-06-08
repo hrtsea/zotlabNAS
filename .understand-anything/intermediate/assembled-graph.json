@@ -1,0 +1,600 @@
+{
+  "nodes": [
+    {
+      "id": "doc:README.md",
+      "type": "document",
+      "name": "项目说明文档",
+      "filePath": "README.md",
+      "summary": "TuneBar 是基于 ESP32-S3 的硬件开发项目，提供完整的 LVGL UI、音频功能和 NAS 监控能力",
+      "tags": ["documentation", "overview"]
+    },
+    {
+      "id": "config:.gitignore",
+      "type": "config",
+      "name": "Git 忽略配置",
+      "filePath": ".gitignore",
+      "summary": "定义 Git 仓库中需要忽略的文件和目录",
+      "tags": ["git", "configuration"]
+    },
+    {
+      "id": "config:sketch/platformio.ini",
+      "type": "config",
+      "name": "PlatformIO 配置",
+      "filePath": "sketch/platformio.ini",
+      "summary": "PlatformIO 项目配置文件，定义 ESP32-S3 开发环境",
+      "tags": ["platformio", "configuration", "esp32"]
+    },
+    {
+      "id": "config:sketch/boards/esp32-s3-devkitc1-n16r8.json",
+      "type": "config",
+      "name": "开发板配置",
+      "filePath": "sketch/boards/esp32-s3-devkitc1-n16r8.json",
+      "summary": "ESP32-S3 开发板硬件配置",
+      "tags": ["board", "hardware", "configuration"]
+    },
+    {
+      "id": "config:sketch/partitions/7MB_app_ota_2MB_littlefs.csv",
+      "type": "config",
+      "summary": "Flash 分区表配置",
+      "filePath": "sketch/partitions/7MB_app_ota_2MB_littlefs.csv",
+      "name": "Flash 分区配置",
+      "tags": ["partition", "flash", "configuration"]
+    },
+    {
+      "id": "file:sketch/include/lv_conf.h",
+      "type": "file",
+      "name": "LVGL 配置",
+      "filePath": "sketch/include/lv_conf.h",
+      "summary": "LVGL 图形库的配置文件",
+      "tags": ["lvgl", "ui", "configuration"]
+    },
+    {
+      "id": "file:sketch/include/user_config.h",
+      "type": "file",
+      "name": "用户硬件配置",
+      "filePath": "sketch/include/user_config.h",
+      "summary": "硬件引脚、I2C 设备地址等硬件配置",
+      "tags": ["hardware", "configuration"]
+    },
+    {
+      "id": "file:sketch/include/xtask.h",
+      "type": "file",
+      "name": "FreeRTOS 任务定义",
+      "filePath": "sketch/include/xtask.h",
+      "summary": "FreeRTOS 任务声明和任务函数原型",
+      "tags": ["freertos", "task", "rtos"]
+    },
+    {
+      "id": "file:sketch/src/main.cpp",
+      "type": "file",
+      "name": "主程序入口",
+      "filePath": "sketch/src/main.cpp",
+      "summary": "主程序文件，包含 setup() 和 loop() 函数",
+      "tags": ["main", "entry-point"]
+    },
+    {
+      "id": "file:sketch/src/xtask.cpp",
+      "type": "file",
+      "name": "FreeRTOS 任务实现",
+      "filePath": "sketch/src/xtask.cpp",
+      "summary": "FreeRTOS 任务的具体实现",
+      "tags": ["freertos", "task"]
+    },
+    {
+      "id": "file:sketch/src/i2c_bsp/i2c_bsp.h",
+      "type": "file",
+      "name": "I2C 总线驱动头文件",
+      "filePath": "sketch/src/i2c_bsp/i2c_bsp.h",
+      "summary": "I2C 通信接口驱动头文件",
+      "tags": ["i2c", "driver", "hardware"]
+    },
+    {
+      "id": "file:sketch/src/i2c_bsp/i2c_bsp.c",
+      "type": "file",
+      "name": "I2C 总线驱动实现",
+      "filePath": "sketch/src/i2c_bsp/i2c_bsp.c",
+      "summary": "I2C 通信接口的具体实现",
+      "tags": ["i2c", "driver", "hardware"]
+    },
+    {
+      "id": "file:sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.h",
+      "type": "file",
+      "name": "LCD 背光 PWM 驱动头文件",
+      "filePath": "sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.h",
+      "summary": "LCD 背光 PWM 控制驱动头文件",
+      "tags": ["lcd", "pwm", "driver"]
+    },
+    {
+      "id": "file:sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.c",
+      "type": "file",
+      "name": "LCD 背光 PWM 驱动实现",
+      "filePath": "sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.c",
+      "summary": "LCD 背光 PWM 控制的具体实现",
+      "tags": ["lcd", "pwm", "driver"]
+    },
+    {
+      "id": "file:sketch/src/pcf85063/pcf85063.h",
+      "type": "file",
+      "name": "PCF85063 RTC 驱动头文件",
+      "filePath": "sketch/src/pcf85063/pcf85063.h",
+      "summary": "PCF85063 实时时钟芯片驱动头文件",
+      "tags": ["rtc", "pcf85063", "driver"]
+    },
+    {
+      "id": "file:sketch/src/pcf85063/pcf85063.cpp",
+      "type": "file",
+      "name": "PCF85063 RTC 驱动实现",
+      "filePath": "sketch/src/pcf85063/pcf85063.cpp",
+      "summary": "PCF85063 实时时钟芯片驱动的具体实现",
+      "tags": ["rtc", "pcf85063", "driver"]
+    },
+    {
+      "id": "file:sketch/src/tca9554/tca9554.h",
+      "type": "file",
+      "name": "TCA9554 IO 扩展驱动头文件",
+      "filePath": "sketch/src/tca9554/tca9554.h",
+      "summary": "TCA9554 IO 扩展器芯片驱动头文件",
+      "tags": ["io-expander", "tca9554", "driver"]
+    },
+    {
+      "id": "file:sketch/src/tca9554/tca9554.cpp",
+      "type": "file",
+      "name": "TCA9554 IO 扩展驱动实现",
+      "filePath": "sketch/src/tca9554/tca9554.cpp",
+      "summary": "TCA9554 IO 扩展器芯片驱动的具体实现",
+      "tags": ["io-expander", "tca9554", "driver"]
+    },
+    {
+      "id": "file:sketch/src/es7210/es7210.h",
+      "type": "file",
+      "name": "ES7210 麦克风驱动头文件",
+      "filePath": "sketch/src/es7210/es7210.h",
+      "summary": "ES7210 音频 ADC 麦克风芯片驱动头文件",
+      "tags": ["microphone", "es7210", "audio", "driver"]
+    },
+    {
+      "id": "file:sketch/src/es7210/es7210.cpp",
+      "type": "file",
+      "name": "ES7210 麦克风驱动实现",
+      "filePath": "sketch/src/es7210/es7210.cpp",
+      "summary": "ES7210 音频 ADC 麦克风芯片驱动的具体实现",
+      "tags": ["microphone", "es7210", "audio", "driver"]
+    },
+    {
+      "id": "file:sketch/src/es7210/es7210_reg.h",
+      "type": "file",
+      "name": "ES7210 寄存器定义",
+      "filePath": "sketch/src/es7210/es7210_reg.h",
+      "summary": "ES7210 芯片寄存器地址和寄存器定义",
+      "tags": ["microphone", "es7210", "audio", "register"]
+    },
+    {
+      "id": "file:sketch/src/es8311/es8311.h",
+      "type": "file",
+      "name": "ES8311 音频编解码驱动头文件",
+      "filePath": "sketch/src/es8311/es8311.h",
+      "summary": "ES8311 音频编解码芯片驱动头文件",
+      "tags": ["audio", "es8311", "codec", "driver"]
+    },
+    {
+      "id": "file:sketch/src/es8311/es8311.cpp",
+      "type": "file",
+      "name": "ES8311 音频编解码驱动实现",
+      "filePath": "sketch/src/es8311/es8311.cpp",
+      "summary": "ES8311 音频编解码芯片驱动的具体实现",
+      "tags": ["audio", "es8311", "codec", "driver"]
+    },
+    {
+      "id": "file:sketch/src/axs15231b/esp_lcd_axs15231b.h",
+      "type": "file",
+      "name": "AXS15231B LCD 驱动头文件",
+      "filePath": "sketch/src/axs15231b/esp_lcd_axs15231b.h",
+      "summary": "AXS15231B LCD 显示屏驱动头文件",
+      "tags": ["lcd", "axs15231b", "display", "driver"]
+    },
+    {
+      "id": "file:sketch/src/axs15231b/esp_lcd_axs15231b.c",
+      "type": "file",
+      "name": "AXS15231B LCD 驱动实现",
+      "filePath": "sketch/src/axs15231b/esp_lcd_axs15231b.c",
+      "summary": "AXS15231B LCD 显示屏驱动的具体实现",
+      "tags": ["lcd", "axs15231b", "display", "driver"]
+    },
+    {
+      "id": "file:sketch/src/touch/esp_lcd_touch.h",
+      "type": "file",
+      "name": "LCD 触摸驱动头文件",
+      "filePath": "sketch/src/touch/esp_lcd_touch.h",
+      "summary": "LCD 触摸屏驱动头文件",
+      "tags": ["touch", "lcd", "driver"]
+    },
+    {
+      "id": "file:sketch/src/touch/esp_lcd_touch.c",
+      "type": "file",
+      "name": "LCD 触摸驱动实现",
+      "filePath": "sketch/src/touch/esp_lcd_touch.c",
+      "summary": "LCD 触摸屏驱动的具体实现",
+      "tags": ["touch", "lcd", "driver"]
+    },
+    {
+      "id": "file:sketch/src/lvgl_port/lvgl_port.h",
+      "type": "file",
+      "name": "LVGL 移植层头文件",
+      "filePath": "sketch/src/lvgl_port/lvgl_port.h",
+      "summary": "LVGL 图形库在 ESP32 上的移植层头文件",
+      "tags": ["lvgl", "port", "ui"]
+    },
+    {
+      "id": "file:sketch/src/lvgl_port/lvgl_port.cpp",
+      "type": "file",
+      "name": "LVGL 移植层实现",
+      "filePath": "sketch/src/lvgl_port/lvgl_port.cpp",
+      "summary": "LVGL 图形库在 ESP32 上的移植层具体实现",
+      "tags": ["lvgl", "port", "ui"]
+    },
+    {
+      "id": "file:sketch/src/ESP32-audioI2S-master/Audio.h",
+      "type": "file",
+      "name": "ESP32 音频库头文件",
+      "filePath": "sketch/src/ESP32-audioI2S-master/Audio.h",
+      "summary": "ESP32 音频 I2S 库头文件",
+      "tags": ["audio", "i2s", "library"]
+    },
+    {
+      "id": "file:sketch/src/ESP32-audioI2S-master/Audio.cpp",
+      "type": "file",
+      "name": "ESP32 音频库实现",
+      "filePath": "sketch/src/ESP32-audioI2S-master/Audio.cpp",
+      "summary": "ESP32 音频 I2S 库的具体实现",
+      "tags": ["audio", "i2s", "library"]
+    },
+    {
+      "id": "file:sketch/src/ui/ui.h",
+      "type": "file",
+      "name": "UI 主头文件",
+      "filePath": "sketch/src/ui/ui.h",
+      "summary": "UI 界面的主要头文件",
+      "tags": ["ui", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/ui.c",
+      "type": "file",
+      "name": "UI 主实现",
+      "filePath": "sketch/src/ui/ui.c",
+      "summary": "UI 界面的主要实现",
+      "tags": ["ui", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/ui_events.h",
+      "type": "file",
+      "name": "UI 事件处理头文件",
+      "filePath": "sketch/src/ui/ui_events.h",
+      "summary": "UI 事件处理函数声明",
+      "tags": ["ui", "events", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/ui_events.cpp",
+      "type": "file",
+      "name": "UI 事件处理实现",
+      "filePath": "sketch/src/ui/ui_events.cpp",
+      "summary": "UI 事件处理函数的具体实现",
+      "tags": ["ui", "events", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/ui_helpers.h",
+      "type": "file",
+      "name": "UI 辅助函数头文件",
+      "filePath": "sketch/src/ui/ui_helpers.h",
+      "summary": "UI 辅助函数声明",
+      "tags": ["ui", "helpers", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/ui_helpers.c",
+      "type": "file",
+      "name": "UI 辅助函数实现",
+      "filePath": "sketch/src/ui/ui_helpers.c",
+      "summary": "UI 辅助函数的具体实现",
+      "tags": ["ui", "helpers", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/screens/ui_Screen_Boot.h",
+      "type": "file",
+      "name": "启动屏幕头文件",
+      "filePath": "sketch/src/ui/screens/ui_Screen_Boot.h",
+      "summary": "启动屏幕界面头文件",
+      "tags": ["ui", "screen", "boot", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/screens/ui_Screen_Boot.c",
+      "type": "file",
+      "name": "启动屏幕实现",
+      "filePath": "sketch/src/ui/screens/ui_Screen_Boot.c",
+      "summary": "启动屏幕界面的具体实现",
+      "tags": ["ui", "screen", "boot", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/screens/ui_Screen_Overview.h",
+      "type": "file",
+      "name": "概览屏幕头文件",
+      "filePath": "sketch/src/ui/screens/ui_Screen_Overview.h",
+      "summary": "概览屏幕界面头文件",
+      "tags": ["ui", "screen", "overview", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/screens/ui_Screen_Overview.cpp",
+      "type": "file",
+      "name": "概览屏幕实现",
+      "filePath": "sketch/src/ui/screens/ui_Screen_Overview.cpp",
+      "summary": "概览屏幕界面的具体实现",
+      "tags": ["ui", "screen", "overview", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/screens/ui_Screen_Settings.h",
+      "type": "file",
+      "name": "设置屏幕头文件",
+      "filePath": "sketch/src/ui/screens/ui_Screen_Settings.h",
+      "summary": "设置屏幕界面头文件",
+      "tags": ["ui", "screen", "settings", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/screens/ui_Screen_Settings.c",
+      "type": "file",
+      "name": "设置屏幕实现",
+      "filePath": "sketch/src/ui/screens/ui_Screen_Settings.c",
+      "summary": "设置屏幕界面的具体实现",
+      "tags": ["ui", "screen", "settings", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/screens/ui_Screen_Storage.h",
+      "type": "file",
+      "name": "存储屏幕头文件",
+      "filePath": "sketch/src/ui/screens/ui_Screen_Storage.h",
+      "summary": "存储屏幕界面头文件",
+      "tags": ["ui", "screen", "storage", "lvgl"]
+    },
+    {
+      "id": "file:sketch/src/ui/screens/ui_Screen_Storage.c",
+      "type": "file",
+      "name": "存储屏幕实现",
+      "filePath": "sketch/src/ui/screens/ui_Screen_Storage.c",
+      "summary": "存储屏幕界面的具体实现",
+      "tags": ["ui", "screen", "storage", "lvgl"]
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:sketch/src/main.cpp",
+      "target": "file:sketch/include/lv_conf.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/main.cpp",
+      "target": "file:sketch/include/user_config.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/main.cpp",
+      "target": "file:sketch/include/xtask.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/main.cpp",
+      "target": "file:sketch/src/xtask.cpp",
+      "type": "related_to",
+      "weight": 0.8
+    },
+    {
+      "source": "file:sketch/src/lvgl_port/lvgl_port.h",
+      "target": "file:sketch/include/lv_conf.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/lvgl_port/lvgl_port.cpp",
+      "target": "file:sketch/src/lvgl_port/lvgl_port.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/lvgl_port/lvgl_port.cpp",
+      "target": "file:sketch/src/axs15231b/esp_lcd_axs15231b.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/lvgl_port/lvgl_port.cpp",
+      "target": "file:sketch/src/touch/esp_lcd_touch.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/lvgl_port/lvgl_port.cpp",
+      "target": "file:sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/ui/ui.h",
+      "target": "file:sketch/src/lvgl_port/lvgl_port.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/ui/ui.c",
+      "target": "file:sketch/src/ui/ui.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/ui/ui_events.h",
+      "target": "file:sketch/src/ui/ui.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/ui/ui_events.cpp",
+      "target": "file:sketch/src/ui/ui_events.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/ui/ui_helpers.h",
+      "target": "file:sketch/src/ui/ui.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/ui/ui_helpers.c",
+      "target": "file:sketch/src/ui/ui_helpers.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/ui/screens/ui_Screen_Boot.h",
+      "target": "file:sketch/src/ui/ui.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/ui/screens/ui_Screen_Boot.c",
+      "target": "file:sketch/src/ui/screens/ui_Screen_Boot.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/ui/screens/ui_Screen_Overview.h",
+      "target": "file:sketch/src/ui/ui.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/ui/screens/ui_Screen_Overview.cpp",
+      "target": "file:sketch/src/ui/screens/ui_Screen_Overview.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/ui/screens/ui_Screen_Settings.h",
+      "target": "file:sketch/src/ui/ui.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/ui/screens/ui_Screen_Settings.c",
+      "target": "file:sketch/src/ui/screens/ui_Screen_Settings.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/ui/screens/ui_Screen_Storage.h",
+      "target": "file:sketch/src/ui/ui.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/ui/screens/ui_Screen_Storage.c",
+      "target": "file:sketch/src/ui/screens/ui_Screen_Storage.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/i2c_bsp/i2c_bsp.c",
+      "target": "file:sketch/src/i2c_bsp/i2c_bsp.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.c",
+      "target": "file:sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/pcf85063/pcf85063.cpp",
+      "target": "file:sketch/src/pcf85063/pcf85063.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/pcf85063/pcf85063.h",
+      "target": "file:sketch/src/i2c_bsp/i2c_bsp.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/tca9554/tca9554.cpp",
+      "target": "file:sketch/src/tca9554/tca9554.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/tca9554/tca9554.h",
+      "target": "file:sketch/src/i2c_bsp/i2c_bsp.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/es7210/es7210.cpp",
+      "target": "file:sketch/src/es7210/es7210.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/es7210/es7210.h",
+      "target": "file:sketch/src/es7210/es7210_reg.h",
+      "type": "includes",
+      "weight": 0.7
+    },
+    {
+      "source": "file:sketch/src/es8311/es8311.cpp",
+      "target": "file:sketch/src/es8311/es8311.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/axs15231b/esp_lcd_axs15231b.c",
+      "target": "file:sketch/src/axs15231b/esp_lcd_axs15231b.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/touch/esp_lcd_touch.c",
+      "target": "file:sketch/src/touch/esp_lcd_touch.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "file:sketch/src/ESP32-audioI2S-master/Audio.cpp",
+      "target": "file:sketch/src/ESP32-audioI2S-master/Audio.h",
+      "type": "implements",
+      "weight": 0.9
+    },
+    {
+      "source": "config:sketch/platformio.ini",
+      "target": "config:sketch/boards/esp32-s3-devkitc1-n16r8.json",
+      "type": "configures",
+      "weight": 0.6
+    },
+    {
+      "source": "config:sketch/platformio.ini",
+      "target": "config:sketch/partitions/7MB_app_ota_2MB_littlefs.csv",
+      "type": "configures",
+      "weight": 0.6
+    },
+    {
+      "source": "doc:README.md",
+      "target": "file:sketch/src/main.cpp",
+      "type": "documents",
+      "weight": 0.5
+    },
+    {
+      "source": "doc:README.md",
+      "target": "config:sketch/platformio.ini",
+      "type": "documents",
+      "weight": 0.5
+    }
+  ]
+}

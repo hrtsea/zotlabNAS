@@ -1,0 +1,40 @@
+# PlatformIO
+.pio/
+.libdeps/
+platformio.ini.backup
+
+# Build output
+build/
+*.bin
+*.elf
+*.map
+sketch/.cache/
+
+# IDE
+.vscode/settings.json
+.vscode/ipch/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary
+*.tmp
+*.bak
+~$*
+
+# Packages (download separately)
+sketch/packages/
+
+# ArduinoJson (if using git submodule)
+# lib/ArduinoJson/
+
+# ESP32 exceptions decoder
+exception_decoder/
