@@ -12,6 +12,8 @@
 #include <WiFi.h>
 #include "data/config.h"
 #include "net/wifi_manager.h"
+#include "fan_pwm_bsp.h"
+#include "net/data_source.h"
 
 // 外部变量声明
 extern AppConfig g_config;
@@ -23,44 +25,27 @@ extern QueueHandle_t audio_cmd_queue;
 //==============================================
 // BUTTON INPUT TASK - Core 1
 void button_input_task(void *param) {
-<<<<<<< HEAD
-    static uint32_t last_boot_press_ms = 0;
-    static uint32_t last_power_press_ms = 0;
-    const uint32_t DEBOUNCE_MS = 50;
-    
-    for (;;) {
-        uint32_t now = millis();
-        
-        // Check BOOT button
-        if (digitalRead(BOOT) == LOW && now - last_boot_press_ms > DEBOUNCE_MS) {
-            Serial.println("BOOT button pressed");
-            last_boot_press_ms = now;
-        }
+  static uint32_t last_boot_press_ms = 0;
+  static uint32_t last_power_press_ms = 0;
+  const uint32_t DEBOUNCE_MS = 50;
 
-        // Check power button
-        if (digitalRead(SYS_OUT) == LOW && now - last_power_press_ms > DEBOUNCE_MS) {
-            Serial.println("Power button pressed");
-            last_power_press_ms = now;
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(10));
-    }
-=======
   for (;;) {
+    uint32_t now = millis();
+
     // Check BOOT button
-    if (digitalRead(BOOT) == LOW) {
+    if (digitalRead(BOOT) == LOW && now - last_boot_press_ms > DEBOUNCE_MS) {
       Serial.println("BOOT button pressed");
-      vTaskDelay(pdMS_TO_TICKS(200));  // Debounce
+      last_boot_press_ms = now;
     }
 
     // Check power button
-    if (digitalRead(SYS_OUT) == LOW) {
+    if (digitalRead(SYS_OUT) == LOW && now - last_power_press_ms > DEBOUNCE_MS) {
       Serial.println("Power button pressed");
+      last_power_press_ms = now;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(50));
+    vTaskDelay(pdMS_TO_TICKS(10));
   }
->>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
 }
 
 //==============================================
@@ -178,19 +163,11 @@ void audio_loop_task(void *param) {
 static volatile uint64_t s_idle_count[2] = {0, 0};
 
 bool IRAM_ATTR idle_hook0(void) {
-<<<<<<< HEAD
-  s_idle_count[0] = s_idle_count[0] + 1;
-  return false;
-}
-bool IRAM_ATTR idle_hook1(void) {
-  s_idle_count[1] = s_idle_count[1] + 1;
-=======
   s_idle_count[0]++;
   return false;
 }
 bool IRAM_ATTR idle_hook1(void) {
   s_idle_count[1]++;
->>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
   return false;
 }
 
@@ -232,5 +209,214 @@ void cpu_monitor_task(void *param) {
     last_ms = now_ms;
     last_count[0] = curr[0];
     last_count[1] = curr[1];
+  }
+}
+
+//==============================================
+// FAN CONTROL TASK - Core 1
+// Temperature-based PWM fan control with hysteresis and ramp control
+// Reads NAS temperature data and applies configured fan curve
+void fan_control_task(void *param) {
+  (void)param;
+  static uint8_t last_pwm_pct = 0;
+  static int16_t last_temp = 0;
+  static uint32_t last_stall_check_ms = 0;
+
+  // Initialize fan PWM hardware
+  uint8_t initial_pwm = g_config.fan.enabled ? g_config.fan.manual_pwm_pct : 0;
+  fan_pwm_bsp_init(initial_pwm);
+  fan_pwm_bsp_set_enabled(g_config.fan.enabled);
+
+  Serial.printf("[Fan] Control task started (mode=%s, initial=%d%%, curve_points=%d)\n",
+                g_config.fan.mode == 0 ? "AUTO" : "MANUAL",
+                initial_pwm, FAN_CURVE_POINTS);
+
+  for (;;) {
+    // Fan enabled flag from config (can change at runtime via UI)
+    if (!g_config.fan.enabled) {
+      fan_pwm_bsp_set_pwm(0);
+      last_pwm_pct = 0;
+      vTaskDelay(pdMS_TO_TICKS(1000));
+      continue;
+    }
+
+    // ===== Step 1: Determine target temperature =====
+    int16_t ctrl_temp = 0;
+    bool temp_valid = false;
+
+    if (g_data_source != nullptr && g_data_source->isConnected()) {
+      const NasData& data = g_data_source->getData();
+
+      // Select temperature source based on config
+      switch (g_config.fan.temp_source) {
+        case 0:  // TEMP_MAX_CPU_SYS
+          ctrl_temp = (int16_t)max((int16_t)data.system.temp_cpu,
+                                   (int16_t)data.system.temp_sys);
+          temp_valid = (ctrl_temp > 0);
+          break;
+        case 1:  // TEMP_AVG_CPU_SYS
+          if (data.system.temp_cpu > 0 && data.system.temp_sys > 0) {
+            ctrl_temp = (int16_t)((data.system.temp_cpu + data.system.temp_sys) / 2);
+            temp_valid = true;
+          } else if (data.system.temp_cpu > 0) {
+            ctrl_temp = data.system.temp_cpu;
+            temp_valid = true;
+          } else if (data.system.temp_sys > 0) {
+            ctrl_temp = data.system.temp_sys;
+            temp_valid = true;
+          }
+          break;
+        case 2:  // TEMP_CPU_ONLY
+          ctrl_temp = data.system.temp_cpu;
+          temp_valid = (ctrl_temp > 0);
+          break;
+        case 3:  // TEMP_SYS_ONLY
+          ctrl_temp = data.system.temp_sys;
+          temp_valid = (ctrl_temp > 0);
+          break;
+        default:
+          ctrl_temp = (int16_t)max((int16_t)data.system.temp_cpu,
+                                   (int16_t)data.system.temp_sys);
+          temp_valid = (ctrl_temp > 0);
+          break;
+      }
+    }
+
+    // Fallback: no temperature data - use manual or default minimum
+    if (!temp_valid) {
+      // No NAS data available - use manual PWM or safe minimum
+      if (g_config.fan.mode == 1) {  // FAN_MODE_MANUAL
+        uint8_t target = g_config.fan.manual_pwm_pct;
+        if (target != last_pwm_pct) {
+          fan_pwm_bsp_set_pwm(target);
+          last_pwm_pct = target;
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        continue;
+      }
+      // AUTO without temp data - use min PWM (safe default, not 0 to prevent overheat)
+      ctrl_temp = 35;  // Assume moderate temperature
+      temp_valid = true;
+    }
+
+    // ===== Step 2: Determine target PWM =====
+    uint8_t target_pwm = 0;
+
+    if (g_config.fan.mode == 1) {
+      // MANUAL mode - use configured PWM directly
+      target_pwm = g_config.fan.manual_pwm_pct;
+    } else {
+      // AUTO mode - interpolate fan curve
+      // Fan curve: array of (temp, pwm_pct) points, sorted by temp ascending
+      // Points from config: config_load memcpy DEFAULT_FAN_CURVE as default
+      FanCurvePoint* curve = (FanCurvePoint*)g_config.fan.curve;
+      int curve_points = FAN_CURVE_POINTS;
+
+      if (ctrl_temp <= curve[0].temp) {
+        // Below lowest curve point - use minimum PWM (not 0, for safety)
+        target_pwm = g_config.fan.min_pwm_pct;
+      } else if (ctrl_temp >= curve[curve_points - 1].temp) {
+        // Above highest curve point - full speed
+        target_pwm = 100;
+      } else {
+        // Interpolate between curve points
+        for (int i = 0; i < curve_points - 1; i++) {
+          if (ctrl_temp >= curve[i].temp && ctrl_temp <= curve[i + 1].temp) {
+            // Linear interpolation between curve[i] and curve[i+1]
+            int16_t temp_range = curve[i + 1].temp - curve[i].temp;
+            int16_t temp_delta = ctrl_temp - curve[i].temp;
+            int16_t pwm_range = curve[i + 1].pwm_pct - curve[i].pwm_pct;
+            if (temp_range > 0) {
+              target_pwm = curve[i].pwm_pct +
+                           (uint8_t)((int32_t)temp_delta * pwm_range / temp_range);
+            } else {
+              target_pwm = curve[i].pwm_pct;
+            }
+            break;
+          }
+        }
+      }
+
+      // Clamp to min PWM
+      if (target_pwm < g_config.fan.min_pwm_pct) {
+        target_pwm = g_config.fan.min_pwm_pct;
+      }
+      // Emergency over-temperature - full speed
+      if (ctrl_temp >= g_config.fan.emergency_temp) {
+        target_pwm = 100;
+      }
+    }
+
+    // Clamp PWM to 0-100
+    if (target_pwm > 100) target_pwm = 100;
+
+    // ===== Step 3: Apply hysteresis (reduces PWM hunting) =====
+    // Only change PWM if:
+    // 1. Delta >= min_change_pct, OR
+    // 2. Temperature delta >= hysteresis, OR
+    // 3. Emergency condition
+    int16_t temp_delta = ctrl_temp - last_temp;
+    if (temp_delta < 0) temp_delta = -temp_delta;
+    int16_t pwm_delta = (int16_t)target_pwm - (int16_t)last_pwm_pct;
+    if (pwm_delta < 0) pwm_delta = -pwm_delta;
+
+    bool should_update = false;
+    if (last_pwm_pct == 0 || target_pwm == 100 || target_pwm == 0) {
+      should_update = true;  // Always update on-state transitions
+    } else if (pwm_delta >= g_config.fan.min_change_pct) {
+      should_update = true;
+    } else if (temp_delta >= g_config.fan.hysteresis) {
+      should_update = true;
+    }
+
+    if (should_update) {
+      // Soft ramp: incrementally approach target over multiple ticks
+      // to prevent sudden current spikes. Ramp speed: 5% per 100ms
+      uint8_t current = last_pwm_pct;
+      if (current == target_pwm) {
+        // already at target - just apply
+        fan_pwm_bsp_set_pwm(target_pwm);
+      } else {
+        // Gradual ramp via set_pwm in loop
+        while (current != target_pwm) {
+          if (current < target_pwm) {
+            current = (uint8_t)min((int)target_pwm, (int)current + 5);
+          } else {
+            current = (uint8_t)max((int)target_pwm, (int)current - 5);
+          }
+          fan_pwm_bsp_set_pwm(current);
+          vTaskDelay(pdMS_TO_TICKS(100));
+        }
+      }
+      last_pwm_pct = target_pwm;
+      last_temp = ctrl_temp;
+
+      // Debug output (throttled)
+      static uint32_t last_log_ms = 0;
+      if (millis() - last_log_ms > 5000) {
+        last_log_ms = millis();
+        Serial.printf("[Fan] T=%d°C, PWM=%d%% (mode=%s, source=%d)\n",
+                      ctrl_temp, target_pwm,
+                      g_config.fan.mode == 0 ? "AUTO" : "MANUAL",
+                      g_config.fan.temp_source);
+      }
+    }
+
+    // ===== Step 4: Stall detection (simple heuristic) =====
+    // If PWM > 0 but rpm is 0 (or very low), flag stall alarm
+    // Actual tachometer reading would require pulse counter ISR
+    if (g_config.fan.stall_detect_sec > 0 && target_pwm > 20) {
+      uint32_t now = millis();
+      if (now - last_stall_check_ms > (uint32_t)g_config.fan.stall_detect_sec * 1000) {
+        last_stall_check_ms = now;
+        // Simple software check: verify PWM was actually applied
+        if (fan_pwm_bsp_get_pwm() == 0 && target_pwm > 20) {
+          // This should not happen - log warning
+          Serial.println(F("[Fan] WARN: target>0 but hardware reports PWM=0"));
+        }
+      }
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }

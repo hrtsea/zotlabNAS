@@ -1,6 +1,6 @@
 // ZotLab NAS Monitor - WiFi Manager Implementation
 #include "wifi_manager.h"
-#include "config.h"
+#include "data/config.h"
 #include <WiFi.h>
 #include <esp_wifi.h>
 
@@ -100,11 +100,6 @@ void wifi_event_callback(WiFiEvent_t event, WiFiEventInfo_t info) {
     }
 }
 
-// 全局辅助函数:获取WiFiManager单例的RTC指针
-ESP32Time* wifi_get_rtc() {
-    return g_wifi.getRtc();
-}
-
 WiFiManager::WiFiManager()
     : state(WIFI_DISCONNECTED), last_reconnect_ms(0), connect_start_ms(0),
       connect_timeout_ms(25000), connecting_nonblocking(false), reconnect_attempts(0), network_count(0) {
@@ -171,18 +166,7 @@ void WiFiManager::connectNonBlocking(const char* ssid, const char* password) {
 
     Serial.printf("[WiFi] Starting non-blocking connection to SSID: '%s'\n", ssid);
     if (password && strlen(password) > 0) {
-<<<<<<< HEAD
         Serial.printf("[WiFi] Password configured (length: %d)\n", strlen(password));
-=======
-        Serial.printf("[WiFi] Password length: %d\n", strlen(password));
-        // 打印密码前4个字符和后4个字符，帮助调试
-        if (strlen(password) >= 8) {
-            Serial.printf("[WiFi] Password hint: %c%c%c%c....%c%c%c%c\n",
-                          password[0], password[1], password[2], password[3],
-                          password[strlen(password)-4], password[strlen(password)-3],
-                          password[strlen(password)-2], password[strlen(password)-1]);
-        }
->>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
     } else {
         Serial.println(F("[WiFi] No password (open network or WPS?)"));
     }
@@ -469,10 +453,6 @@ int32_t WiFiManager::getNetworkRSSI(int index) const {
         return WiFi.RSSI(index);
     }
     return 0;
-}
-
-ESP32Time* WiFiManager::getRtc() {
-    return &rtc;
 }
 
 void WiFiManager::disconnect(bool stopWiFi) {

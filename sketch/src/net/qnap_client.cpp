@@ -1,5 +1,5 @@
 #include "qnap_client.h"
-#include "config.h"
+#include "data/config.h"
 #include <WiFi.h>
 
 QnapClient::QnapClient() {

@@ -2,8 +2,8 @@
 #pragma once
 #include <Arduino.h>
 #include <Preferences.h>
-#include "nas_data.h"
-#include "config.h"
+#include "data/nas_data.h"
+#include "data/config.h"
 
 // NAS类型配置结构体（用于UI默认值和字段可见性）
 struct NasTypeConfig {

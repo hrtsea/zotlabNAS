@@ -1,8 +1,8 @@
 // ZotLab NAS Monitor - HTTP API Client Implementation
 #include <WiFi.h>
 #include "api_client.h"
-#include "config.h"
-#include "nas_config.h"
+#include "data/config.h"
+#include "data/nas_config.h"
 
 ApiClient::ApiClient()
     : nas_port(0), state(API_IDLE), last_poll_ms(0),

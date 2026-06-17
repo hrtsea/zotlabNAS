@@ -1,5 +1,5 @@
 #include "truenas_client.h"
-#include "config.h"
+#include "data/config.h"
 #include <ArduinoJson.h>
 #include <WiFi.h>
 

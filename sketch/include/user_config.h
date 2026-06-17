@@ -155,4 +155,19 @@ ESP32 RX ← ES7210 (ADC)
 #define EXIO6_BIT 0b01000000  // power hold
 #define EXIO7_BIT 0b10000000  // audio_amp
 
+// ============================================================
+// 11. 风扇 PWM 控制配置
+// ============================================================
+// PWM 控制信号输出引脚（连接 4 线 PWM 风扇的 PWM 线）
+// 默认使用 GPIO 17（可根据实际硬件接线修改）
+#ifndef FAN_PWM_PIN
+#define FAN_PWM_PIN           (GPIO_NUM_17)
+#endif
+
+// 风扇转速反馈输入引脚（可选，用于堵转检测）
+// 如果不需要堵转检测，可以不连接此引脚
+#ifndef FAN_TACH_PIN
+#define FAN_TACH_PIN          (GPIO_NUM_NC)
+#endif
+
 #endif // USER_CONFIG_H

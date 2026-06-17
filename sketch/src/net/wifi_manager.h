@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
-#include <ESP32Time.h>
 
 enum WifiState {
     WIFI_DISCONNECTED,
@@ -55,9 +54,6 @@ public:
     // Get RSSI of scanned network at index
     int32_t getNetworkRSSI(int index) const;
 
-    // Get RTC pointer
-    ESP32Time* getRtc();
-
     // Disconnect and reset state
     void disconnect(bool stopWiFi = false);
 
@@ -72,7 +68,6 @@ public:
 
 private:
     WifiState state;
-    ESP32Time rtc;
     char ip_str[16];
     uint32_t last_reconnect_ms;
     uint32_t connect_start_ms;  // 非阻塞连接开始时间
@@ -89,5 +84,3 @@ private:
 
 extern WiFiManager g_wifi;
 
-// Global helper function: get RTC pointer from WiFiManager
-ESP32Time* wifi_get_rtc();

@@ -1,7 +1,7 @@
 // ZotLab NAS Monitor - Serial Client Implementation
 #include "serial_client.h"
-#include "config.h"
-#include "nas_config.h"
+#include "data/config.h"
+#include "data/nas_config.h"
 #include "user_config.h"
 
 SerialClient::SerialClient()

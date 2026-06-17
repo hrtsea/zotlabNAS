@@ -1,7 +1,7 @@
 // ZotLab NAS Monitor - Mock Data Source for Testing
 #include "mock_client.h"
-#include "config.h"
-#include "nas_data.h"
+#include "data/config.h"
+#include "data/nas_data.h"
 #include <math.h>
 #include <Arduino.h>
 
