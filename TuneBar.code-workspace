@@ -14,10 +14,6 @@
 		}
 	],
 	"settings": {
-		"clangd.arguments": [
-			"--compile-commands-dir=f:/nasmonitor/TuneBar-main/sketch/.cache/clangd",
-			"--query-driver=C:/Users/steven/.platformio/packages/toolchain-*/bin/*,C:/Users/steven/.platformio/packages/tool-*/bin/*"
-		]
 	//	"platformio-ide.workspaceDir": "sketch"
 
 	},
