@@ -145,6 +145,7 @@ void config_save() {
 }
 
 void config_save_wifi(const char* ssid, const char* pass) {
+<<<<<<< HEAD
     // 参数验证
     if (ssid == nullptr) {
         Serial.println("[Config] Error: SSID cannot be null!");
@@ -163,6 +164,8 @@ void config_save_wifi(const char* ssid, const char* pass) {
         return;
     }
     
+=======
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
     prefs.begin(NVS_NAMESPACE, false);
     prefs.putString(NVS_WIFI_SSID, ssid);
     if (pass && strlen(pass) > 0) prefs.putString(NVS_WIFI_PASS, pass);
@@ -173,6 +176,7 @@ void config_save_wifi(const char* ssid, const char* pass) {
 
 void config_save_nas(const char* type, const char* ip, uint16_t port,
                      const char* user, const char* pass, bool https) {
+<<<<<<< HEAD
     // 参数验证
     if (type == nullptr || strlen(type) == 0) {
         Serial.println("[Config] Error: NAS type cannot be null or empty!");
@@ -199,12 +203,19 @@ void config_save_nas(const char* type, const char* ip, uint16_t port,
         return;
     }
     
+=======
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
     prefs.begin(NVS_NAMESPACE, false);
     prefs.putString(NVS_NAS_TYPE, type);
     prefs.putString(NVS_NAS_IP, ip);
     prefs.putUShort(NVS_NAS_PORT, port);
+<<<<<<< HEAD
     if (user != nullptr) prefs.putString(NVS_NAS_USER, user);
     if (pass != nullptr) prefs.putString(NVS_NAS_PASS, pass);
+=======
+    prefs.putString(NVS_NAS_USER, user);
+    prefs.putString(NVS_NAS_PASS, pass);
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
     prefs.putBool(NVS_NAS_HTTPS, https);
     prefs.end();
 
@@ -213,8 +224,13 @@ void config_save_nas(const char* type, const char* ip, uint16_t port,
     strlcpy(g_config.nas_type, type, sizeof(g_config.nas_type));
     strlcpy(g_config.nas_ip, ip, sizeof(g_config.nas_ip));
     g_config.nas_port = port;
+<<<<<<< HEAD
     if (user != nullptr) strlcpy(g_config.nas_user, user, sizeof(g_config.nas_user));
     if (pass != nullptr) strlcpy(g_config.nas_pass, pass, sizeof(g_config.nas_pass));
+=======
+    strlcpy(g_config.nas_user, user, sizeof(g_config.nas_user));
+    strlcpy(g_config.nas_pass, pass, sizeof(g_config.nas_pass));
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
     g_config.nas_https = https;
     
     // 强制延迟一下，让LVGL事件处理完成

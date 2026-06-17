@@ -4,7 +4,10 @@
 // Project name: tune_bar
 
 #include "../ui.h"
+<<<<<<< HEAD
 #include "../ui_helpers.h"
+=======
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
 
 lv_obj_t * ui_Screen_Settings = NULL;
 lv_obj_t * ui_MainMenu_Tabview_ConfigPanel = NULL;
@@ -105,7 +108,11 @@ void ui_event_MainMenu_Switch_Wifi(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
+<<<<<<< HEAD
     if(event_code == LV_EVENT_VALUE_CHANGED) {
+=======
+    if(event_code == LV_EVENT_CLICKED) {
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
         toggleWiFi(e);
     }
 }

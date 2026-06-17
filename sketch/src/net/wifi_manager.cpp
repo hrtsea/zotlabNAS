@@ -171,7 +171,18 @@ void WiFiManager::connectNonBlocking(const char* ssid, const char* password) {
 
     Serial.printf("[WiFi] Starting non-blocking connection to SSID: '%s'\n", ssid);
     if (password && strlen(password) > 0) {
+<<<<<<< HEAD
         Serial.printf("[WiFi] Password configured (length: %d)\n", strlen(password));
+=======
+        Serial.printf("[WiFi] Password length: %d\n", strlen(password));
+        // 打印密码前4个字符和后4个字符，帮助调试
+        if (strlen(password) >= 8) {
+            Serial.printf("[WiFi] Password hint: %c%c%c%c....%c%c%c%c\n",
+                          password[0], password[1], password[2], password[3],
+                          password[strlen(password)-4], password[strlen(password)-3],
+                          password[strlen(password)-2], password[strlen(password)-1]);
+        }
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
     } else {
         Serial.println(F("[WiFi] No password (open network or WPS?)"));
     }

@@ -274,6 +274,7 @@ void loadWiFiConfigToUI(void) {
 
             wl_status_t status = WiFi.status();
             if (status == WL_CONNECTED) {
+<<<<<<< HEAD
                 // 获取当前连接的SSID和IP
                 const char* ssid = WiFi.SSID().c_str();
                 IPAddress ip = WiFi.localIP();
@@ -289,11 +290,19 @@ void loadWiFiConfigToUI(void) {
                 if (ui_MainMenu_Dropdown_NetworkList != NULL && strlen(ssid) > 0) {
                     lv_dropdown_set_text(ui_MainMenu_Dropdown_NetworkList, ssid);
                 }
+=======
+                char buf[64];
+                IPAddress ip = WiFi.localIP();
+                snprintf(buf, sizeof(buf), "IP: %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+                lv_label_set_text(ui_MainMenu_Label_connectStatus, buf);
+                lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0x00FF00), 0);
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
             } else if (status == WL_CONNECT_FAILED) {
                 lv_label_set_text(ui_MainMenu_Label_connectStatus, "Connect failed");
                 lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0xFF0000), 0);
             } else if (status == WL_DISCONNECTED) {
                 const char* cur = lv_label_get_text(ui_MainMenu_Label_connectStatus);
+<<<<<<< HEAD
                 // 如果是用户手动关闭了 WiFi，保持显示 "Disabled"
                 if (wifiEnable == false) {
                     if (strcmp(cur, "Disabled") != 0) {
@@ -303,6 +312,9 @@ void loadWiFiConfigToUI(void) {
                 } 
                 // 否则是网络问题断开，显示 "Disconnected"
                 else if (cur && (strncmp(cur, "IP:", 3) == 0 || strchr(cur, '\n') != NULL)) {
+=======
+                if (cur && strncmp(cur, "IP:", 3) == 0) {
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
                     lv_label_set_text(ui_MainMenu_Label_connectStatus, "Disconnected");
                     lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0xFF0000), 0);
                 }
@@ -320,8 +332,11 @@ void saveWiFiCredential(lv_event_t *e) {
   uint8_t wifiCount = loadWifiList(wifiList);
   wifiCount = addOrUpdateWifi(newSSID, newPWD, wifiList, wifiCount);
   saveWifiList(wifiList, wifiCount);
+<<<<<<< HEAD
   // Also save to NVS config for auto-connect
   config_save_wifi(newSSID, newPWD);
+=======
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
   SCREEN_OFF_TIMER = millis(); // reset timer
 }
 
@@ -335,6 +350,7 @@ void scanNetwork(lv_event_t *e) {
 void toggleWiFi(lv_event_t * e) {
   SCREEN_OFF_TIMER = millis(); // reset timer
 
+<<<<<<< HEAD
   // Get the switch object from event
   lv_obj_t *sw = lv_event_get_target(e);
   if (sw == NULL) {
@@ -360,13 +376,32 @@ void toggleWiFi(lv_event_t * e) {
       wifi_check_timer = NULL;
     }
     if(wifiTaskHandle != NULL) {
+=======
+  if (wifiEnable) {//disabled
+    wifiEnable = false;
+    //delete wifi check timer
+    if (wifi_check_timer) lv_timer_del(wifi_check_timer);
+    if(wifiTaskHandle != NULL) {//kill wifi_connect_task
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
       vTaskDelete(wifiTaskHandle);
       wifiTaskHandle = NULL;
     }
     WiFi.disconnectAsync();
+<<<<<<< HEAD
     lv_label_set_text(ui_MainMenu_Label_connectStatus, "Disabled");
     lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0xFF0000), LV_PART_MAIN);
     log_d("WiFi Disabled");
+=======
+    lv_label_set_text(ui_MainMenu_Label_connectStatus, "Disconnected");
+    lv_obj_set_style_text_color(ui_MainMenu_Label_connectStatus, lv_color_hex(0xFF0000), LV_PART_MAIN);
+    log_d("WiFi Disconnected");
+
+  } else {//enabled
+
+    wifiEnable = true;
+    //start wifi check timer
+    wifi_check_timer = lv_timer_create(lvgl_wifi_check_cb, WIFI_CHECK_INTERVAL, NULL);//wifi status check interval timer
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
   }
 }
 void setBrightness(lv_event_t* e) {

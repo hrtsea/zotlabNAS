@@ -48,7 +48,10 @@
 #include "net/data_source.h"
 #include "net/network.h"
 #include "data/config.h"
+<<<<<<< HEAD
 #include "file/file.h"
+=======
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
 
 // 外部变量声明
 extern AppConfig g_config;
@@ -95,6 +98,7 @@ void setup() {
   i2c_master_Init();
 
   // Initialize IO expander
+<<<<<<< HEAD
     io = new TCA9554(tca9554_dev_handle);
     if (io == nullptr) {
         Serial.println("[ERROR] Failed to allocate TCA9554!");
@@ -103,13 +107,23 @@ void setup() {
         io->setPinMode(EXIO6_BIT, 0);  // Output: power hold
         io->setPinMode(EXIO7_BIT, 0);  // Output: power amp
     }
+=======
+  io = new TCA9554(tca9554_dev_handle);
+  io->begin();
+  io->setPinMode(EXIO6_BIT, 0);  // Output: power hold
+  io->setPinMode(EXIO7_BIT, 0);  // Output: power amp
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
 
   // Power on hold
   if (digitalRead(SYS_OUT) == LOW) {
     Serial.println("Power ON");
+<<<<<<< HEAD
     if (io != nullptr) {
         io->digitalWrite(EXIO6_BIT, 1);
     }
+=======
+    io->digitalWrite(EXIO6_BIT, 1);
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
   }
 
   // Initialize LVGL (display + touch)
@@ -121,13 +135,17 @@ void setup() {
     lv_timer_del(timer);
   }, 1, NULL);
 
+<<<<<<< HEAD
   // Initialize LittleFS file system
   initLittleFS();
 
+=======
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
   // Initialize LCD backlight
   lcd_bl_pwm_bsp_init(LCD_PWM_MODE_255);
 
   // Enable power amplifier
+<<<<<<< HEAD
   if (io != nullptr) {
     io->digitalWrite(EXIO7_BIT, 1);
     delay(100);
@@ -138,6 +156,14 @@ void setup() {
   } else {
     Serial.println("Power Amp skipped (IO expander not available)");
   }
+=======
+  io->digitalWrite(EXIO7_BIT, 1);
+  delay(100);
+  if (io->digitalRead(EXIO7_BIT) == 0)
+    Serial.println("Power Amp ERROR!");
+  else
+    Serial.println("Power Amp OK");
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
 
   // Initialize ES8311 (audio DAC)
   speaker.setVolume(80);
@@ -161,12 +187,17 @@ void setup() {
   audio.setConnectionTimeout(2000, 4000);
 
   // Create audio command queue
+<<<<<<< HEAD
     audio_cmd_queue = xQueueCreate(10, sizeof(int));
     if (audio_cmd_queue == NULL) {
         Serial.println("[ERROR] Failed to create audio command queue!");
     } else {
         assert(audio_cmd_queue != NULL);
     }
+=======
+  audio_cmd_queue = xQueueCreate(10, sizeof(int));
+  assert(audio_cmd_queue != NULL);
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
 
   // Create FreeRTOS tasks
   xTaskCreatePinnedToCore(audio_loop_task, "audio_loop", 5 * 1024, NULL, 4, NULL, 1);

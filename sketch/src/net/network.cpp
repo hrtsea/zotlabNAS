@@ -1,5 +1,8 @@
 #include "network.h"
+<<<<<<< HEAD
 #include "data/config.h"
+=======
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
 #include "esp32-hal.h"
 #include "file/file.h"
 #include "pcf85063/pcf85063.h"
@@ -291,6 +294,7 @@ void wifi_connect_task(void *param) {
     if (WiFi.getMode() != WIFI_STA) WiFi.mode(WIFI_STA);
     vTaskDelay(pdMS_TO_TICKS(100));
     uint8_t wifiCount = loadWifiList(wifiList);
+<<<<<<< HEAD
     
     // 优先添加 NVS 中保存的 WiFi 凭证（上次成功连接的）
     extern AppConfig g_config;
@@ -329,6 +333,8 @@ void wifi_connect_task(void *param) {
       }
     }
     
+=======
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
     log_d("Loaded %d Wi-Fi credentials", wifiCount);
     updateWiFiStatus("Scanning...", 0x00FF00, 0x777777);
 
@@ -405,11 +411,14 @@ void wifi_connect_task(void *param) {
             log_i("%s", connectedMsg);
             updateWiFiStatus(connectedMsg, 0x00FF00, 0x0000FF);
 
+<<<<<<< HEAD
             // 保存当前连接的 WiFi 凭证到 NVS（作为下次优先连接的）
             extern void config_save_wifi(const char *ssid, const char *pass);
             config_save_wifi(wifiList[matchIndex[idx]].ssid, wifiList[matchIndex[idx]].password);
             log_i("Saved current WiFi to NVS: %s", wifiList[matchIndex[idx]].ssid);
 
+=======
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
             rtc.ntp_sync(UTC_offset_hour[offset_hour_index], UTC_offset_minute[offset_minute_index]);
             rtc.calibratBySeconds(0, 0.0); // mode 0 (eery 2 second, diff_time/total_calibrate_time)
             // check if new firmware available

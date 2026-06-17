@@ -23,6 +23,7 @@ extern QueueHandle_t audio_cmd_queue;
 //==============================================
 // BUTTON INPUT TASK - Core 1
 void button_input_task(void *param) {
+<<<<<<< HEAD
     static uint32_t last_boot_press_ms = 0;
     static uint32_t last_power_press_ms = 0;
     const uint32_t DEBOUNCE_MS = 50;
@@ -44,6 +45,22 @@ void button_input_task(void *param) {
 
         vTaskDelay(pdMS_TO_TICKS(10));
     }
+=======
+  for (;;) {
+    // Check BOOT button
+    if (digitalRead(BOOT) == LOW) {
+      Serial.println("BOOT button pressed");
+      vTaskDelay(pdMS_TO_TICKS(200));  // Debounce
+    }
+
+    // Check power button
+    if (digitalRead(SYS_OUT) == LOW) {
+      Serial.println("Power button pressed");
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(50));
+  }
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
 }
 
 //==============================================
@@ -161,11 +178,19 @@ void audio_loop_task(void *param) {
 static volatile uint64_t s_idle_count[2] = {0, 0};
 
 bool IRAM_ATTR idle_hook0(void) {
+<<<<<<< HEAD
   s_idle_count[0] = s_idle_count[0] + 1;
   return false;
 }
 bool IRAM_ATTR idle_hook1(void) {
   s_idle_count[1] = s_idle_count[1] + 1;
+=======
+  s_idle_count[0]++;
+  return false;
+}
+bool IRAM_ATTR idle_hook1(void) {
+  s_idle_count[1]++;
+>>>>>>> 89db8d722f90853fa0efe8e106b49eadd6220200
   return false;
 }
 

@@ -2,11 +2,24 @@
   "version": "1.0.0",
   "project": {
     "name": "TuneBar",
-    "languages": ["C", "C++", "Python", "Markdown", "JSON", "YAML"],
-    "frameworks": ["PlatformIO", "LVGL", "Arduino", "ESP-IDF", "FreeRTOS"],
+    "languages": [
+      "C",
+      "C++",
+      "Python",
+      "Markdown",
+      "JSON",
+      "YAML"
+    ],
+    "frameworks": [
+      "PlatformIO",
+      "LVGL",
+      "Arduino",
+      "ESP-IDF",
+      "FreeRTOS"
+    ],
     "description": "基于 ESP32-S3 的硬件开发项目，提供完整的 LVGL UI、音频功能和 NAS 监控能力",
-    "analyzedAt": "2026-06-06T03:00:00.000Z",
-    "gitCommitHash": "local"
+    "analyzedAt": "2026-06-08T07:56:22.747Z",
+    "gitCommitHash": "57a1316e302bc457eaec2285a747888902dfcbcb"
   },
   "nodes": [
     {
@@ -15,7 +28,10 @@
       "name": "项目说明文档",
       "filePath": "README.md",
       "summary": "TuneBar 是基于 ESP32-S3 的硬件开发项目，提供完整的 LVGL UI、音频功能和 NAS 监控能力",
-      "tags": ["documentation", "overview"]
+      "tags": [
+        "documentation",
+        "overview"
+      ]
     },
     {
       "id": "config:.gitignore",
@@ -23,7 +39,10 @@
       "name": "Git 忽略配置",
       "filePath": ".gitignore",
       "summary": "定义 Git 仓库中需要忽略的文件和目录",
-      "tags": ["git", "configuration"]
+      "tags": [
+        "git",
+        "configuration"
+      ]
     },
     {
       "id": "config:sketch/platformio.ini",
@@ -31,7 +50,11 @@
       "name": "PlatformIO 配置",
       "filePath": "sketch/platformio.ini",
       "summary": "PlatformIO 项目配置文件，定义 ESP32-S3 开发环境",
-      "tags": ["platformio", "configuration", "esp32"]
+      "tags": [
+        "platformio",
+        "configuration",
+        "esp32"
+      ]
     },
     {
       "id": "config:sketch/boards/esp32-s3-devkitc1-n16r8.json",
@@ -39,7 +62,11 @@
       "name": "开发板配置",
       "filePath": "sketch/boards/esp32-s3-devkitc1-n16r8.json",
       "summary": "ESP32-S3 开发板硬件配置",
-      "tags": ["board", "hardware", "configuration"]
+      "tags": [
+        "board",
+        "hardware",
+        "configuration"
+      ]
     },
     {
       "id": "config:sketch/partitions/7MB_app_ota_2MB_littlefs.csv",
@@ -47,7 +74,11 @@
       "summary": "Flash 分区表配置",
       "filePath": "sketch/partitions/7MB_app_ota_2MB_littlefs.csv",
       "name": "Flash 分区配置",
-      "tags": ["partition", "flash", "configuration"]
+      "tags": [
+        "partition",
+        "flash",
+        "configuration"
+      ]
     },
     {
       "id": "file:sketch/include/lv_conf.h",
@@ -55,7 +86,11 @@
       "name": "LVGL 配置",
       "filePath": "sketch/include/lv_conf.h",
       "summary": "LVGL 图形库的配置文件",
-      "tags": ["lvgl", "ui", "configuration"]
+      "tags": [
+        "lvgl",
+        "ui",
+        "configuration"
+      ]
     },
     {
       "id": "file:sketch/include/user_config.h",
@@ -63,7 +98,10 @@
       "name": "用户硬件配置",
       "filePath": "sketch/include/user_config.h",
       "summary": "硬件引脚、I2C 设备地址等硬件配置",
-      "tags": ["hardware", "configuration"]
+      "tags": [
+        "hardware",
+        "configuration"
+      ]
     },
     {
       "id": "file:sketch/include/xtask.h",
@@ -71,7 +109,11 @@
       "name": "FreeRTOS 任务定义",
       "filePath": "sketch/include/xtask.h",
       "summary": "FreeRTOS 任务声明和任务函数原型",
-      "tags": ["freertos", "task", "rtos"]
+      "tags": [
+        "freertos",
+        "task",
+        "rtos"
+      ]
     },
     {
       "id": "file:sketch/src/main.cpp",
@@ -79,7 +121,10 @@
       "name": "主程序入口",
       "filePath": "sketch/src/main.cpp",
       "summary": "主程序文件，包含 setup() 和 loop() 函数",
-      "tags": ["main", "entry-point"]
+      "tags": [
+        "main",
+        "entry-point"
+      ]
     },
     {
       "id": "file:sketch/src/xtask.cpp",
@@ -87,7 +132,10 @@
       "name": "FreeRTOS 任务实现",
       "filePath": "sketch/src/xtask.cpp",
       "summary": "FreeRTOS 任务的具体实现",
-      "tags": ["freertos", "task"]
+      "tags": [
+        "freertos",
+        "task"
+      ]
     },
     {
       "id": "file:sketch/src/i2c_bsp/i2c_bsp.h",
@@ -95,7 +143,11 @@
       "name": "I2C 总线驱动头文件",
       "filePath": "sketch/src/i2c_bsp/i2c_bsp.h",
       "summary": "I2C 通信接口驱动头文件",
-      "tags": ["i2c", "driver", "hardware"]
+      "tags": [
+        "i2c",
+        "driver",
+        "hardware"
+      ]
     },
     {
       "id": "file:sketch/src/i2c_bsp/i2c_bsp.c",
@@ -103,7 +155,11 @@
       "name": "I2C 总线驱动实现",
       "filePath": "sketch/src/i2c_bsp/i2c_bsp.c",
       "summary": "I2C 通信接口的具体实现",
-      "tags": ["i2c", "driver", "hardware"]
+      "tags": [
+        "i2c",
+        "driver",
+        "hardware"
+      ]
     },
     {
       "id": "file:sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.h",
@@ -111,7 +167,11 @@
       "name": "LCD 背光 PWM 驱动头文件",
       "filePath": "sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.h",
       "summary": "LCD 背光 PWM 控制驱动头文件",
-      "tags": ["lcd", "pwm", "driver"]
+      "tags": [
+        "lcd",
+        "pwm",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.c",
@@ -119,7 +179,11 @@
       "name": "LCD 背光 PWM 驱动实现",
       "filePath": "sketch/src/lcd_bl_bsp/lcd_bl_pwm_bsp.c",
       "summary": "LCD 背光 PWM 控制的具体实现",
-      "tags": ["lcd", "pwm", "driver"]
+      "tags": [
+        "lcd",
+        "pwm",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/pcf85063/pcf85063.h",
@@ -127,7 +191,11 @@
       "name": "PCF85063 RTC 驱动头文件",
       "filePath": "sketch/src/pcf85063/pcf85063.h",
       "summary": "PCF85063 实时时钟芯片驱动头文件",
-      "tags": ["rtc", "pcf85063", "driver"]
+      "tags": [
+        "rtc",
+        "pcf85063",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/pcf85063/pcf85063.cpp",
@@ -135,7 +203,11 @@
       "name": "PCF85063 RTC 驱动实现",
       "filePath": "sketch/src/pcf85063/pcf85063.cpp",
       "summary": "PCF85063 实时时钟芯片驱动的具体实现",
-      "tags": ["rtc", "pcf85063", "driver"]
+      "tags": [
+        "rtc",
+        "pcf85063",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/tca9554/tca9554.h",
@@ -143,7 +215,11 @@
       "name": "TCA9554 IO 扩展驱动头文件",
       "filePath": "sketch/src/tca9554/tca9554.h",
       "summary": "TCA9554 IO 扩展器芯片驱动头文件",
-      "tags": ["io-expander", "tca9554", "driver"]
+      "tags": [
+        "io-expander",
+        "tca9554",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/tca9554/tca9554.cpp",
@@ -151,7 +227,11 @@
       "name": "TCA9554 IO 扩展驱动实现",
       "filePath": "sketch/src/tca9554/tca9554.cpp",
       "summary": "TCA9554 IO 扩展器芯片驱动的具体实现",
-      "tags": ["io-expander", "tca9554", "driver"]
+      "tags": [
+        "io-expander",
+        "tca9554",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/es7210/es7210.h",
@@ -159,7 +239,12 @@
       "name": "ES7210 麦克风驱动头文件",
       "filePath": "sketch/src/es7210/es7210.h",
       "summary": "ES7210 音频 ADC 麦克风芯片驱动头文件",
-      "tags": ["microphone", "es7210", "audio", "driver"]
+      "tags": [
+        "microphone",
+        "es7210",
+        "audio",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/es7210/es7210.cpp",
@@ -167,7 +252,12 @@
       "name": "ES7210 麦克风驱动实现",
       "filePath": "sketch/src/es7210/es7210.cpp",
       "summary": "ES7210 音频 ADC 麦克风芯片驱动的具体实现",
-      "tags": ["microphone", "es7210", "audio", "driver"]
+      "tags": [
+        "microphone",
+        "es7210",
+        "audio",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/es7210/es7210_reg.h",
@@ -175,7 +265,12 @@
       "name": "ES7210 寄存器定义",
       "filePath": "sketch/src/es7210/es7210_reg.h",
       "summary": "ES7210 芯片寄存器地址和寄存器定义",
-      "tags": ["microphone", "es7210", "audio", "register"]
+      "tags": [
+        "microphone",
+        "es7210",
+        "audio",
+        "register"
+      ]
     },
     {
       "id": "file:sketch/src/es8311/es8311.h",
@@ -183,7 +278,12 @@
       "name": "ES8311 音频编解码驱动头文件",
       "filePath": "sketch/src/es8311/es8311.h",
       "summary": "ES8311 音频编解码芯片驱动头文件",
-      "tags": ["audio", "es8311", "codec", "driver"]
+      "tags": [
+        "audio",
+        "es8311",
+        "codec",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/es8311/es8311.cpp",
@@ -191,7 +291,12 @@
       "name": "ES8311 音频编解码驱动实现",
       "filePath": "sketch/src/es8311/es8311.cpp",
       "summary": "ES8311 音频编解码芯片驱动的具体实现",
-      "tags": ["audio", "es8311", "codec", "driver"]
+      "tags": [
+        "audio",
+        "es8311",
+        "codec",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/axs15231b/esp_lcd_axs15231b.h",
@@ -199,7 +304,12 @@
       "name": "AXS15231B LCD 驱动头文件",
       "filePath": "sketch/src/axs15231b/esp_lcd_axs15231b.h",
       "summary": "AXS15231B LCD 显示屏驱动头文件",
-      "tags": ["lcd", "axs15231b", "display", "driver"]
+      "tags": [
+        "lcd",
+        "axs15231b",
+        "display",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/axs15231b/esp_lcd_axs15231b.c",
@@ -207,7 +317,12 @@
       "name": "AXS15231B LCD 驱动实现",
       "filePath": "sketch/src/axs15231b/esp_lcd_axs15231b.c",
       "summary": "AXS15231B LCD 显示屏驱动的具体实现",
-      "tags": ["lcd", "axs15231b", "display", "driver"]
+      "tags": [
+        "lcd",
+        "axs15231b",
+        "display",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/touch/esp_lcd_touch.h",
@@ -215,7 +330,11 @@
       "name": "LCD 触摸驱动头文件",
       "filePath": "sketch/src/touch/esp_lcd_touch.h",
       "summary": "LCD 触摸屏驱动头文件",
-      "tags": ["touch", "lcd", "driver"]
+      "tags": [
+        "touch",
+        "lcd",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/touch/esp_lcd_touch.c",
@@ -223,7 +342,11 @@
       "name": "LCD 触摸驱动实现",
       "filePath": "sketch/src/touch/esp_lcd_touch.c",
       "summary": "LCD 触摸屏驱动的具体实现",
-      "tags": ["touch", "lcd", "driver"]
+      "tags": [
+        "touch",
+        "lcd",
+        "driver"
+      ]
     },
     {
       "id": "file:sketch/src/lvgl_port/lvgl_port.h",
@@ -231,7 +354,11 @@
       "name": "LVGL 移植层头文件",
       "filePath": "sketch/src/lvgl_port/lvgl_port.h",
       "summary": "LVGL 图形库在 ESP32 上的移植层头文件",
-      "tags": ["lvgl", "port", "ui"]
+      "tags": [
+        "lvgl",
+        "port",
+        "ui"
+      ]
     },
     {
       "id": "file:sketch/src/lvgl_port/lvgl_port.cpp",
@@ -239,7 +366,11 @@
       "name": "LVGL 移植层实现",
       "filePath": "sketch/src/lvgl_port/lvgl_port.cpp",
       "summary": "LVGL 图形库在 ESP32 上的移植层具体实现",
-      "tags": ["lvgl", "port", "ui"]
+      "tags": [
+        "lvgl",
+        "port",
+        "ui"
+      ]
     },
     {
       "id": "file:sketch/src/ESP32-audioI2S-master/Audio.h",
@@ -247,7 +378,11 @@
       "name": "ESP32 音频库头文件",
       "filePath": "sketch/src/ESP32-audioI2S-master/Audio.h",
       "summary": "ESP32 音频 I2S 库头文件",
-      "tags": ["audio", "i2s", "library"]
+      "tags": [
+        "audio",
+        "i2s",
+        "library"
+      ]
     },
     {
       "id": "file:sketch/src/ESP32-audioI2S-master/Audio.cpp",
@@ -255,7 +390,11 @@
       "name": "ESP32 音频库实现",
       "filePath": "sketch/src/ESP32-audioI2S-master/Audio.cpp",
       "summary": "ESP32 音频 I2S 库的具体实现",
-      "tags": ["audio", "i2s", "library"]
+      "tags": [
+        "audio",
+        "i2s",
+        "library"
+      ]
     },
     {
       "id": "file:sketch/src/ui/ui.h",
@@ -263,7 +402,10 @@
       "name": "UI 主头文件",
       "filePath": "sketch/src/ui/ui.h",
       "summary": "UI 界面的主要头文件",
-      "tags": ["ui", "lvgl"]
+      "tags": [
+        "ui",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/ui.c",
@@ -271,7 +413,10 @@
       "name": "UI 主实现",
       "filePath": "sketch/src/ui/ui.c",
       "summary": "UI 界面的主要实现",
-      "tags": ["ui", "lvgl"]
+      "tags": [
+        "ui",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/ui_events.h",
@@ -279,7 +424,11 @@
       "name": "UI 事件处理头文件",
       "filePath": "sketch/src/ui/ui_events.h",
       "summary": "UI 事件处理函数声明",
-      "tags": ["ui", "events", "lvgl"]
+      "tags": [
+        "ui",
+        "events",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/ui_events.cpp",
@@ -287,7 +436,11 @@
       "name": "UI 事件处理实现",
       "filePath": "sketch/src/ui/ui_events.cpp",
       "summary": "UI 事件处理函数的具体实现",
-      "tags": ["ui", "events", "lvgl"]
+      "tags": [
+        "ui",
+        "events",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/ui_helpers.h",
@@ -295,7 +448,11 @@
       "name": "UI 辅助函数头文件",
       "filePath": "sketch/src/ui/ui_helpers.h",
       "summary": "UI 辅助函数声明",
-      "tags": ["ui", "helpers", "lvgl"]
+      "tags": [
+        "ui",
+        "helpers",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/ui_helpers.c",
@@ -303,7 +460,11 @@
       "name": "UI 辅助函数实现",
       "filePath": "sketch/src/ui/ui_helpers.c",
       "summary": "UI 辅助函数的具体实现",
-      "tags": ["ui", "helpers", "lvgl"]
+      "tags": [
+        "ui",
+        "helpers",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/screens/ui_Screen_Boot.h",
@@ -311,7 +472,12 @@
       "name": "启动屏幕头文件",
       "filePath": "sketch/src/ui/screens/ui_Screen_Boot.h",
       "summary": "启动屏幕界面头文件",
-      "tags": ["ui", "screen", "boot", "lvgl"]
+      "tags": [
+        "ui",
+        "screen",
+        "boot",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/screens/ui_Screen_Boot.c",
@@ -319,7 +485,12 @@
       "name": "启动屏幕实现",
       "filePath": "sketch/src/ui/screens/ui_Screen_Boot.c",
       "summary": "启动屏幕界面的具体实现",
-      "tags": ["ui", "screen", "boot", "lvgl"]
+      "tags": [
+        "ui",
+        "screen",
+        "boot",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/screens/ui_Screen_Overview.h",
@@ -327,7 +498,12 @@
       "name": "概览屏幕头文件",
       "filePath": "sketch/src/ui/screens/ui_Screen_Overview.h",
       "summary": "概览屏幕界面头文件",
-      "tags": ["ui", "screen", "overview", "lvgl"]
+      "tags": [
+        "ui",
+        "screen",
+        "overview",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/screens/ui_Screen_Overview.cpp",
@@ -335,7 +511,12 @@
       "name": "概览屏幕实现",
       "filePath": "sketch/src/ui/screens/ui_Screen_Overview.cpp",
       "summary": "概览屏幕界面的具体实现",
-      "tags": ["ui", "screen", "overview", "lvgl"]
+      "tags": [
+        "ui",
+        "screen",
+        "overview",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/screens/ui_Screen_Settings.h",
@@ -343,7 +524,12 @@
       "name": "设置屏幕头文件",
       "filePath": "sketch/src/ui/screens/ui_Screen_Settings.h",
       "summary": "设置屏幕界面头文件",
-      "tags": ["ui", "screen", "settings", "lvgl"]
+      "tags": [
+        "ui",
+        "screen",
+        "settings",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/screens/ui_Screen_Settings.c",
@@ -351,7 +537,12 @@
       "name": "设置屏幕实现",
       "filePath": "sketch/src/ui/screens/ui_Screen_Settings.c",
       "summary": "设置屏幕界面的具体实现",
-      "tags": ["ui", "screen", "settings", "lvgl"]
+      "tags": [
+        "ui",
+        "screen",
+        "settings",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/screens/ui_Screen_Storage.h",
@@ -359,7 +550,12 @@
       "name": "存储屏幕头文件",
       "filePath": "sketch/src/ui/screens/ui_Screen_Storage.h",
       "summary": "存储屏幕界面头文件",
-      "tags": ["ui", "screen", "storage", "lvgl"]
+      "tags": [
+        "ui",
+        "screen",
+        "storage",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/ui/screens/ui_Screen_Storage.c",
@@ -367,7 +563,12 @@
       "name": "存储屏幕实现",
       "filePath": "sketch/src/ui/screens/ui_Screen_Storage.c",
       "summary": "存储屏幕界面的具体实现",
-      "tags": ["ui", "screen", "storage", "lvgl"]
+      "tags": [
+        "ui",
+        "screen",
+        "storage",
+        "lvgl"
+      ]
     },
     {
       "id": "file:sketch/src/net/wifi_manager.h",
@@ -375,7 +576,11 @@
       "name": "WiFi 管理器头文件",
       "filePath": "sketch/src/net/wifi_manager.h",
       "summary": "WiFi 连接管理、状态监控、NTP 时间同步、网络扫描等功能的头文件",
-      "tags": ["wifi", "network", "manager"]
+      "tags": [
+        "wifi",
+        "network",
+        "manager"
+      ]
     },
     {
       "id": "file:sketch/src/net/wifi_manager.cpp",
@@ -383,7 +588,11 @@
       "name": "WiFi 管理器实现",
       "filePath": "sketch/src/net/wifi_manager.cpp",
       "summary": "WiFi 管理器的具体实现，包括连接管理、事件处理、重连机制等",
-      "tags": ["wifi", "network", "manager"]
+      "tags": [
+        "wifi",
+        "network",
+        "manager"
+      ]
     },
     {
       "id": "file:sketch/src/net/network.h",
@@ -391,7 +600,11 @@
       "name": "网络模块头文件",
       "filePath": "sketch/src/net/network.h",
       "summary": "网络功能的头文件，包括 WiFi 列表管理、连接控制、HTTP 请求等",
-      "tags": ["network", "wifi", "http"]
+      "tags": [
+        "network",
+        "wifi",
+        "http"
+      ]
     },
     {
       "id": "file:sketch/src/net/network.cpp",
@@ -399,7 +612,11 @@
       "name": "网络模块实现",
       "filePath": "sketch/src/net/network.cpp",
       "summary": "网络功能的具体实现",
-      "tags": ["network", "wifi", "http"]
+      "tags": [
+        "network",
+        "wifi",
+        "http"
+      ]
     },
     {
       "id": "file:sketch/src/net/api_client.h",
@@ -407,7 +624,11 @@
       "name": "API 客户端头文件",
       "filePath": "sketch/src/net/api_client.h",
       "summary": "通用 API 客户端头文件",
-      "tags": ["api", "client", "network"]
+      "tags": [
+        "api",
+        "client",
+        "network"
+      ]
     },
     {
       "id": "file:sketch/src/net/api_client.cpp",
@@ -415,7 +636,11 @@
       "name": "API 客户端实现",
       "filePath": "sketch/src/net/api_client.cpp",
       "summary": "通用 API 客户端实现",
-      "tags": ["api", "client", "network"]
+      "tags": [
+        "api",
+        "client",
+        "network"
+      ]
     },
     {
       "id": "file:sketch/src/net/data_source.h",
@@ -423,7 +648,11 @@
       "name": "数据源头文件",
       "filePath": "sketch/src/net/data_source.h",
       "summary": "数据源抽象接口头文件",
-      "tags": ["data", "source", "network"]
+      "tags": [
+        "data",
+        "source",
+        "network"
+      ]
     },
     {
       "id": "file:sketch/src/net/data_source.cpp",
@@ -431,7 +660,11 @@
       "name": "数据源实现",
       "filePath": "sketch/src/net/data_source.cpp",
       "summary": "数据源抽象接口实现",
-      "tags": ["data", "source", "network"]
+      "tags": [
+        "data",
+        "source",
+        "network"
+      ]
     },
     {
       "id": "file:sketch/src/net/truenas_client.h",
@@ -439,7 +672,11 @@
       "name": "TrueNAS 客户端头文件",
       "filePath": "sketch/src/net/truenas_client.h",
       "summary": "TrueNAS NAS 监控客户端头文件",
-      "tags": ["truenas", "nas", "client"]
+      "tags": [
+        "truenas",
+        "nas",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/truenas_client.cpp",
@@ -447,7 +684,11 @@
       "name": "TrueNAS 客户端实现",
       "filePath": "sketch/src/net/truenas_client.cpp",
       "summary": "TrueNAS NAS 监控客户端实现",
-      "tags": ["truenas", "nas", "client"]
+      "tags": [
+        "truenas",
+        "nas",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/synology_client.h",
@@ -455,7 +696,11 @@
       "name": "Synology 客户端头文件",
       "filePath": "sketch/src/net/synology_client.h",
       "summary": "Synology NAS 监控客户端头文件",
-      "tags": ["synology", "nas", "client"]
+      "tags": [
+        "synology",
+        "nas",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/synology_client.cpp",
@@ -463,7 +708,11 @@
       "name": "Synology 客户端实现",
       "filePath": "sketch/src/net/synology_client.cpp",
       "summary": "Synology NAS 监控客户端实现",
-      "tags": ["synology", "nas", "client"]
+      "tags": [
+        "synology",
+        "nas",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/qnap_client.h",
@@ -471,7 +720,11 @@
       "name": "QNAP 客户端头文件",
       "filePath": "sketch/src/net/qnap_client.h",
       "summary": "QNAP NAS 监控客户端头文件",
-      "tags": ["qnap", "nas", "client"]
+      "tags": [
+        "qnap",
+        "nas",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/qnap_client.cpp",
@@ -479,7 +732,11 @@
       "name": "QNAP 客户端实现",
       "filePath": "sketch/src/net/qnap_client.cpp",
       "summary": "QNAP NAS 监控客户端实现",
-      "tags": ["qnap", "nas", "client"]
+      "tags": [
+        "qnap",
+        "nas",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/snmp_client.h",
@@ -487,7 +744,11 @@
       "name": "SNMP 客户端头文件",
       "filePath": "sketch/src/net/snmp_client.h",
       "summary": "SNMP 协议客户端头文件",
-      "tags": ["snmp", "network", "client"]
+      "tags": [
+        "snmp",
+        "network",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/snmp_client.cpp",
@@ -495,7 +756,11 @@
       "name": "SNMP 客户端实现",
       "filePath": "sketch/src/net/snmp_client.cpp",
       "summary": "SNMP 协议客户端实现",
-      "tags": ["snmp", "network", "client"]
+      "tags": [
+        "snmp",
+        "network",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/netdata_client.h",
@@ -503,7 +768,11 @@
       "name": "Netdata 客户端头文件",
       "filePath": "sketch/src/net/netdata_client.h",
       "summary": "Netdata 监控客户端头文件",
-      "tags": ["netdata", "monitoring", "client"]
+      "tags": [
+        "netdata",
+        "monitoring",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/netdata_client.cpp",
@@ -511,7 +780,11 @@
       "name": "Netdata 客户端实现",
       "filePath": "sketch/src/net/netdata_client.cpp",
       "summary": "Netdata 监控客户端实现",
-      "tags": ["netdata", "monitoring", "client"]
+      "tags": [
+        "netdata",
+        "monitoring",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/mock_client.h",
@@ -519,7 +792,11 @@
       "name": "模拟客户端头文件",
       "filePath": "sketch/src/net/mock_client.h",
       "summary": "模拟数据源客户端头文件，用于测试",
-      "tags": ["mock", "test", "client"]
+      "tags": [
+        "mock",
+        "test",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/mock_client.cpp",
@@ -527,7 +804,11 @@
       "name": "模拟客户端实现",
       "filePath": "sketch/src/net/mock_client.cpp",
       "summary": "模拟数据源客户端实现，用于测试",
-      "tags": ["mock", "test", "client"]
+      "tags": [
+        "mock",
+        "test",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/serial_client.h",
@@ -535,7 +816,11 @@
       "name": "串口客户端头文件",
       "filePath": "sketch/src/net/serial_client.h",
       "summary": "串口通信客户端头文件",
-      "tags": ["serial", "communication", "client"]
+      "tags": [
+        "serial",
+        "communication",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/serial_client.cpp",
@@ -543,7 +828,11 @@
       "name": "串口客户端实现",
       "filePath": "sketch/src/net/serial_client.cpp",
       "summary": "串口通信客户端实现",
-      "tags": ["serial", "communication", "client"]
+      "tags": [
+        "serial",
+        "communication",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/fnos_client.h",
@@ -551,7 +840,11 @@
       "name": "FNOS 客户端头文件",
       "filePath": "sketch/src/net/fnos_client.h",
       "summary": "FNOS NAS 监控客户端头文件",
-      "tags": ["fnos", "nas", "client"]
+      "tags": [
+        "fnos",
+        "nas",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/net/unraid_client.h",
@@ -559,7 +852,11 @@
       "name": "Unraid 客户端头文件",
       "filePath": "sketch/src/net/unraid_client.h",
       "summary": "Unraid NAS 监控客户端头文件",
-      "tags": ["unraid", "nas", "client"]
+      "tags": [
+        "unraid",
+        "nas",
+        "client"
+      ]
     },
     {
       "id": "file:sketch/src/data/config.h",
@@ -567,7 +864,11 @@
       "name": "配置管理头文件",
       "filePath": "sketch/src/data/config.h",
       "summary": "NVS 配置管理头文件，包括 WiFi、NAS、显示等配置",
-      "tags": ["config", "nvs", "data"]
+      "tags": [
+        "config",
+        "nvs",
+        "data"
+      ]
     },
     {
       "id": "file:sketch/src/data/config.cpp",
@@ -575,7 +876,11 @@
       "name": "配置管理实现",
       "filePath": "sketch/src/data/config.cpp",
       "summary": "NVS 配置管理实现",
-      "tags": ["config", "nvs", "data"]
+      "tags": [
+        "config",
+        "nvs",
+        "data"
+      ]
     },
     {
       "id": "file:sketch/src/data/nas_data.h",
@@ -583,7 +888,11 @@
       "name": "NAS 数据结构头文件",
       "filePath": "sketch/src/data/nas_data.h",
       "summary": "NAS 监控数据结构定义",
-      "tags": ["nas", "data", "structure"]
+      "tags": [
+        "nas",
+        "data",
+        "structure"
+      ]
     },
     {
       "id": "file:sketch/src/data/nas_config.h",
@@ -591,7 +900,11 @@
       "name": "NAS 配置头文件",
       "filePath": "sketch/src/data/nas_config.h",
       "summary": "NAS 配置结构定义",
-      "tags": ["nas", "config", "structure"]
+      "tags": [
+        "nas",
+        "config",
+        "structure"
+      ]
     },
     {
       "id": "file:sketch/src/file/file.h",
@@ -599,7 +912,11 @@
       "name": "文件管理头文件",
       "filePath": "sketch/src/file/file.h",
       "summary": "文件系统管理头文件",
-      "tags": ["file", "filesystem", "storage"]
+      "tags": [
+        "file",
+        "filesystem",
+        "storage"
+      ]
     },
     {
       "id": "file:sketch/src/file/file.cpp",
@@ -607,7 +924,11 @@
       "name": "文件管理实现",
       "filePath": "sketch/src/file/file.cpp",
       "summary": "文件系统管理实现",
-      "tags": ["file", "filesystem", "storage"]
+      "tags": [
+        "file",
+        "filesystem",
+        "storage"
+      ]
     },
     {
       "id": "file:sketch/src/task_msg/task_msg.h",
@@ -615,7 +936,11 @@
       "name": "任务消息头文件",
       "filePath": "sketch/src/task_msg/task_msg.h",
       "summary": "任务间消息传递头文件",
-      "tags": ["task", "message", "rtos"]
+      "tags": [
+        "task",
+        "message",
+        "rtos"
+      ]
     },
     {
       "id": "file:sketch/src/task_msg/task_msg.cpp",
@@ -623,7 +948,11 @@
       "name": "任务消息实现",
       "filePath": "sketch/src/task_msg/task_msg.cpp",
       "summary": "任务间消息传递实现",
-      "tags": ["task", "message", "rtos"]
+      "tags": [
+        "task",
+        "message",
+        "rtos"
+      ]
     },
     {
       "id": "file:sketch/src/updater/updater.h",
@@ -631,7 +960,11 @@
       "name": "OTA 更新头文件",
       "filePath": "sketch/src/updater/updater.h",
       "summary": "OTA 固件更新头文件",
-      "tags": ["ota", "update", "firmware"]
+      "tags": [
+        "ota",
+        "update",
+        "firmware"
+      ]
     },
     {
       "id": "file:sketch/src/updater/updater.cpp",
@@ -639,7 +972,11 @@
       "name": "OTA 更新实现",
       "filePath": "sketch/src/updater/updater.cpp",
       "summary": "OTA 固件更新实现",
-      "tags": ["ota", "update", "firmware"]
+      "tags": [
+        "ota",
+        "update",
+        "firmware"
+      ]
     },
     {
       "id": "file:sketch/src/weather/weather.h",
@@ -647,7 +984,11 @@
       "name": "天气功能头文件",
       "filePath": "sketch/src/weather/weather.h",
       "summary": "天气信息获取头文件",
-      "tags": ["weather", "api", "network"]
+      "tags": [
+        "weather",
+        "api",
+        "network"
+      ]
     },
     {
       "id": "file:sketch/src/weather/weather.cpp",
@@ -655,7 +996,11 @@
       "name": "天气功能实现",
       "filePath": "sketch/src/weather/weather.cpp",
       "summary": "天气信息获取实现",
-      "tags": ["weather", "api", "network"]
+      "tags": [
+        "weather",
+        "api",
+        "network"
+      ]
     }
   ],
   "edges": [
@@ -1294,37 +1639,55 @@
       "order": 1,
       "title": "项目概览",
       "description": "从项目说明文档开始，了解 TuneBar 项目的整体架构和功能",
-      "nodeIds": ["doc:README.md"]
+      "nodeIds": [
+        "doc:README.md"
+      ]
     },
     {
       "order": 2,
       "title": "主程序入口",
       "description": "查看主程序入口文件，了解程序启动流程",
-      "nodeIds": ["file:sketch/src/main.cpp", "file:sketch/include/xtask.h"]
+      "nodeIds": [
+        "file:sketch/src/main.cpp",
+        "file:sketch/include/xtask.h"
+      ]
     },
     {
       "order": 3,
       "title": "WiFi 连接管理",
       "description": "深入了解 WiFi 管理器的工作原理和连接机制",
-      "nodeIds": ["file:sketch/src/net/wifi_manager.h", "file:sketch/src/net/wifi_manager.cpp"]
+      "nodeIds": [
+        "file:sketch/src/net/wifi_manager.h",
+        "file:sketch/src/net/wifi_manager.cpp"
+      ]
     },
     {
       "order": 4,
       "title": "NAS 监控系统",
       "description": "了解 NAS 监控的各种客户端实现",
-      "nodeIds": ["file:sketch/src/net/truenas_client.h", "file:sketch/src/net/synology_client.h", "file:sketch/src/net/data_source.h"]
+      "nodeIds": [
+        "file:sketch/src/net/truenas_client.h",
+        "file:sketch/src/net/synology_client.h",
+        "file:sketch/src/net/data_source.h"
+      ]
     },
     {
       "order": 5,
       "title": "配置管理",
       "description": "了解配置数据的存储和管理方式",
-      "nodeIds": ["file:sketch/src/data/config.h", "file:sketch/src/data/config.cpp"]
+      "nodeIds": [
+        "file:sketch/src/data/config.h",
+        "file:sketch/src/data/config.cpp"
+      ]
     },
     {
       "order": 6,
       "title": "用户界面",
       "description": "了解 LVGL 图形界面的实现",
-      "nodeIds": ["file:sketch/src/ui/ui.h", "file:sketch/src/lvgl_port/lvgl_port.h"]
+      "nodeIds": [
+        "file:sketch/src/ui/ui.h",
+        "file:sketch/src/lvgl_port/lvgl_port.h"
+      ]
     }
   ]
 }
