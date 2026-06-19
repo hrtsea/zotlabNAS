@@ -81,6 +81,29 @@
   .roller-value { font-size: 10px; color: #00ADFF; padding: 2px 4px; min-width: 30px; text-align: center; }
   .region-hint { font-size: 8px; color: #666; text-align: right; margin-top: auto; }
 
+  /* Fan Tab */
+  .fan-content { display: flex; gap: 8px; flex: 1; align-items: center; }
+  .fan-info { width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .fan-icon { width: 50px; height: 50px; border: 2px solid #40E0D0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .fan-rpm { font-size: 11px; color: #40E0D0; font-weight: 700; margin-top: 2px; }
+  .fan-pwm { font-size: 9px; color: #666; }
+  .fan-control { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .fan-mode-row { display: flex; gap: 4px; }
+  .fan-mode-btn { flex: 1; height: 22px; background: #333; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; cursor: pointer; }
+  .fan-mode-btn.active { background: #40E0D0; color: #000; }
+  .fan-slider-area { display: flex; flex-direction: column; gap: 2px; }
+  .fan-slider-label { display: flex; justify-content: space-between; font-size: 10px; color: #888; }
+  .fan-slider-bar { height: 14px; background: #333; border-radius: 4px; position: relative; overflow: hidden; }
+  .fan-slider-fill { height: 100%; background: #40E0D0; border-radius: 4px; }
+  .fan-temps { display: flex; justify-content: space-around; font-size: 9px; margin-top: 2px; }
+  .fan-temp-item { text-align: center; }
+  .fan-curve { width: 140px; display: flex; flex-direction: column; border-left: 1px solid #333; padding-left: 6px; }
+  .fan-curve-title { font-size: 9px; color: #666; margin-bottom: 2px; }
+  .fan-curve-grid { height: 50px; position: relative; background: linear-gradient(to top, #333 1px, transparent 1px); background-size: 100% 12px; }
+  .fan-curve-line { position: absolute; bottom: 0; left: 0; right: 0; height: 100%; background: linear-gradient(to right, #40E0D0 0%, #FF8C00 50%, #FF4500 100%); clip-path: polygon(0% 75%, 25% 70%, 50% 40%, 75% 20%, 100% 5%, 100% 100%, 0% 100%); }
+  .fan-curve-labels { display: flex; justify-content: space-between; font-size: 8px; color: #666; margin-top: 2px; }
+
   /* Guide Tab */
   .guide-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   .guide-text { flex: 1; background: transparent; border: none; color: #FFF; font-size: 8px; line-height: 1.3; resize: none; overflow-y: auto; font-family: monospace; }
@@ -217,6 +240,37 @@ http://radio.example.com/mp3</textarea>
         <div class="region-hint">UTC Offset :Hour   Minute   Unit</div>
       </div>
 
+      <!-- Tab Content: Fan -->
+      <div class="tab-content" id="tab-fan">
+        <div class="fan-content">
+          <div class="fan-info">
+            <div class="fan-icon">F</div>
+            <div class="fan-rpm">1420 RPM</div>
+            <div class="fan-pwm">45% PWM</div>
+          </div>
+          <div class="fan-control">
+            <div class="fan-mode-row">
+              <div class="fan-mode-btn active" onclick="setFanMode('auto')">AUTO</div>
+              <div class="fan-mode-btn" onclick="setFanMode('manual')">MANUAL</div>
+            </div>
+            <div class="fan-slider-area">
+              <div class="fan-slider-label"><span>PWM</span><span>45%</span></div>
+              <div class="fan-slider-bar"><div class="fan-slider-fill" style="width:45%"></div></div>
+            </div>
+            <div class="fan-temps">
+              <div class="fan-temp-item"><span style="color:#40E0D0">CPU: 42°C</span></div>
+              <div class="fan-temp-item"><span style="color:#FF8C00">SYS: 45°C</span></div>
+              <div class="fan-temp-item"><span style="color:#22c55e">DISK: 38°C</span></div>
+            </div>
+          </div>
+          <div class="fan-curve">
+            <div class="fan-curve-title">Fan Curve</div>
+            <div class="fan-curve-grid"><div class="fan-curve-line"></div></div>
+            <div class="fan-curve-labels"><span>25°C</span><span>45°C</span><span>65°C</span></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Tab Content: User Guide -->
       <div class="tab-content" id="tab-guide">
         <div class="guide-content">
@@ -253,6 +307,7 @@ http://radio.example.com/mp3</textarea>
       <!-- Tab Bar -->
       <div class="tab-bar">
         <div class="tab-btn active" onclick="switchTab('wifi')">Wi-Fi</div>
+        <div class="tab-btn" onclick="switchTab('fan')">Fan</div>
         <div class="tab-btn" onclick="switchTab('screen')">Screen</div>
         <div class="tab-btn" onclick="switchTab('radio')">Radio</div>
         <div class="tab-btn" onclick="switchTab('music')">Music</div>
@@ -262,16 +317,23 @@ http://radio.example.com/mp3</textarea>
     </div>
   </div>
 </div>
-<div class="screen-label">Settings - WiFi / Screen / Radio / Music / Region / Guide</div>
+<div class="screen-label">Settings - WiFi / Fan / Screen / Radio / Music / Region / Guide</div>
 
 <script>
   let wifiEnabled = true;
   let autoIP = true;
+  let fanMode = 'auto';
 
   function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  function setFanMode(mode) {
+    fanMode = mode;
+    document.querySelectorAll('.fan-mode-btn').forEach(el => el.classList.remove('active'));
     event.target.classList.add('active');
   }
 
