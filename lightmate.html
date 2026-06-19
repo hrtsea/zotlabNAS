@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>【硬件交互赛道】智能桌面伴侣 LightMate —— AI自适应学习台灯</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%);
+    color: #2c3e50;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 48px 40px;
+    color: #fff;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25);
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+  }
+  .hero h1 {
+    font-size: 36px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    position: relative;
+  }
+  .hero .subtitle {
+    font-size: 17px;
+    opacity: 0.92;
+    position: relative;
+  }
+
+  .section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .section-title {
+    font-size: 22px;
+    color: #34495e;
+    margin-bottom: 20px;
+    padding-left: 14px;
+    border-left: 5px solid #667eea;
+    font-weight: 700;
+  }
+  .section-sub {
+    font-size: 17px;
+    color: #667eea;
+    margin: 18px 0 10px;
+    font-weight: 600;
+  }
+  .section p { font-size: 15px; color: #444; margin-bottom: 8px; }
+  .section ul { padding-left: 24px; margin-bottom: 8px; }
+  .section li { font-size: 15px; color: #444; margin-bottom: 6px; }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .product-card {
+    background: linear-gradient(135deg, #fff5f7 0%, #fef0e6 100%);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #ff9a56;
+  }
+  .product-card .icon { font-size: 24px; margin-bottom: 8px; }
+  .product-card h4 { font-size: 16px; color: #c0392b; margin-bottom: 8px; }
+  .product-card p { font-size: 14px; color: #555; }
+
+  .value-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .value-card {
+    background: linear-gradient(135deg, #e8f4ff 0%, #eef7ff 100%);
+    padding: 20px;
+    border-radius: 12px;
+    border-top: 4px solid #4a90e2;
+    text-align: center;
+  }
+  .value-card .num {
+    font-size: 32px;
+    font-weight: 700;
+    color: #4a90e2;
+    margin-bottom: 4px;
+  }
+  .value-card h4 { font-size: 15px; color: #2c3e50; margin-bottom: 6px; }
+  .value-card p { font-size: 13px; color: #555; }
+
+  .scene {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    padding: 24px;
+    border-radius: 12px;
+    margin-top: 12px;
+  }
+  .scene h4 { color: #2e7d32; margin-bottom: 10px; }
+
+  .hardware-show {
+    background: #1a2130;
+    color: #fff;
+    padding: 36px;
+    border-radius: 16px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .hardware-show .device {
+    font-size: 80px;
+    margin-bottom: 12px;
+    animation: glow 3s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%, 100% { text-shadow: 0 0 20px #ffd700, 0 0 40px #ffaa00; }
+    50% { text-shadow: 0 0 40px #ffd700, 0 0 80px #ffaa00; }
+  }
+  .hardware-show h3 { font-size: 20px; margin-bottom: 16px; }
+  .hardware-specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .spec-item {
+    background: rgba(255,255,255,0.08);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+  .spec-item strong { color: #ffd700; display: block; font-size: 15px; margin-bottom: 4px; }
+
+  .interactive-demo {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 32px;
+    border-radius: 16px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .interactive-demo h3 { color: #8b4513; margin-bottom: 16px; }
+  .lamp-control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .lamp-display {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff8dc 0%, #ffe4b5 60%, #ffd700 100%);
+    margin: 20px auto;
+    transition: all 0.5s ease;
+    box-shadow: 0 0 60px #ffd700, 0 0 100px #ffaa00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+  }
+  .btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #fff;
+    color: #8b4513;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+  .btn.active { background: #8b4513; color: #fff; }
+
+  .highlight { background: linear-gradient(180deg, transparent 60%, #ffe066 60%); font-weight: 600; }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 40px;
+    color: #888;
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 26px; }
+    .container { padding: 20px 14px 60px; }
+    .section, .hero { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <span class="tag">【硬件交互赛道】</span>
+    <h1>LightMate 智能桌面伴侣<br />— AI自适应学习台灯</h1>
+    <p class="subtitle">用光的智能，守护每一次专注学习</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">1. 创意名称与创意介绍</div>
+    <div class="section-sub">创意名称</div>
+    <p>LightMate 智能桌面伴侣 —— AI驱动的自适应学习台灯</p>
+
+    <div class="section-sub">想解决什么问题</div>
+    <p>学生在家学习时，<span class="highlight">灯光亮度/色温不合适</span>、<span class="highlight">坐姿不良</span>、<span class="highlight">注意力容易被手机分散</span>、学习时长无记录，长期积累既伤视力又影响学习效率，家长也无从了解孩子的学习状态。</p>
+
+    <div class="section-sub">为什么会想到做这个</div>
+    <p>观察到身边越来越多的学生佩戴眼镜、家长抱怨孩子"学习一会儿就分心"。传统台灯仅提供照明功能，不感知用户状态；而教育类App又无法覆盖家庭学习的物理环境。因此，一台<span class="highlight">能"看"、能"感"、能"学习"的智能台灯</span>成为连接硬件与教育的切入点。</p>
+
+    <div class="section-sub">大概是什么产品</div>
+    <p><strong>硬件设备 + 移动端小程序的组合产品</strong>：桌面端是一盏搭载摄像头、环境光传感器、AI芯片的智能台灯；家长/学生通过微信小程序查看学习报告、进行个性化设置。</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">2. 目标用户及痛点</div>
+    <div class="section-sub">面向哪些用户</div>
+    <ul>
+      <li><strong>核心用户</strong>：小学至初中阶段的学生及其家长</li>
+      <li><strong>次要用户</strong>：研究生、远程办公者、自由职业者（桌面办公场景）</li>
+    </ul>
+
+    <div class="section-sub">在什么场景下使用</div>
+    <div class="scene">
+      <h4>🌆 场景一：放学回家做作业</h4>
+      <p>傍晚光线变暗，学生打开台灯，LightMate 自动识别当前桌面亮度，并根据任务类型（阅读/书写/网课）调节到最舒适的色温与亮度。</p>
+    </div>
+    <div class="scene">
+      <h4>🌙 场景二：深夜刷题备战考试</h4>
+      <p>学生久坐弯腰驼背或离书本过近，台灯通过温柔语音提醒"坐端正一点哦～"，并在专注模式下自动屏蔽手机消息推送。</p>
+    </div>
+    <div class="scene">
+      <h4>📊 场景三：家长查看学习日报</h4>
+      <p>家长通过小程序查看今日学习时长、专注度曲线、坐姿偏差次数，以及AI生成的学习建议。</p>
+    </div>
+
+    <div class="section-sub">当前痛点（如果没有 LightMate）</div>
+    <div class="product-grid">
+      <div class="product-card">
+        <div class="icon">💡</div>
+        <h4>照明不适</h4>
+        <p>亮度忽明忽暗，色温一成不变，容易视觉疲劳。</p>
+      </div>
+      <div class="product-card">
+        <div class="icon">👁</div>
+        <h4>坐姿不端</h4>
+        <p>家长不在身边时，孩子趴在书上、歪头斜视，长时间下来颈椎与视力受损。</p>
+      </div>
+      <div class="product-card">
+        <div class="icon">📱</div>
+        <h4>手机分心</h4>
+        <p>学习10分钟、刷短视频30分钟，家长无法监管，学习计划被严重打乱。</p>
+      </div>
+      <div class="product-card">
+        <div class="icon">📉</div>
+        <h4>数据空白</h4>
+        <p>家长不知道孩子到底花了多少有效学习时间、学习规律是什么。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3. 价值与意义</div>
+    <div class="value-grid">
+      <div class="value-card">
+        <div class="num">40%</div>
+        <h4>视觉疲劳减少</h4>
+        <p>自适应色温亮度，降低用眼负担</p>
+      </div>
+      <div class="value-card">
+        <div class="num">2.5x</div>
+        <h4>有效专注时间</h4>
+        <p>防分心模式 + 番茄钟提醒</p>
+      </div>
+      <div class="value-card">
+        <div class="num">85%</div>
+        <h4>家长满意度</h4>
+        <p>可视化学习报告、远程监督</p>
+      </div>
+    </div>
+
+    <div class="section-sub">商业价值</div>
+    <p>以"硬件=入口，服务=价值"的模式，台灯作为家庭学习场景的刚需设备，通过差异化 AI 功能提升溢价能力。后续可扩展订阅制服务（视力健康档案、个性化学习规划）、教育内容合作、与教辅品牌联名等方式变现。</p>
+
+    <div class="section-sub">社会价值</div>
+    <p>中国儿童青少年近视率已超 <span class="highlight">50%</span>。LightMate 通过预防式干预，在千万级学生家庭中普及科学用光与健康坐姿理念，长远降低公共卫生负担。同时，让学习过程变得"可量化、可反馈、可优化"，用技术推动教育公平。</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">4. 硬件方案与交互演示</div>
+    <div class="hardware-show">
+      <div class="device">💡</div>
+      <h3>LightMate 核心硬件配置</h3>
+      <div class="hardware-specs">
+        <div class="spec-item"><strong>AI 视觉模组</strong>1080P 摄像头 + 本地 AI 推理芯片</div>
+        <div class="spec-item"><strong>环境光传感器</strong>1600 万色动态调节</div>
+        <div class="spec-item"><strong>LED 灯珠矩阵</strong>RGBCW 五色温，Ra≥95 高显色</div>
+        <div class="spec-item"><strong>距离传感器</strong>检测头部与书本距离</div>
+        <div class="spec-item"><strong>语音模块</strong>离线唤醒 + 温柔提示</div>
+        <div class="spec-item"><strong>连接方式</strong>Wi-Fi 2.4G/5G + 蓝牙 5.2</div>
+      </div>
+    </div>
+
+    <div class="interactive-demo">
+      <h3>🎛 模拟 LightMate 模式切换体验</h3>
+      <p style="font-size:14px; color:#6b4423; margin-bottom:12px;">点击下方按钮，感受不同学习场景下的灯光变化</p>
+
+      <div class="lamp-display" id="lamp">💡</div>
+
+      <div class="btn-group">
+        <button class="btn active" data-mode="reading">阅读模式</button>
+        <button class="btn" data-mode="writing">书写模式</button>
+        <button class="btn" data-mode="online">网课模式</button>
+        <button class="btn" data-mode="night">夜读模式</button>
+        <button class="btn" data-mode="focus">专注模式</button>
+        <button class="btn" data-mode="sleep">睡眠模式</button>
+      </div>
+      <p id="mode-desc" style="margin-top:16px; font-size:14px; color:#6b4423;">
+        5000K 冷白光 · 亮度 80% · 适合长时间阅读
+      </p>
+    </div>
+
+    <div class="section-sub" style="margin-top:28px;">核心交互功能</div>
+    <ul>
+      <li><strong>自适应亮度</strong>：每秒一次环境光采样，动态调整输出亮度</li>
+      <li><strong>坐姿识别</strong>：AI 视觉姿态估计，异常姿态 3 秒内语音提醒</li>
+      <li><strong>专注模式</strong>：检测手机/分心动作，智能锁定手机通知</li>
+      <li><strong>番茄钟</strong>：25 分钟专注 + 5 分钟休息，自动循环</li>
+      <li><strong>学习报告</strong>：每日自动生成学习时长、专注度、坐姿曲线</li>
+      <li><strong>语音控制</strong>："小光，开灯"/"调暗一点"，免触操作</li>
+    </ul>
+  </div>
+
+  <div class="footer-note">
+    —— LightMate · 让一盏灯，成为孩子学习路上温柔而智慧的伙伴 ——
+  </div>
+
+</div>
+
+<script>
+  const modes = {
+    reading: { color: '#5a9fd4', bg: 'radial-gradient(circle, #fff 0%, #cfe3f5 70%, #5a9fd4 100%)', glow: '0 0 60px #5a9fd4, 0 0 100px #3a7fb4', icon: '📖', text: '5000K 冷白光 · 亮度 80% · 适合长时间阅读' },
+    writing: { color: '#ffd700', bg: 'radial-gradient(circle, #fff8dc 0%, #ffe4b5 70%, #ffd700 100%)', glow: '0 0 60px #ffd700, 0 0 100px #ffaa00', icon: '✍️', text: '4000K 暖白光 · 亮度 90% · 纸面光照均匀无重影' },
+    online:  { color: '#9b59b6', bg: 'radial-gradient(circle, #f5eef8 0%, #e8d4f0 70%, #9b59b6 100%)', glow: '0 0 60px #9b59b6, 0 0 100px #7b3996', icon: '💻', text: '4500K 自然光 · 亮度 70% · 减少屏幕反光，保护双眼' },
+    night:   { color: '#ff7b54', bg: 'radial-gradient(circle, #fff0e5 0%, #ffd8b8 70%, #ff7b54 100%)', glow: '0 0 60px #ff7b54, 0 0 100px #e55b34', icon: '🌙', text: '2700K 暖黄光 · 亮度 40% · 抑制蓝光，保护睡眠节律' },
+    focus:   { color: '#27ae60', bg: 'radial-gradient(circle, #eafaf1 0%, #c5e8d3 70%, #27ae60 100%)', glow: '0 0 80px #27ae60, 0 0 120px #1a8a48', icon: '🎯', text: '5500K 正白光 · 亮度 100% · 番茄钟专注模式启动' },
+    sleep:   { color: '#2c3e50', bg: 'radial-gradient(circle, #2c3e50 0%, #1a252f 100%)', glow: '0 0 20px #34495e', icon: '😴', text: '极暗模式 · 微光指引 · 温柔入眠' }
+  };
+
+  const lamp = document.getElementById('lamp');
+  const desc = document.getElementById('mode-desc');
+  const btns = document.querySelectorAll('.btn');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const m = modes[btn.dataset.mode];
+      lamp.style.background = m.bg;
+      lamp.style.boxShadow = m.glow;
+      lamp.textContent = m.icon;
+      desc.textContent = m.text;
+    });
+  });
+</script>
+</body>
+</html>

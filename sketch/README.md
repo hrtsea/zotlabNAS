@@ -1,6 +1,6 @@
-# TuneBar Firmware
+# ZotLab NAS 监控屏幕固件
 
-This directory contains the source code for the TuneBar project. The firmware is developed using **pioArduino**, a high-performance branch of the Espressif 32 platform for PlatformIO.
+This directory contains the source code for the ZotLab NAS Monitor project. The firmware is developed using **pioArduino**, a high-performance branch of the Espressif 32 platform for PlatformIO.
 
 ## Development Environment
 

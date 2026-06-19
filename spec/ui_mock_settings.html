@@ -46,7 +46,7 @@
   .nas-extra-panel.visible { display: flex; }
   .nas-status { font-size: 10px; color: #FF0000; margin-top: 4px; }
   .nas-status.ok { color: #00FF00; }
-  .nas-save-btn { background: #00ADFF; color: #fff; border: none; padding: 6px 20px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+  .nas-save-btn { background: #00ADFF; color: #fff; border: none; padding: 6px 20px; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; }
   .nas-save-btn:hover { background: #0088CC; }
 
   /* Common styles */
@@ -54,7 +54,7 @@
   .btn:hover { background: rgba(64,224,208,0.2); }
   .label { font-size: 10px; color: #888; }
   .value { font-size: 12px; color: #fff; }
-  .input-field { height: 22px; background: #000; border: 1px solid #333; color: #FFF; font-size: 11px; padding: 0 6px; border-radius: 3px; }
+  .input-field { height: 22px; background: #000; border: 1px solid #333; color: #FFF; font-size: 14px; padding: 0 6px; border-radius: 3px; }
   .dropdown { height: 22px; background: #000; border: 1px solid #333; color: #FFF; font-size: 10px; padding: 0 4px; border-radius: 3px; }
 
   /* Wi-Fi Tab */
@@ -106,7 +106,7 @@
   .region-right { display: flex; gap: 3px; align-items: center; }
   .roller { display: flex; flex-direction: column; align-items: center; background: #000; border: 1px solid #333; border-radius: 3px; width: 45px; }
   .roller-label { font-size: 7px; color: #888; padding: 1px; }
-  .roller-value { font-size: 11px; color: #40E0D0; padding: 3px 2px; text-align: center; }
+  .roller-value { font-size: 14px; color: #40E0D0; padding: 3px 2px; text-align: center; }
   .region-hint { font-size: 7px; color: #666; text-align: right; }
 
   /* Fan Tab */
@@ -150,7 +150,7 @@
 </head>
 <body>
 <h1>⚙️ Settings (640×172)</h1>
-<p class="subtitle">TuneBar Zotlabnas · System Configuration</p>
+<p class="subtitle">ZotLab NAS · System Configuration</p>
 <div class="nav"><a href="ui_mock_boot.html">Boot</a> | <a href="ui_mock_overview.html">Overview</a> | <a href="ui_mock_storage.html">Storage</a> | <a href="ui_mock_cpu.html">CPU</a> | <a href="project_spec.html">Spec</a></div>
 
 <div class="device">
@@ -159,83 +159,76 @@
     <div class="tabview">
       <!-- Tab Content: NAS -->
       <div class="tab-content active" id="tab-nas">
-        <div class="nas-content">
-          <!-- 第一行: 类型选择 -->
-          <div class="nas-row">
-            <span class="nas-label">NAS Type:</span>
-            <select class="nas-dropdown" id="nasType" onchange="onNasTypeChange()">
-              <option value="0">Synology DSM</option>
-              <option value="1">QNAP QTS</option>
-              <option value="2">TrueNAS</option>
-              <option value="3">FNOS</option>
-              <option value="4">Unraid</option>
-              <option value="5">Netdata</option>
-              <option value="6">SNMP</option>
-              <option value="7">Linux (HTTP)</option>
-              <option value="8">Linux (Serial)</option>
-              <option value="9">Windows</option>
-              <option value="10">Mock (Test)</option>
-            </select>
-            <span style="margin-left: 8px;"></span>
-            <span class="nas-label">Storage:</span>
-            <span class="nas-label" style="color:#40E0D0">SATA:</span>
-            <select class="nas-dropdown" id="sataCount" style="width:50px">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6" selected>6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-            </select>
-            <span class="nas-label" style="color:#40E0D0">M.2:</span>
-            <select class="nas-dropdown" id="m2Count" style="width:50px">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3" selected>3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-            </select>
-          </div>
-          <!-- 第二行: IP + Port + HTTPS -->
-          <div class="nas-row">
-            <span class="nas-label">IP:</span>
-            <input type="text" class="nas-input nas-input-ip" id="nasIP" placeholder="192.168.1.100">
-            <span class="nas-label">Port:</span>
-            <input type="text" class="nas-input nas-input-port" id="nasPort" placeholder="5000">
-            <div class="nas-switch" id="nasHttps" onclick="toggleNasHttps()"></div>
-            <span class="nas-label">HTTPS</span>
-          </div>
-          <!-- 第三行: 用户名密码 -->
-          <div class="nas-row" id="nasAuthRow">
-            <span class="nas-label">User:</span>
-            <input type="text" class="nas-input nas-input-user" id="nasUser" placeholder="admin">
-            <span class="nas-label">Pass:</span>
-            <input type="password" class="nas-input nas-input-pass" id="nasPass" placeholder="password">
-          </div>
-          <!-- 额外配置面板 (SNMP/Serial) -->
-          <div class="nas-extra-panel" id="nasExtraPanel">
-            <div class="nas-row">
-              <span class="nas-label" id="nasExtraLabel1">SNMP Community:</span>
-              <input type="text" class="nas-input nas-input-user" id="nasExtra1" placeholder="public">
-              <span class="nas-label" id="nasExtraLabel2">Ver:</span>
-              <select class="nas-dropdown" id="nasExtra2" style="width:70px">
-                <option value="1">v1</option>
-                <option value="2">v2c</option>
-                <option value="3">v3</option>
+        <!-- 主容器：横向 Flex -->
+        <div style="display: flex; height: 100%;">
+          <!-- 左侧容器 (66%): 竖向 Flex - 四行均匀分布 -->
+          <div style="flex: 0 0 66%; display: flex; flex-direction: column; justify-content: space-between; padding: 2px; box-sizing: border-box; position: relative;">
+            <!-- 行1: IP + Port -->
+            <div style="display: flex; align-items: center; padding: 0 2px;">
+              <span class="nas-label" style="width: 35px; text-align: right; padding-right: 2px; font-size: 12px;">IP:</span>
+              <input type="text" class="nas-input" id="nasIP" placeholder="192.168.1.100" style="width: 90px; height: 20px; font-size: 12px;">
+              <span class="nas-label" style="width: 40px; text-align: right; padding-right: 2px; margin-left: 8px; font-size: 12px;">Port:</span>
+              <input type="text" class="nas-input" id="nasPort" placeholder="5000" style="width: 60px; height: 20px; font-size: 12px;">
+            </div>
+            <!-- 行2: User + Pass -->
+            <div style="display: flex; align-items: center; padding: 0 2px;">
+              <span class="nas-label" style="width: 40px; text-align: right; padding-right: 2px; font-size: 12px;">User:</span>
+              <input type="text" class="nas-input" id="nasUser" placeholder="admin" style="width: 90px; height: 20px; font-size: 12px;">
+              <span class="nas-label" style="width: 40px; text-align: right; padding-right: 2px; margin-left: 8px; font-size: 12px;">Pass:</span>
+              <input type="password" class="nas-input" id="nasPass" placeholder="password" style="width: 90px; height: 20px; font-size: 12px;">
+            </div>
+            <!-- 行3: HTTPS + Save -->
+            <div style="display: flex; align-items: center; padding: 0 2px;">
+              <span class="nas-label" style="width: 50px; text-align: right; padding-right: 2px; font-size: 12px;">HTTPS</span>
+              <div class="nas-switch" id="nasHttps" onclick="toggleNasHttps()" style="width: 36px; height: 18px;"></div>
+              <button class="nas-save-btn" onclick="saveNasConfig()" style="margin-left: auto; height: 24px; font-size: 12px;">D Save</button>
+            </div>
+            <!-- Status 浮动消息 -->
+            <span class="nas-status" id="nasStatus" style="position: absolute; bottom: 2px; left: 4px; font-size: 12px;">Not configured</span>
+            <!-- 行4: SNMP 配置 (动态显示) -->
+            <div id="nasExtraPanel" style="display: none; align-items: center;">
+              <span class="nas-label" id="nasExtraLabel1">SNMP:</span>
+              <input type="text" class="nas-input" id="nasExtra1" placeholder="public">
+              <span class="nas-label" id="nasExtraLabel2" style="margin-left: 10px;">Ver:</span>
+              <select class="nas-dropdown" id="nasExtra2">
+                <option value="1">v1</option><option value="2" selected>v2c</option><option value="3">v3</option>
               </select>
             </div>
           </div>
-          <!-- 状态 + 保存 -->
-          <div class="nas-row" style="margin-top: auto;">
-            <span class="nas-status" id="nasStatus">Not configured</span>
-            <button class="nas-save-btn" onclick="saveNasConfig()">D Save</button>
+          <!-- 右侧容器 (34%): 竖向 Flex - 两行均匀分布 -->
+          <div style="flex: 0 0 34%; display: flex; flex-direction: column; justify-content: space-between; padding: 2px; border-left: 1px solid #333; box-sizing: border-box;">
+            <!-- 行1: NAS 类型 -->
+            <div style="display: flex; align-items: center;">
+              <span class="nas-label" style="min-width: 35px; font-size: 12px;">NAS:</span>
+              <select class="nas-dropdown" id="nasType" onchange="onNasTypeChange()" style="font-size: 12px;">
+                <option value="0">Synology DSM</option>
+                <option value="1">QNAP QTS</option>
+                <option value="2">TrueNAS</option>
+                <option value="3">FNOS</option>
+                <option value="4">Unraid</option>
+                <option value="5">Netdata</option>
+                <option value="6">SNMP</option>
+                <option value="7">Linux (HTTP)</option>
+                <option value="8">Linux (Serial)</option>
+                <option value="9">Windows</option>
+                <option value="10">Mock (Test)</option>
+              </select>
+            </div>
+            <!-- 行2: Disk 设置 -->
+            <div style="display: flex; align-items: center;">
+              <span class="nas-label" style="min-width: 40px; font-size: 12px;">SATA:</span>
+              <select class="nas-dropdown" id="sataCount" onchange="saveDiskConfig()" style="font-size: 12px;">
+                <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+                <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                <option value="6" selected>6</option><option value="7">7</option><option value="8">8</option>
+              </select>
+              <span class="nas-label" style="min-width: 35px; margin-left: 10px; font-size: 12px;">M.2:</span>
+              <select class="nas-dropdown" id="m2Count" onchange="saveDiskConfig()" style="font-size: 12px;">
+                <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+                <option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
+                <option value="6">6</option><option value="7">7</option><option value="8">8</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -511,39 +504,41 @@ Supported: Synology DSM, QNAP QTS, TrueNAS, FNOS, Unraid, Netdata, SNMP, Linux H
     const httpsSwitch = document.getElementById('nasHttps');
     const extraPanel = document.getElementById('nasExtraPanel');
 
-    // 认证面板
-    if (NAS_NEEDS_AUTH[nasTypeIndex]) {
-      authRow.style.display = 'flex';
-    } else {
-      authRow.style.display = 'none';
+    // 认证面板 (User/Pass)
+    if (authRow) {
+      if (NAS_NEEDS_AUTH[nasTypeIndex]) {
+        authRow.style.display = 'flex';
+      } else {
+        authRow.style.display = 'none';
+      }
     }
 
     // HTTPS 开关
     if (NAS_SUPPORTS_HTTPS[nasTypeIndex]) {
       httpsSwitch.style.display = 'block';
-      httpsSwitch.nextSibling.textContent = ' HTTPS';
     } else {
       httpsSwitch.style.display = 'none';
-      httpsSwitch.nextSibling.textContent = '';
     }
 
-    // 额外配置面板
-    if (NAS_NEEDS_EXTRA[nasTypeIndex]) {
-      extraPanel.classList.add('visible');
-      const extraLabel1 = document.getElementById('nasExtraLabel1');
-      const extraLabel2 = document.getElementById('nasExtraLabel2');
+    // 额外配置面板 (SNMP/Serial)
+    if (extraPanel) {
+      if (NAS_NEEDS_EXTRA[nasTypeIndex]) {
+        extraPanel.style.display = 'flex';
+        const extraLabel1 = document.getElementById('nasExtraLabel1');
+        const extraLabel2 = document.getElementById('nasExtraLabel2');
 
-      if (nasTypeIndex === 6) { // SNMP
-        extraLabel1.textContent = 'SNMP Community:';
-        extraLabel2.textContent = 'Ver:';
-        document.getElementById('nasExtra1').placeholder = 'public';
-      } else if (nasTypeIndex === 8) { // Linux Serial
-        extraLabel1.textContent = 'Device:';
-        extraLabel2.textContent = 'Baud:';
-        document.getElementById('nasExtra1').placeholder = '/dev/ttyUSB0';
+        if (nasTypeIndex === 6) { // SNMP
+          extraLabel1.textContent = 'SNMP:';
+          extraLabel2.textContent = 'Ver:';
+          document.getElementById('nasExtra1').placeholder = 'public';
+        } else if (nasTypeIndex === 8) { // Linux Serial
+          extraLabel1.textContent = 'Device:';
+          extraLabel2.textContent = 'Baud:';
+          document.getElementById('nasExtra1').placeholder = '/dev/ttyUSB0';
+        }
+      } else {
+        extraPanel.style.display = 'none';
       }
-    } else {
-      extraPanel.classList.remove('visible');
     }
   }
 
@@ -587,9 +582,7 @@ Supported: Synology DSM, QNAP QTS, TrueNAS, FNOS, Unraid, Netdata, SNMP, Linux H
       type: nasType,
       ip: nasIP,
       port: nasPort,
-      https: nasHttpsEnabled,
-      sataCount: parseInt(document.getElementById('sataCount').value),
-      m2Count: parseInt(document.getElementById('m2Count').value)
+      https: nasHttpsEnabled
     };
 
     if (NAS_NEEDS_AUTH[nasTypeIndex]) {
@@ -606,7 +599,21 @@ Supported: Synology DSM, QNAP QTS, TrueNAS, FNOS, Unraid, Netdata, SNMP, Linux H
     nasStatus.classList.add('ok');
 
     console.log('NAS Config saved:', config);
-    alert(`NAS 配置已保存!\n\n类型: ${nasType}\nIP: ${nasIP}\n端口: ${nasPort}\nHTTPS: ${nasHttpsEnabled ? 'ON' : 'OFF'}\n存储: SATA ${config.sataCount} + M.2 ${config.m2Count}`);
+    alert(`NAS 配置已保存!\n\n类型: ${nasType}\nIP: ${nasIP}\n端口: ${nasPort}\nHTTPS: ${nasHttpsEnabled ? 'ON' : 'OFF'}`);
+  }
+
+  // 保存硬盘数量配置（选择后立即保存）
+  function saveDiskConfig() {
+    const sataCount = parseInt(document.getElementById('sataCount').value);
+    const m2Count = parseInt(document.getElementById('m2Count').value);
+
+    const config = {
+      sataCount: sataCount,
+      m2Count: m2Count
+    };
+
+    console.log('Disk Config saved:', config);
+    // 在实际设备中，这里会调用 config_save_disk_config(sataCount, m2Count)
   }
 
   // 初始化 NAS 字段可见性

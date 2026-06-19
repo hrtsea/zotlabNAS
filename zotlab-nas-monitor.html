@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>【硬件交互赛道】ZotLab NAS Monitor —— 嵌入式NAS监控屏幕固件</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%);
+    color: #2c3e50;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .hero {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    border-radius: 20px;
+    padding: 48px 40px;
+    color: #fff;
+    box-shadow: 0 20px 60px rgba(26, 115, 232, 0.25);
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+  }
+  .hero h1 {
+    font-size: 36px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    position: relative;
+  }
+  .hero .subtitle {
+    font-size: 17px;
+    opacity: 0.92;
+    position: relative;
+  }
+
+  .section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .section-title {
+    font-size: 22px;
+    color: #34495e;
+    margin-bottom: 20px;
+    padding-left: 14px;
+    border-left: 5px solid #1a73e8;
+    font-weight: 700;
+  }
+  .section-sub {
+    font-size: 17px;
+    color: #1a73e8;
+    margin: 18px 0 10px;
+    font-weight: 600;
+  }
+  .section p { font-size: 15px; color: #444; margin-bottom: 8px; }
+  .section ul { padding-left: 24px; margin-bottom: 8px; }
+  .section li { font-size: 15px; color: #444; margin-bottom: 6px; }
+  .section code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .product-card {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #ff9800;
+  }
+  .product-card .icon { font-size: 24px; margin-bottom: 8px; }
+  .product-card h4 { font-size: 16px; color: #e65100; margin-bottom: 8px; }
+  .product-card p { font-size: 14px; color: #555; }
+
+  .scene {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    padding: 24px;
+    border-radius: 12px;
+    margin-top: 12px;
+  }
+  .scene h4 { color: #1565c0; margin-bottom: 10px; }
+
+  .highlight { background: linear-gradient(180deg, transparent 60%, #ffe066 60%); font-weight: 600; }
+
+  .hardware-show {
+    background: #1a2130;
+    color: #fff;
+    padding: 36px;
+    border-radius: 16px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .hardware-show .device {
+    font-size: 80px;
+    margin-bottom: 12px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  .hardware-show h3 { font-size: 20px; margin-bottom: 16px; }
+  .hardware-specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .spec-item {
+    background: rgba(255,255,255,0.08);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+  .spec-item strong { color: #4fc3f7; display: block; font-size: 15px; margin-bottom: 4px; }
+
+  .interactive-demo {
+    background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+    padding: 32px;
+    border-radius: 16px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .interactive-demo h3 { color: #283593; margin-bottom: 16px; }
+
+  .device-frame {
+    width: 640px;
+    height: 172px;
+    background: #000;
+    border: 4px solid #1a1a2e;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 0 auto 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    font-family: monospace;
+  }
+
+  .nas-screen {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .statusbar {
+    height: 35px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    border-bottom: 2px solid #333;
+  }
+  .statusbar .title { color: #fff; font-size: 14px; font-weight: 600; width: 100px; }
+  .statusbar .time { color: #fff; font-size: 14px; width: 80px; }
+  .statusbar .speed-up { color: #fff; font-size: 14px; width: 100px; text-align: center; }
+  .statusbar .speed-down { color: #fff; font-size: 14px; width: 100px; text-align: center; }
+  .statusbar .ip { color: #fff; font-size: 14px; margin-left: auto; }
+
+  .main-area { flex: 1; display: flex; flex-direction: row; padding: 4px; }
+  .cpu-area { width: 240px; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; }
+  .meter { width: 95px; height: 65px; position: relative; overflow: hidden; }
+  .meter-container { width: 95px; height: 95px; position: absolute; top: -15px; left: 0; }
+  .meter-bg { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 210deg, #1a1a2e 0deg, #1a1a2e 240deg); border: 3px solid #333; }
+  .meter-arc { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; transition: background 0.3s; }
+  .meter-pointer { position: absolute; top: 50%; left: 50%; width: 35px; height: 3px; background: #40E0D0; transform-origin: left center; border-radius: 2px; }
+  .meter-pointer::after { content: ''; position: absolute; right: -3px; top: 50%; width: 6px; height: 6px; background: #40E0D0; border-radius: 50%; transform: translateY(-50%); }
+  .meter-center { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #40E0D0; border-radius: 50%; transform: translate(-50%, -50%); }
+  .meter-value { position: absolute; bottom: 0; left: 0; width: 100%; text-align: center; }
+  .meter-label { font-size: 14px; color: #fff; font-weight: 600; }
+  .meter-sub { font-size: 9px; color: #666; }
+
+  .mem-disk-area { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; padding: 0 8px; }
+  .bar-row { display: flex; align-items: center; height: 28px; }
+  .bar-label { color: #fff; font-size: 14px; width: 80px; }
+  .bar-container { flex: 1; height: 18px; background: #333; border-radius: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; background: #40E0D0; border-radius: 5px; transition: width 0.3s; }
+  .bar-percent { color: #fff; font-size: 14px; width: 35px; text-align: right; margin-left: 8px; }
+
+  .hdd-bar { height: 35px; display: flex; align-items: center; padding: 0 5px; gap: 8px; }
+  .hdd-btn { width: 95px; height: 30px; background: #333; border-radius: 3px; display: flex; align-items: center; padding: 0 8px; }
+  .hdd-label { color: #fff; font-size: 14px; flex: 1; }
+  .hdd-led { width: 14px; height: 14px; border-radius: 50%; }
+  .hdd-led.on { background: #00FF00; box-shadow: 0 0 6px #00FF00; }
+  .hdd-led.off { background: #666; }
+
+  .storage-container { position: relative; height: 130px; padding-top: 5px; }
+  .hdd-row { position: absolute; display: flex; align-items: center; height: 28px; }
+  .hdd-row.col0 { left: 10px; }
+  .hdd-row.col1 { left: 320px; }
+  .hdd-row.row0 { top: 5px; }
+  .hdd-row.row1 { top: 33px; }
+  .hdd-row.row2 { top: 61px; }
+  .hdd-row.row3 { top: 89px; }
+  .hdd-name { color: #fff; font-size: 14px; width: 40px; }
+  .hdd-bar-bg { width: 170px; height: 16px; background: #333; border-radius: 4px; overflow: hidden; }
+  .hdd-bar-fill { height: 100%; background: #40E0D0; border-radius: 4px; transition: width 0.3s; }
+  .hdd-bar-fill.warn { background: #FF8C00; }
+  .hdd-pct { color: #fff; font-size: 14px; margin-left: 8px; width: 40px; }
+
+  .btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #fff;
+    color: #283593;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+  .btn.active { background: #283593; color: #fff; }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 40px;
+    color: #888;
+    font-size: 13px;
+  }
+
+  .footer-note a { color: #1a73e8; text-decoration: none; }
+  .footer-note a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 26px; }
+    .container { padding: 20px 14px 60px; }
+    .section, .hero { padding: 24px; }
+    .device-frame { width: 100%; max-width: 640px; height: auto; aspect-ratio: 640/172; }
+    .nas-screen { height: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <span class="tag">【硬件交互赛道】</span>
+    <h1>ZotLab NAS Monitor<br />— 嵌入式NAS监控屏幕固件 Demo</h1>
+    <p class="subtitle">用一块屏幕，掌控数据中心的每一次跳动</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">1. Demo 简介</div>
+
+    <div class="section-sub">是什么</div>
+    <p>ZotLab NAS Monitor 是一个 ESP32-S3 嵌入式 NAS 监控屏幕的交互式 Web Demo，模拟屏幕根据 NAS 系统 API 实时显示 CPU/内存、温度、存储使用率、硬盘健康度、网络速率等核心监控数据。</p>
+
+    <div class="section-sub">面向谁</div>
+    <p>家庭/小型办公室 NAS 用户、服务器运维人员、数码爱好者，也适用于多 NAS 系统统一监控场景。</p>
+
+    <div class="section-sub">主要功能</div>
+    <ul>
+      <li><strong>四大视图切换</strong>：总览（圆盘仪表+进度条）、存储（双列8盘布局）、设置（Tab标签页）、CPU监控</li>
+      <li>实时数据模拟：CPU 温度圆弧仪表、内存/磁盘进度条、上下行网络速率</li>
+      <li>硬盘状态指示灯：HDD1-6 + M.2-1/2 在线/离线/告警状态一目了然</li>
+      <li>支持 11 种 NAS 系统：Synology DSM / QNAP QTS / TrueNAS / FNOS / Unraid / Netdata / SNMP / Linux HTTP/Serial / Windows / Mock</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">2. Demo 创作思路</div>
+
+    <div class="section-sub">灵感来源</div>
+    <p>看到越来越多的家庭和小型办公室部署 NAS 存储数据，但监控 NAS 状态需要打开电脑浏览器或手机 App，交互繁琐且无法固定展示。想要一块<span class="highlight">百元级的 ESP32-S3 屏幕</span>，像汽车仪表盘一样，实时展示 NAS 的"健康状态"。</p>
+
+    <div class="section-sub">想解决的问题</div>
+    <p>NAS 监控场景下的四大痛点——</p>
+    <ul>
+      <li><strong>交互繁琐</strong>：查看状态需要打开手机 App 或电脑浏览器，步骤多、耗时长</li>
+      <li><strong>设备依赖</strong>：必须依赖手机/电脑才能监控，临时查看不方便</li>
+      <li><strong>品牌封闭</strong>：各 NAS 品牌监控方案互不兼容，多系统用户缺乏统一界面</li>
+      <li><strong>功耗浪费</strong>：为查看状态需要唤醒整个电脑，功耗高、不环保</li>
+    </ul>
+
+    <div class="section-sub">为什么做这个方向</div>
+    <p>专用 NAS 监控屏幕价格昂贵且功能单一。通过一块 <span class="highlight">WaveShare 3.49" IPS 屏幕</span>（百元级），配合开源固件，同时监控 QNAP、Synology、TrueNAS、Unraid 等多种 NAS 系统，实现<span class="highlight">统一、可定制、低功耗</span>的硬件监控方案。</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3. Demo 体验地址</div>
+    <p>本项目文件夹 <code>zotlab-nas-monitor.html</code> 为可直接体验的 HTML 文件，双击即可在浏览器中完整体验所有交互功能。</p>
+    <p>项目源码：<a href="https://github.com/hrtsea/zotlabNAS" target="_blank">https://github.com/hrtsea/zotlabNAS</a></p>
+    <p>配套的 UI Mock 页面位于 <code>spec/</code> 目录下：</p>
+    <ul>
+      <li><code>spec/ui_mock_overview.html</code> - 总览页面 Mock（含实时数据模拟）</li>
+      <li><code>spec/ui_mock_storage.html</code> - 存储页面 Mock</li>
+      <li><code>spec/ui_mock_settings.html</code> - 设置页面 Mock（含 NAS/WiFi/Fan/Screen/Radio/Music/Region/Guide 多 Tab）</li>
+      <li><code>spec/ui_mock_cpu.html</code> - CPU 监控页面 Mock</li>
+      <li><code>spec/project_spec.html</code> - 项目规格说明</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">4. TRAE 实践过程</div>
+    <ul>
+      <li>在 TRAE IDE 中描述需求，AI 生成初始创意提案 HTML 页面</li>
+      <li>在 PlatformIO 项目中逐步迭代，添加 LVGL UI 驱动和网络客户端</li>
+      <li>使用 AI 辅助调试 CSS 样式和 JS 逻辑，实现模拟 NAS 监控界面切换</li>
+      <li>基于 SquareLine Studio 设计 UI 原型，导出 LVGL 代码</li>
+      <li>最终产出可交互的 Web Demo 文件，模拟 640×172 屏幕的真实效果</li>
+    </ul>
+
+    <div class="section-sub">关键文件结构</div>
+    <ul>
+      <li><code>sketch/src/ui/screens/ui_Screen_Overview.c</code> - LVGL 总览页面源码</li>
+      <li><code>sketch/src/ui/screens/ui_Screen_Storage.c</code> - LVGL 存储页面源码</li>
+      <li><code>sketch/src/ui/screens/ui_Screen_Settings.c</code> - LVGL 设置页面源码</li>
+      <li><code>sketch/src/net/</code> - NAS 客户端实现（synology_client / qnap_client / truenas_client 等）</li>
+      <li><code>sketch/src/data/nas_config.h</code> - NAS 类型配置（11 种系统支持）</li>
+      <li><code>sketch/src/data/nas_data.h</code> - 统一数据模型定义</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">5. 硬件方案与交互演示</div>
+    <div class="hardware-show">
+      <div class="device">🖥️</div>
+      <h3>ZotLab NAS Monitor 核心硬件配置</h3>
+      <div class="hardware-specs">
+        <div class="spec-item"><strong>主控芯片</strong>ESP32-S3 (Xtensa dual-core)</div>
+        <div class="spec-item"><strong>显示屏</strong>WaveShare 3.49" IPS (172x640)</div>
+        <div class="spec-item"><strong>触控</strong>I2C 触摸控制器</div>
+        <div class="spec-item"><strong>音频</strong>ES8311 DAC + ES7210 ADC</div>
+        <div class="spec-item"><strong>传感器</strong>QMI8658 (IMU + 温湿度)</div>
+        <div class="spec-item"><strong>存储</strong>SD 卡 + LittleFS</div>
+        <div class="spec-item"><strong>网络</strong>Wi-Fi 2.4G/5G</div>
+        <div class="spec-item"><strong>扩展</strong>TCA9554 IO 扩展器</div>
+      </div>
+    </div>
+
+    <div class="interactive-demo">
+      <h3>🎛 模拟 NAS 监控界面切换</h3>
+      <p style="font-size:14px; color:#1a237e; margin-bottom:12px;">点击下方按钮，切换不同监控视图（640×172 屏幕）</p>
+
+      <div class="device-frame">
+        <div class="nas-screen" id="nas-screen">
+          <div class="statusbar">
+            <div class="title" id="screen-title">ZotLab-NAS</div>
+            <div class="time" id="screen-time">14:23:18</div>
+            <div class="speed-up" id="screen-up">▲ 24.5MB/s</div>
+            <div class="speed-down" id="screen-down">▼ 12.8MB/s</div>
+            <div class="ip" id="screen-ip">IP: 192.168.1.100</div>
+          </div>
+          <div id="screen-content"></div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn active" data-mode="overview">📊 总览</button>
+        <button class="btn" data-mode="storage">💾 存储</button>
+        <button class="btn" data-mode="settings">⚙️ 设置</button>
+        <button class="btn" data-mode="cpu">📈 CPU</button>
+      </div>
+      <p id="mode-desc" style="margin-top:16px; font-size:14px; color:#1a237e;">
+        基于 spec 目录下的 ui_mock_overview.html · 实时数据模拟
+      </p>
+    </div>
+
+    <div class="section-sub" style="margin-top:28px;">支持的 NAS 系统</div>
+    <ul>
+      <li><strong>Synology DSM</strong>：通过 API 获取存储、硬盘健康、CPU/内存、温度数据</li>
+      <li><strong>QNAP QTS</strong>：通过 HTTP API 获取存储、RAID 状态、硬盘信息</li>
+      <li><strong>TrueNAS</strong>：REST API 集成，监控 ZFS 存储池、告警</li>
+      <li><strong>FNOS (飞牛 NAS)</strong>：支持国产 NAS 系统</li>
+      <li><strong>Unraid</strong>：Docker API 方式获取数组状态、磁盘信息</li>
+      <li><strong>Netdata</strong>：通过 Netdata REST API 获取实时监控数据</li>
+      <li><strong>SNMP</strong>：支持标准 SNMP v1/v2c/v3 协议的设备</li>
+      <li><strong>Linux (HTTP)</strong>：通过通用 HTTP API 获取 Linux 系统信息</li>
+      <li><strong>Linux (Serial)</strong>：通过串口通信获取 Linux 系统数据</li>
+      <li><strong>Windows</strong>：通过 SNMP 或 HTTP 获取 Windows 系统信息</li>
+      <li><strong>Mock (Test)</strong>：模拟数据源，用于开发和测试</li>
+    </ul>
+
+    <div class="section-sub">核心功能特性</div>
+    <ul>
+      <li><strong>实时显示</strong>：存储容量、RAID 状态、硬盘温度、风扇转速、CPU/内存</li>
+      <li><strong>多网口监控</strong>：支持最多 4 个网络接口（eth0/eth1/wlan0 等）</li>
+      <li><strong>多设备管理</strong>：同时监控多台 NAS，支持快速切换</li>
+      <li><strong>触控交互</strong>：触摸屏操作，滑动切换视图，物理按键控制</li>
+      <li><strong>风扇控制</strong>：PWM 调速、温度曲线、滞回配置、紧急温度阈值</li>
+      <li><strong>音量控制</strong>：ES8311 DAC + ES7210 ADC，支持告警音效</li>
+      <li><strong>OTA 升级</strong>：通过网络远程更新固件</li>
+      <li><strong>屏幕控制</strong>：亮度调节、睡眠定时、壁纸设置</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">6. 技术架构</div>
+    <div class="section-sub">开发环境</div>
+    <ul>
+      <li><strong>IDE</strong>：Visual Studio Code + PlatformIO IDE</li>
+      <li><strong>框架</strong>：pioArduino (Arduino Framework for ESP32-S3)</li>
+      <li><strong>UI</strong>：LVGL v8.3.11（SquareLine Studio 设计）</li>
+      <li><strong>文件系统</strong>：LittleFS + SD 卡</li>
+      <li><strong>网络</strong>：Wi-Fi Manager + 多协议客户端</li>
+    </ul>
+
+    <div class="section-sub">目录结构</div>
+    <ul>
+      <li><code>src/</code>：主源码（含 UI、驱动、网络模块）</li>
+      <li><code>src/ui/</code>：LVGL UI 代码（SquareLine Studio 导出）</li>
+      <li><code>src/ui/screens/</code>：各页面实现（Overview、Storage、Settings）</li>
+      <li><code>src/net/</code>：NAS 客户端实现（QNAP/Synology/TrueNAS 等）</li>
+      <li><code>src/data/</code>：配置管理、统一数据模型</li>
+      <li><code>src/pcf85063/</code>：RTC 时钟驱动</li>
+      <li><code>src/tca9554/</code>：IO 扩展器驱动</li>
+      <li><code>src/es8311/</code>：音频 DAC 驱动</li>
+      <li><code>src/es7210/</code>：音频 ADC 驱动</li>
+      <li><code>data/</code>：文件系统数据</li>
+      <li><code>include/</code>：全局头文件（引脚配置、参数）</li>
+    </ul>
+
+    <div class="section-sub">统一数据模型</div>
+    <p>所有数据源填充统一数据结构，UI 仅消费此结构：</p>
+    <ul>
+      <li><code>NasSystemInfo</code>：主机名、型号、运行时间、CPU/内存、温度</li>
+      <li><code>NasDiskInfo</code>：硬盘名称、型号、温度、健康状态、容量、读写速度</li>
+      <li><code>NasVolumeInfo</code>：存储卷、RAID 类型、使用率</li>
+      <li><code>NasNetworkInfo</code>：网络接口、IP 地址、上下行速率</li>
+      <li><code>FanStatus</code>：风扇转速、PWM、启用状态</li>
+    </ul>
+
+    <div class="section-sub">网络客户端</div>
+    <ul>
+      <li><code>synology_client</code>：Synology DSM API</li>
+      <li><code>qnap_client</code>：QNAP QTS API</li>
+      <li><code>truenas_client</code>：TrueNAS REST API</li>
+      <li><code>fnos_client</code>：飞牛 NAS API</li>
+      <li><code>unraid_client</code>：Unraid Docker API</li>
+      <li><code>netdata_client</code>：Netdata 轮询</li>
+      <li><code>snmp_client</code>：SNMP v1/v2c/v3</li>
+      <li><code>serial_client</code>：串口通信协议</li>
+      <li><code>mock_client</code>：模拟数据（开发测试用）</li>
+    </ul>
+  </div>
+
+  <div class="footer-note">
+    —— ZotLab NAS Monitor · 让数据中心的脉搏，一目了然 ——<br />
+    <a href="https://github.com/hrtsea/zotlabNAS" target="_blank">GitHub: https://github.com/hrtsea/zotlabNAS</a>
+  </div>
+
+</div>
+
+<script>
+  const modes = {
+    overview: {
+      desc: '基于 spec/ui_mock_overview.html · 实时数据模拟',
+      content: `<div class="main-area">
+        <div class="cpu-area">
+          <div class="meter">
+            <div class="meter-container">
+              <div class="meter-bg"></div>
+              <div class="meter-arc" id="cpu-arc" style="background: conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 108deg, transparent 108deg);"></div>
+              <div class="meter-pointer" id="cpu-pointer" style="transform: rotate(-15deg);"></div>
+              <div class="meter-center"></div>
+            </div>
+            <div class="meter-value">
+              <div class="meter-label" id="cpu-label">45%</div>
+              <div class="meter-sub">CPU</div>
+            </div>
+          </div>
+          <div class="meter">
+            <div class="meter-container">
+              <div class="meter-bg"></div>
+              <div class="meter-arc" id="temp-arc" style="background: conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 100deg, transparent 100deg);"></div>
+              <div class="meter-pointer" id="temp-pointer" style="transform: rotate(-25deg);"></div>
+              <div class="meter-center"></div>
+            </div>
+            <div class="meter-value">
+              <div class="meter-label" id="temp-label">42°C</div>
+              <div class="meter-sub">TEMP</div>
+            </div>
+          </div>
+        </div>
+        <div class="mem-disk-area">
+          <div class="bar-row">
+            <div class="bar-label">MEMORY<br>8GB</div>
+            <div class="bar-container"><div class="bar-fill" id="mem-bar" style="width:40%"></div></div>
+            <div class="bar-percent" id="mem-pct">40%</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label">DISK<br>13TB</div>
+            <div class="bar-container"><div class="bar-fill" id="disk-bar" style="width:52%"></div></div>
+            <div class="bar-percent" id="disk-pct">52%</div>
+          </div>
+        </div>
+      </div>
+      <div class="hdd-bar">
+        <div class="hdd-btn"><div class="hdd-label">HDD1</div><div class="hdd-led on"></div></div>
+        <div class="hdd-btn"><div class="hdd-label">HDD2</div><div class="hdd-led on"></div></div>
+        <div class="hdd-btn"><div class="hdd-label">HDD3</div><div class="hdd-led on"></div></div>
+        <div class="hdd-btn"><div class="hdd-label">HDD4</div><div class="hdd-led off"></div></div>
+        <div class="hdd-btn"><div class="hdd-label">HDD5</div><div class="hdd-led off"></div></div>
+        <div class="hdd-btn"><div class="hdd-label">M.2</div><div class="hdd-led on"></div></div>
+      </div>`
+    },
+    storage: {
+      desc: '基于 spec/ui_mock_storage.html · 双列8盘布局',
+      content: `<div class="storage-container" style="position: relative; height: 130px; padding-top: 5px;">
+        <div class="hdd-row" style="position: absolute; display: flex; align-items: center; height: 28px; left: 10px; top: 5px;">
+          <span style="color: #fff; font-size: 14px; width: 40px;">Disk1</span>
+          <div style="width: 170px; height: 16px; background: #333; border-radius: 4px; overflow: hidden;"><div class="hdd-bar-fill" id="disk1-bar" style="height: 100%; background: #40E0D0; border-radius: 4px; width: 52%;"></div></div>
+          <span style="color: #fff; font-size: 14px; margin-left: 8px; width: 40px;" id="disk1-pct">52%</span>
+        </div>
+        <div class="hdd-row" style="position: absolute; display: flex; align-items: center; height: 28px; left: 10px; top: 33px;">
+          <span style="color: #fff; font-size: 14px; width: 40px;">Disk2</span>
+          <div style="width: 170px; height: 16px; background: #333; border-radius: 4px; overflow: hidden;"><div class="hdd-bar-fill" id="disk2-bar" style="height: 100%; background: #40E0D0; border-radius: 4px; width: 54%;"></div></div>
+          <span style="color: #fff; font-size: 14px; margin-left: 8px; width: 40px;" id="disk2-pct">54%</span>
+        </div>
+        <div class="hdd-row" style="position: absolute; display: flex; align-items: center; height: 28px; left: 10px; top: 61px;">
+          <span style="color: #fff; font-size: 14px; width: 40px;">Disk3</span>
+          <div style="width: 170px; height: 16px; background: #333; border-radius: 4px; overflow: hidden;"><div class="hdd-bar-fill warn" id="disk3-bar" style="height: 100%; background: #FF8C00; border-radius: 4px; width: 78%;"></div></div>
+          <span style="color: #fff; font-size: 14px; margin-left: 8px; width: 40px;" id="disk3-pct">78%</span>
+        </div>
+        <div class="hdd-row" style="position: absolute; display: flex; align-items: center; height: 28px; left: 10px; top: 89px;">
+          <span style="color: #fff; font-size: 14px; width: 40px;">Disk4</span>
+          <div style="width: 170px; height: 16px; background: #333; border-radius: 4px; overflow: hidden;"><div style="height: 100%; background: #FF4500; border-radius: 4px; width: 0%;"></div></div>
+          <span style="color: #f00; font-size: 14px; margin-left: 8px; width: 40px;">CRIT</span>
+        </div>
+        <div class="hdd-row" style="position: absolute; display: flex; align-items: center; height: 28px; left: 320px; top: 5px;">
+          <span style="color: #fff; font-size: 14px; width: 40px;">Disk5</span>
+          <div style="width: 170px; height: 16px; background: #333; border-radius: 4px; overflow: hidden;"><div style="height: 100%; background: #FF4500; border-radius: 4px; width: 0%;"></div></div>
+          <span style="color: #f00; font-size: 14px; margin-left: 8px; width: 40px;">CRIT</span>
+        </div>
+        <div class="hdd-row" style="position: absolute; display: flex; align-items: center; height: 28px; left: 320px; top: 33px;">
+          <span style="color: #fff; font-size: 14px; width: 40px;">Disk6</span>
+          <div style="width: 170px; height: 16px; background: #333; border-radius: 4px; overflow: hidden;"><div style="height: 100%; background: #40E0D0; border-radius: 4px; width: 0%;"></div></div>
+          <span style="color: #fff; font-size: 14px; margin-left: 8px; width: 40px;">OFF</span>
+        </div>
+        <div class="hdd-row" style="position: absolute; display: flex; align-items: center; height: 28px; left: 320px; top: 61px;">
+          <span style="color: #fff; font-size: 14px; width: 40px;">M.2-1</span>
+          <div style="width: 170px; height: 16px; background: #333; border-radius: 4px; overflow: hidden;"><div id="m21-bar" style="height: 100%; background: #3b82f6; border-radius: 4px; width: 50%;"></div></div>
+          <span style="color: #fff; font-size: 14px; margin-left: 8px; width: 40px;" id="m21-pct">50%</span>
+        </div>
+        <div class="hdd-row" style="position: absolute; display: flex; align-items: center; height: 28px; left: 320px; top: 89px;">
+          <span style="color: #fff; font-size: 14px; width: 40px;">M.2-2</span>
+          <div style="width: 170px; height: 16px; background: #333; border-radius: 4px; overflow: hidden;"><div style="height: 100%; background: #3b82f6; border-radius: 4px; width: 0%;"></div></div>
+          <span style="color: #fff; font-size: 14px; margin-left: 8px; width: 40px;">OFF</span>
+        </div>
+      </div>`
+    },
+    settings: {
+      desc: '基于 spec/ui_mock_settings.html · NAS/WiFi/Fan/Screen 多标签页',
+      content: `<div style="padding: 4px; display: flex; flex-direction: column; height: 100%; gap: 4px;">
+        <div style="display: flex; gap: 2px;">
+          <button style="background: #40E0D0; color: #000; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; cursor: pointer;">NAS</button>
+          <button style="background: #333; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;">WiFi</button>
+          <button style="background: #333; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;">Fan</button>
+          <button style="background: #333; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;">Screen</button>
+          <button style="background: #333; color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;">Guide</button>
+        </div>
+        <div style="background: #1a1a2e; padding: 6px; border-radius: 4px; flex: 1;">
+          <div style="display: grid; grid-template-columns: 50% 50%; gap: 6px; font-size: 11px;">
+            <div style="display: flex; gap: 4px;"><span style="color: #888;">NAS:</span><span style="color: #fff;">Synology DSM</span></div>
+            <div style="display: flex; gap: 4px;"><span style="color: #888;">IP:</span><span style="color: #fff;">192.168.1.100</span></div>
+            <div style="display: flex; gap: 4px;"><span style="color: #888;">Port:</span><span style="color: #fff;">5000</span></div>
+            <div style="display: flex; gap: 4px;"><span style="color: #888;">User:</span><span style="color: #fff;">admin</span></div>
+            <div style="display: flex; gap: 4px;"><span style="color: #888;">SATA:</span><span style="color: #fff;">6 bays</span></div>
+            <div style="display: flex; gap: 4px;"><span style="color: #888;">M.2:</span><span style="color: #fff;">2 slots</span></div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; font-size: 10px;">
+          <span style="color: #888;">Status:</span><span style="color: #0f0;">Connected</span>
+          <span style="color: #888;">HTTPS:</span><span style="color: #0f0;">ON</span>
+        </div>
+      </div>`
+    },
+    cpu: {
+      desc: '基于 spec/ui_mock_cpu.html · CPU核心/温度监控',
+      content: `<div style="padding: 6px; display: flex; flex-direction: column; height: 100%; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; color: #888; font-size: 10px;">
+          <span>CPU Monitor</span>
+          <span id="cpu-time">Uptime: 15d 8h 23m</span>
+        </div>
+        <div style="display: flex; gap: 6px; flex: 1;">
+          <div style="flex: 1; background: #1a1a2e; padding: 6px; border-radius: 4px; text-align: center;">
+            <div style="color: #888; font-size: 9px;">CPU Usage</div>
+            <div style="color: #40E0D0; font-size: 20px; font-weight: 600;" id="cpu-usage">45%</div>
+            <div style="color: #666; font-size: 8px;">4/4 cores</div>
+          </div>
+          <div style="flex: 1; background: #1a1a2e; padding: 6px; border-radius: 4px; text-align: center;">
+            <div style="color: #888; font-size: 9px;">CPU Temp</div>
+            <div style="color: #40E0D0; font-size: 20px; font-weight: 600;" id="cpu-temp">42°C</div>
+            <div style="color: #666; font-size: 8px;" id="cpu-temp-status">Normal</div>
+          </div>
+        </div>
+        <div style="background: #1a1a2e; padding: 6px; border-radius: 4px;">
+          <div style="color: #888; font-size: 9px; margin-bottom: 4px;">Load Average</div>
+          <div style="display: flex; gap: 8px; font-size: 11px;">
+            <div><span style="color: #888;">1m:</span> <span style="color: #40E0D0;" id="load-1">0.52</span></div>
+            <div><span style="color: #888;">5m:</span> <span style="color: #40E0D0;" id="load-5">0.48</span></div>
+            <div><span style="color: #888;">15m:</span> <span style="color: #40E0D0;" id="load-15">0.45</span></div>
+          </div>
+        </div>
+      </div>`
+    }
+  };
+
+  const screenContent = document.getElementById('screen-content');
+  const desc = document.getElementById('mode-desc');
+  const btns = document.querySelectorAll('.btn');
+
+  screenContent.innerHTML = modes.overview.content;
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const m = modes[btn.dataset.mode];
+      screenContent.innerHTML = m.content;
+      desc.textContent = m.desc;
+    });
+  });
+
+  class MockDataGenerator {
+    constructor() {
+      this.counter = 0;
+      this.data = {
+        temp_cpu: 42,
+        cpu_pct: 45,
+        ram_pct: 40,
+        disk_used_pct: 52,
+        network_rx_bps: 12500000,
+        network_tx_bps: 6250000
+      };
+    }
+
+    generate() {
+      this.counter++;
+      this.data.cpu_pct = 45.0 + (this.counter % 30);
+      this.data.temp_cpu = 42 + (this.counter % 10);
+      this.data.ram_pct = 40 + (this.counter % 15);
+      this.data.disk_used_pct = 50 + (this.counter % 10);
+      this.data.network_rx_bps = (10 + (this.counter % 90)) * 125000;
+      this.data.network_tx_bps = (5 + (this.counter % 45)) * 125000;
+      return this.data;
+    }
+
+    formatSpeed(bps) {
+      const mbps = bps / 1000000;
+      if (mbps >= 1) return mbps.toFixed(1) + 'MB/s';
+      return (bps / 1000).toFixed(0) + 'KB/s';
+    }
+  }
+
+  const mock = new MockDataGenerator();
+
+  setInterval(() => {
+    const data = mock.generate();
+
+    const cpuLabel = document.getElementById('cpu-label');
+    if (cpuLabel) {
+      const cpuAngle = (data.cpu_pct / 100) * 240;
+      document.getElementById('cpu-arc').style.background = `conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 ${cpuAngle}deg, transparent ${cpuAngle}deg)`;
+      cpuLabel.textContent = Math.round(data.cpu_pct) + '%';
+      document.getElementById('cpu-pointer').style.transform = `rotate(${cpuAngle - 105}deg)`;
+
+      const tempAngle = (data.temp_cpu / 100) * 240;
+      const tempColor = data.temp_cpu > 60 ? '#FF8C00' : '#40E0D0';
+      document.getElementById('temp-arc').style.background = `conic-gradient(from 210deg, ${tempColor} 0deg, ${tempColor} ${tempAngle}deg, transparent ${tempAngle}deg)`;
+      document.getElementById('temp-label').textContent = data.temp_cpu + '°C';
+      document.getElementById('temp-label').style.color = tempColor;
+
+      document.getElementById('mem-bar').style.width = Math.round(data.ram_pct) + '%';
+      document.getElementById('mem-pct').textContent = Math.round(data.ram_pct) + '%';
+      document.getElementById('disk-bar').style.width = Math.round(data.disk_used_pct) + '%';
+      document.getElementById('disk-pct').textContent = Math.round(data.disk_used_pct) + '%';
+    }
+
+    const disk1Bar = document.getElementById('disk1-bar');
+    if (disk1Bar) {
+      const d1 = 52 + (this.counter % 8);
+      document.getElementById('disk1-bar').style.width = d1 + '%';
+      document.getElementById('disk1-pct').textContent = d1 + '%';
+      const d2 = 54 + (this.counter % 7);
+      document.getElementById('disk2-bar').style.width = d2 + '%';
+      document.getElementById('disk2-pct').textContent = d2 + '%';
+      const d3 = 78 + (this.counter % 5);
+      document.getElementById('disk3-bar').style.width = d3 + '%';
+      document.getElementById('disk3-pct').textContent = d3 + '%';
+      const m1 = 50 + (this.counter % 12);
+      document.getElementById('m21-bar').style.width = m1 + '%';
+      document.getElementById('m21-pct').textContent = m1 + '%';
+    }
+
+    const cpuUsage = document.getElementById('cpu-usage');
+    if (cpuUsage) {
+      document.getElementById('cpu-usage').textContent = Math.round(data.cpu_pct) + '%';
+      document.getElementById('cpu-temp').textContent = data.temp_cpu + '°C';
+      const tempColor = data.temp_cpu > 60 ? '#FF8C00' : '#40E0D0';
+      document.getElementById('cpu-temp').style.color = tempColor;
+      document.getElementById('cpu-temp-status').textContent = data.temp_cpu > 65 ? 'Warning' : (data.temp_cpu > 60 ? 'High' : 'Normal');
+      document.getElementById('load-1').textContent = (0.5 + (this.counter % 20) / 10.0).toFixed(2);
+    }
+
+    document.getElementById('screen-up').textContent = '▲ ' + mock.formatSpeed(data.network_tx_bps);
+    document.getElementById('screen-down').textContent = '▼ ' + mock.formatSpeed(data.network_rx_bps);
+    document.getElementById('screen-time').textContent = '14:' + (23 + Math.floor(this.counter / 60) % 60).toString().padStart(2, '0') + ':' + (18 + this.counter % 60).toString().padStart(2, '0');
+  }, 1000);
+</script>
+</body>
+</html>
