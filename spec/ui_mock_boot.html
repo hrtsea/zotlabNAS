@@ -1,163 +1,89 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=640, height=172">
-    <title>Splash Screen - TuneBar Zotlabnas</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<title>NAS Monitor - Boot Screen Mock (640×172)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: monospace; background: #0a0a15; color: #fff; padding: 30px 20px; }
+  h1 { text-align: center; color: #60a5fa; margin-bottom: 8px; font-size: 1.4em; }
+  .subtitle { text-align: center; color: #64748b; margin-bottom: 24px; font-size: 0.85em; }
+  .nav { text-align: center; margin-bottom: 24px; }
+  .nav a { color: #60a5fa; text-decoration: none; margin: 0 8px; font-size: 0.85em; }
+  .nav a:hover { text-decoration: underline; }
 
-        body {
-            background-color: #000000;
-            width: 640px;
-            height: 172px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, Helvetica, sans-serif;
-            overflow: hidden;
-        }
+  .device { width: 640px; height: 172px; background: #000; border: 4px solid #1a1a2e; border-radius: 8px; overflow: hidden; margin: 0 auto; }
+  .screen { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
 
-        .splash-container {
-            width: 640px;
-            height: 172px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
+  .logo { font-size: 36px; font-weight: bold; color: #40E0D0; letter-spacing: 2px; }
+  .version { font-size: 14px; color: #666; margin-top: 8px; }
 
-        .logo-label {
-            font-size: 48px;
-            font-weight: bold;
-            color: #00E676;
-            position: absolute;
-            top: 20px;
-            letter-spacing: 2px;
-        }
+  .progress-container { width: 200px; height: 8px; background: #333; border-radius: 4px; overflow: hidden; margin-top: 20px; }
+  .progress-bar { height: 100%; width: 0%; background: #40E0D0; border-radius: 4px; transition: width 0.5s ease-out; }
 
-        .version-label {
-            font-size: 16px;
-            color: #888888;
-            position: absolute;
-            top: 85px;
-        }
+  .status { font-size: 12px; color: #fff; margin-top: 12px; text-align: center; }
 
-        .progress-container {
-            position: absolute;
-            top: 105px;
-            width: 200px;
-            height: 8px;
-            background-color: #333333;
-            border-radius: 4px;
-            overflow: hidden;
-        }
+  /* Boot animation stages */
+  .stage-1 .progress-bar { width: 25%; }
+  .stage-2 .progress-bar { width: 50%; }
+  .stage-3 .progress-bar { width: 75%; }
+  .stage-4 .progress-bar { width: 100%; }
 
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background-color: #00E676;
-            border-radius: 4px;
-            transition: width 0.5s ease-out;
-        }
+  @keyframes logoGlow {
+    0%, 100% { text-shadow: 0 0 10px rgba(64,224,208,0.3); }
+    50% { text-shadow: 0 0 20px rgba(64,224,208,0.5), 0 0 30px rgba(64,224,208,0.3); }
+  }
+  .logo { animation: logoGlow 2s ease-in-out infinite; }
 
-        .status-label {
-            font-size: 12px;
-            color: #FFFFFF;
-            position: absolute;
-            top: 125px;
-            text-align: center;
-            width: 300px;
-        }
-
-        /* Boot animation stages */
-        .stage-0 .progress-bar { width: 0%; }
-        .stage-1 .progress-bar { width: 25%; }
-        .stage-2 .progress-bar { width: 50%; }
-        .stage-3 .progress-bar { width: 75%; }
-        .stage-4 .progress-bar { width: 100%; }
-
-        /* Subtle logo glow effect */
-        @keyframes logoGlow {
-            0%, 100% { text-shadow: 0 0 10px #00E67640; }
-            50% { text-shadow: 0 0 20px #00E67660, 0 0 30px #00E67630; }
-        }
-
-        .logo-label {
-            animation: logoGlow 2s ease-in-out infinite;
-        }
-
-        /* Progress bar pulse when complete */
-        @keyframes progressPulse {
-            0%, 100% { box-shadow: 0 0 5px #00E67640; }
-            50% { box-shadow: 0 0 15px #00E67660; }
-        }
-
-        .stage-4 .progress-container {
-            animation: progressPulse 1s ease-in-out 3;
-        }
-    </style>
+  .screen-label { text-align: center; margin-top: 8px; color: #94a3b8; font-size: 0.8em; }
+</style>
 </head>
 <body>
-    <div class="splash-container stage-0" id="splashContainer">
-        <div class="logo-label" id="logoLabel">TuneBar Zotlabnas</div>
-        <div class="version-label" id="versionLabel">v1.0.0</div>
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <div class="status-label" id="statusLabel">Initializing system...</div>
+<h1>🚀 Boot Screen (640×172)</h1>
+<p class="subtitle">Splash Screen · Boot Animation · System Initialization</p>
+<div class="nav"><a href="ui_mock_overview.html">&larr; Overview</a> | <a href="project_spec.html">Back to Spec</a></div>
+
+<div class="device">
+  <div class="screen" id="splashScreen">
+    <div class="logo">TuneBar</div>
+    <div class="version">v1.0.0</div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
     </div>
+    <div class="status" id="statusLabel">Initializing system...</div>
+  </div>
+</div>
+<div class="screen-label">Boot Sequence - Loading system components</div>
 
-    <script>
-        const bootStages = [
-            { stage: 1, message: "Loading system components..." },
-            { stage: 2, message: "Initializing storage subsystem..." },
-            { stage: 3, message: "Starting network services..." },
-            { stage: 4, message: "Boot complete!" }
-        ];
+<script>
+  const bootStages = [
+    { stage: 1, message: "Loading system components..." },
+    { stage: 2, message: "Initializing storage subsystem..." },
+    { stage: 3, message: "Starting network services..." },
+    { stage: 4, message: "Boot complete!" }
+  ];
 
-        let currentStage = 0;
-        const splashContainer = document.getElementById('splashContainer');
-        const progressBar = document.getElementById('progressBar');
-        const statusLabel = document.getElementById('statusLabel');
+  let currentStage = 0;
+  const splashScreen = document.getElementById('splashScreen');
+  const statusLabel = document.getElementById('statusLabel');
 
-        function updateBootStage(stage, message) {
-            currentStage = stage;
-            splashContainer.className = 'splash-container stage-' + stage;
-            if (message) {
-                statusLabel.textContent = message;
-            }
-        }
+  function runBootSequence() {
+    let index = 0;
+    function nextStage() {
+      if (index < bootStages.length) {
+        const { stage, message } = bootStages[index];
+        splashScreen.className = 'screen stage-' + stage;
+        statusLabel.textContent = message;
+        index++;
+        setTimeout(nextStage, 750);
+      }
+    }
+    setTimeout(nextStage, 500);
+  }
 
-        // Auto-run boot sequence animation
-        function runBootSequence() {
-            let index = 0;
-
-            function nextStage() {
-                if (index < bootStages.length) {
-                    const { stage, message } = bootStages[index];
-                    updateBootStage(stage, message);
-                    index++;
-                    setTimeout(nextStage, 750); // 750ms per stage
-                }
-            }
-
-            // Start after initial delay
-            setTimeout(nextStage, 500);
-        }
-
-        // Initialize with stage 0
-        updateBootStage(0, "Initializing system...");
-
-        // Start boot animation after page loads
-        window.addEventListener('load', function() {
-            setTimeout(runBootSequence, 300);
-        });
-    </script>
+  window.addEventListener('load', function() {
+    setTimeout(runBootSequence, 300);
+  });
+</script>
 </body>
 </html>
