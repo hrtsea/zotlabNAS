@@ -63,27 +63,27 @@
 <div class="device">
   <div class="screen">
     <div class="statusbar">
-      <div class="title">Synology</div>
+      <div class="title">ZotLab-NAS</div>
       <div class="time">14:23:18</div>
-      <div class="speed-up">▲ 12.4MB/s</div>
-      <div class="speed-down">▼ 3.8MB/s</div>
-      <div class="ip">IP: 192.168.1.88</div>
+      <div class="speed-up">▲ 24.5MB/s</div>
+      <div class="speed-down">▼ 12.8MB/s</div>
+      <div class="ip">IP: 192.168.1.100</div>
     </div>
     <div class="main-area">
       <div class="cpu-area">
         <div class="meter">
           <div class="meter-bg"></div>
-          <div class="meter-arc" style="background: conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 168deg, transparent 168deg);"></div>
+          <div class="meter-arc" style="background: conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 108deg, transparent 108deg);"></div>
           <div class="meter-value">
-            <div class="meter-label">70%</div>
+            <div class="meter-label">45%</div>
             <div class="meter-sub">CPU</div>
           </div>
         </div>
         <div class="meter">
           <div class="meter-bg"></div>
-          <div class="meter-arc" style="background: conic-gradient(from 210deg, #FF8C00 0deg, #FF8C00 139deg, transparent 139deg);"></div>
+          <div class="meter-arc" style="background: conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 100deg, transparent 100deg);"></div>
           <div class="meter-value">
-            <div class="meter-label">58°C</div>
+            <div class="meter-label">42°C</div>
             <div class="meter-sub">TEMP</div>
           </div>
         </div>
@@ -91,23 +91,23 @@
       <div class="mem-disk-area">
         <div class="bar-row">
           <div class="bar-label">MEMORY<br>8GB</div>
-          <div class="bar-container"><div class="bar-fill" style="width:72%"></div></div>
-          <div class="bar-percent">72%</div>
+          <div class="bar-container"><div class="bar-fill" style="width:40%"></div></div>
+          <div class="bar-percent">40%</div>
         </div>
         <div class="bar-row">
-          <div class="bar-label">DISK<br>2048GB</div>
-          <div class="bar-container"><div class="bar-fill" style="width:50%"></div></div>
-          <div class="bar-percent">50%</div>
+          <div class="bar-label">DISK<br>13TB</div>
+          <div class="bar-container"><div class="bar-fill" style="width:52%"></div></div>
+          <div class="bar-percent">52%</div>
         </div>
       </div>
     </div>
     <div class="hdd-bar">
-      <div class="hdd-btn"><div class="hdd-label">HDD1</div><div class="hdd-led off"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD2</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD3</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD4</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD5</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD6</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk1</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk2</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk3</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk4</div><div class="hdd-led off"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk5</div><div class="hdd-led off"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">M.2</div><div class="hdd-led on"></div></div>
     </div>
   </div>
 </div>
@@ -157,12 +157,12 @@
       </div>
     </div>
     <div class="hdd-bar">
-      <div class="hdd-btn"><div class="hdd-label">HDD1</div><div class="hdd-led off"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD2</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD3</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD4</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD5</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD6</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk1</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk2</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk3</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk4</div><div class="hdd-led off"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">Disk5</div><div class="hdd-led off"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">M.2</div><div class="hdd-led on"></div></div>
     </div>
   </div>
 </div>
@@ -196,3 +196,118 @@
 <div class="screen-label">OFFLINE - Connection timeout · Auto-retry</div>
 
 </div>
+
+<script>
+// 动态 Mock 数据生成器
+class MockDataGenerator {
+  constructor() {
+    this.counter = 0;
+    this.data = {
+      hostname: 'ZotLab-NAS-Mock',
+      model: 'Mock NAS DS920+',
+      uptime_s: 0,
+      temp_cpu: 42,
+      temp_sys: 38,
+      cpu_pct: 25,
+      ram_total_mb: 8192,
+      ram_used_mb: 3276,
+      ram_pct: 40,
+      cpu_core_count: 4,
+      cpu_cores: [20, 25, 30, 35],
+      load_avg: [0.5, 0.8, 1.2],
+      disk_used_pct: 52,
+      network_rx_bps: 12500000,  // 100 Mbps
+      network_tx_bps: 6250000,   // 50 Mbps
+      fan_rpm: 1200,
+      fan_pwm: 40
+    };
+  }
+
+  generate() {
+    this.counter++;
+    
+    // CPU 使用率：25% + 波动
+    this.data.cpu_pct = 25.0 + (this.counter % 30);
+    
+    // CPU 温度：42°C + 波动
+    this.data.temp_cpu = 42 + (this.counter % 10);
+    this.data.temp_sys = 38 + (this.counter % 8);
+    
+    // 内存使用：3276MB + 波动
+    this.data.ram_used_mb = 3276 + (this.counter % 500);
+    this.data.ram_pct = (this.data.ram_used_mb * 100.0) / this.data.ram_total_mb;
+    
+    // CPU 核心使用率
+    for (let i = 0; i < 4; i++) {
+      this.data.cpu_cores[i] = 20.0 + ((this.counter + i * 10) % 40);
+    }
+    
+    // 负载平均值
+    this.data.load_avg[0] = 0.5 + (this.counter % 20) / 10.0;
+    
+    // 磁盘使用
+    this.data.disk_used_pct = 50 + (this.counter % 10);
+    
+    // 网络速度（转换为 MB/s）
+    this.data.network_rx_bps = (10 + (this.counter % 90)) * 125000;  // KB/s
+    this.data.network_tx_bps = (5 + (this.counter % 45)) * 125000;
+    
+    // 风扇数据
+    let simulated_temp = 45.0 + Math.sin(this.counter * 0.1) * 15.0;
+    let pwm = 20;
+    if (simulated_temp < 35) pwm = 20;
+    else if (simulated_temp < 50) pwm = 20 + Math.floor((simulated_temp - 35) * 2.0);
+    else if (simulated_temp < 65) pwm = 50 + Math.floor((simulated_temp - 50) * 2.0);
+    else pwm = Math.min(100, 80 + Math.floor((simulated_temp - 65) * 1.33));
+    
+    this.data.fan_pwm = pwm;
+    this.data.fan_rpm = 800 + pwm * 22 + ((this.counter % 50) - 25);
+    
+    return this.data;
+  }
+
+  formatSpeed(bps) {
+    const mbps = bps / 1000000;
+    if (mbps >= 1) return mbps.toFixed(1) + 'MB/s';
+    const kbps = bps / 1000;
+    return kbps.toFixed(0) + 'KB/s';
+  }
+}
+
+// 更新函数
+function updateUI() {
+  const data = mock.generate();
+  
+  // 更新第一个屏幕（正常状态）
+  document.querySelector('.screen-row:first-child .speed-up').textContent = '▲ ' + mock.formatSpeed(data.network_tx_bps);
+  document.querySelector('.screen-row:first-child .speed-down').textContent = '▼ ' + mock.formatSpeed(data.network_rx_bps);
+  
+  const cpuMeter1 = document.querySelector('.screen-row:first-child .meter-arc');
+  const cpuLabel1 = document.querySelector('.screen-row:first-child .meter-label');
+  const tempMeter1 = document.querySelectorAll('.screen-row:first-child .meter')[1].querySelector('.meter-arc');
+  const tempLabel1 = document.querySelectorAll('.screen-row:first-child .meter')[1].querySelector('.meter-label');
+  
+  const cpuAngle1 = (data.cpu_pct / 100) * 240;
+  const tempAngle1 = (data.temp_cpu / 100) * 240;
+  
+  cpuMeter1.style.background = `conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 ${cpuAngle1}deg, transparent ${cpuAngle1}deg)`;
+  cpuLabel1.textContent = Math.round(data.cpu_pct) + '%';
+  tempMeter1.style.background = `conic-gradient(from 210deg, ${data.temp_cpu > 60 ? '#FF8C00' : '#40E0D0'} 0deg, ${data.temp_cpu > 60 ? '#FF8C00' : '#40E0D0'} ${tempAngle1}deg, transparent ${tempAngle1}deg)`;
+  tempLabel1.textContent = data.temp_cpu + '°C';
+  tempLabel1.style.color = data.temp_cpu > 60 ? '#FF8C00' : '#fff';
+  
+  const memBar1 = document.querySelector('.screen-row:first-child .mem-disk-area .bar-fill');
+  const memPct1 = document.querySelector('.screen-row:first-child .mem-disk-area .bar-percent');
+  memBar1.style.width = Math.round(data.ram_pct) + '%';
+  memPct1.textContent = Math.round(data.ram_pct) + '%';
+  
+  const diskBar1 = document.querySelectorAll('.screen-row:first-child .mem-disk-area .bar-fill')[1];
+  const diskPct1 = document.querySelectorAll('.screen-row:first-child .mem-disk-area .bar-percent')[1];
+  diskBar1.style.width = Math.round(data.disk_used_pct) + '%';
+  diskPct1.textContent = Math.round(data.disk_used_pct) + '%';
+}
+
+const mock = new MockDataGenerator();
+setInterval(updateUI, 1000);
+updateUI();
+</script>

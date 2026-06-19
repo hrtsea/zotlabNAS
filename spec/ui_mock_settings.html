@@ -15,16 +15,15 @@
   .device { width: 640px; height: 172px; background: #000; border: 4px solid #1a1a2e; border-radius: 8px; overflow: hidden; margin: 0 auto; }
   .screen { width: 100%; height: 100%; display: flex; flex-direction: column; }
 
-  .statusbar { height: 35px; background: #000; display: flex; align-items: center; padding: 0 8px; border-bottom: 2px solid #333; }
-  .statusbar .title { color: #40E0D0; font-size: 14px; font-weight: 600; width: 100px; }
-  .statusbar .version { color: #666; font-size: 12px; margin-left: auto; }
+  .close-btn { width: 24px; height: 24px; background: #40E0D0; border: 2px solid #40E0D0; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #000; font-weight: bold; cursor: pointer; border-radius: 3px; position: absolute; top: 4px; right: 4px; z-index: 10; }
+  .close-btn:hover { background: #5ce1d0; }
 
   /* Tab view */
-  .tabview { width: 100%; flex: 1; display: flex; flex-direction: column; position: relative; }
-  .tab-content { flex: 1; display: none; padding: 6px 8px; overflow: hidden; }
+  .tabview { width: 100%; height: 100%; display: flex; flex-direction: column; position: relative; }
+  .tab-content { flex: 1; display: none; padding: 4px; overflow: hidden; }
   .tab-content.active { display: flex; flex-direction: column; }
 
-  .tab-bar { height: 28px; background: #000; display: flex; align-items: stretch; border-top: 2px solid #333; }
+  .tab-bar { height: 26px; background: #000; display: flex; align-items: stretch; border-top: 2px solid #333; }
   .tab-btn { flex: 1; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #fff; background: #333; border-right: 2px solid #000; cursor: pointer; }
   .tab-btn:last-child { border-right: none; }
   .tab-btn.active { background: #40E0D0; color: #000; font-weight: 600; }
@@ -38,73 +37,83 @@
   .dropdown { height: 22px; background: #000; border: 1px solid #333; color: #FFF; font-size: 10px; padding: 0 4px; border-radius: 3px; }
 
   /* Wi-Fi Tab */
-  .wifi-status { font-size: 11px; color: #FF4500; margin-bottom: 4px; }
-  .wifi-form { display: flex; flex-direction: column; gap: 4px; }
-  .wifi-row { display: flex; align-items: center; gap: 6px; }
-  .wifi-label { font-size: 11px; color: #888; width: 40px; }
-  .wifi-dropdown { width: 160px; }
-  .wifi-input { width: 160px; }
-  .wifi-btn-group { display: flex; gap: 6px; margin-top: 4px; margin-left: 40px; }
-  .wifi-switch { position: absolute; right: 8px; bottom: 38px; width: 40px; height: 18px; background: #40E0D0; border-radius: 9px; cursor: pointer; }
-  .wifi-switch::after { content: ''; position: absolute; width: 14px; height: 14px; background: #fff; border-radius: 50%; top: 2px; right: 2px; }
+  .wifi-content { position: relative; height: 100%; padding: 2px; }
+  .wifi-header-info { position: absolute; top: 4px; right: 8px; font-size: 10px; color: #888; text-align: right; }
+  .wifi-status { font-size: 10px; color: #FF0000; }
+  .wifi-status.connected { color: #40E0D0; }
+  .wifi-ip { font-size: 10px; color: #40E0D0; }
+  .status-label { font-size: 9px; color: #888; margin-right: 2px; }
+  .wifi-label-group { font-size: 10px; color: #888; line-height: 1.5; position: absolute; top: 4px; left: 4px; white-space: pre-wrap; }
+  .wifi-status-row { display: flex; align-items: center; position: absolute; top: 82px; left: 4px; }
+  .wifi-row { display: flex; align-items: center; gap: 6px; position: absolute; top: 44px; left: 55px; }
+  .wifi-pass-row { display: flex; align-items: center; gap: 6px; position: absolute; top: 78px; left: 55px; }
+  .wifi-dropdown { width: 350px; height: 26px; }
+  .wifi-input { width: 350px; height: 26px; }
+  .wifi-btn-scan { width: 78px; height: 26px; background: #40E0D0; border: 1px solid #40E0D0; color: #000; font-size: 10px; font-weight: bold; cursor: pointer; }
+  .wifi-btn-save { width: 78px; height: 26px; background: #40E0D0; border: 1px solid #40E0D0; color: #000; font-size: 10px; font-weight: bold; cursor: pointer; position: relative; z-index: 5; }
+  .wifi-switch { position: absolute; right: 20px; top: 80px; width: 48px; height: 22px; background: #333; border-radius: 11px; cursor: pointer; }
+  .wifi-switch::after { content: ''; position: absolute; width: 18px; height: 18px; background: #40E0D0; border-radius: 50%; top: 2px; right: 2px; }
+  .wifi-switch.off { background: #333; }
+  .wifi-switch.off::after { right: auto; left: 2px; }
 
   /* Screen Tab */
-  .screen-options { display: flex; gap: 16px; align-items: flex-start; }
-  .screen-option { display: flex; flex-direction: column; gap: 2px; }
-  .screen-dropdown { width: 90px; }
+  .screen-options { display: flex; justify-content: space-around; align-items: center; height: 100%; }
+  .screen-option { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .screen-option .label { font-size: 9px; color: #888; }
+  .screen-dropdown { width: 100px; height: 22px; }
 
   /* Radio Tab */
-  .station-area { display: flex; gap: 8px; flex: 1; }
-  .station-list { flex: 1; background: #000; border: 1px solid #333; color: #FFF; font-size: 10px; padding: 4px; resize: none; border-radius: 3px; }
-  .station-help { width: 150px; font-size: 9px; color: #888; line-height: 1.3; }
+  .station-area { display: flex; gap: 6px; height: 100%; }
+  .station-list { flex: 1; background: #000; border: 1px solid #333; color: #FFF; font-size: 9px; padding: 3px; resize: none; border-radius: 3px; height: 90px; }
+  .station-help { width: 130px; font-size: 8px; color: #888; line-height: 1.3; display: flex; flex-direction: column; justify-content: center; }
+  .station-help .btn { align-self: center; margin-top: 4px; }
 
   /* Music Tab */
-  .music-content { display: flex; flex-direction: column; gap: 6px; }
-  .music-hint { font-size: 10px; color: #888; }
-  .music-count { font-size: 16px; color: #40E0D0; }
+  .music-content { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 4px; }
+  .music-hint { font-size: 9px; color: #888; text-align: center; }
+  .music-count { font-size: 14px; color: #40E0D0; }
 
   /* Region Tab */
-  .region-content { display: flex; gap: 12px; align-items: flex-start; flex: 1; }
-  .region-left { display: flex; flex-direction: column; gap: 4px; }
-  .icon-box { width: 40px; height: 40px; background: #333; border: 2px solid #40E0D0; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #40E0D0; font-size: 10px; font-weight: bold; }
-  .region-checkbox { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #FFF; cursor: pointer; }
-  .checkbox-box { width: 12px; height: 12px; background: #333; border: 1px solid #40E0D0; border-radius: 2px; }
+  .region-content { display: flex; gap: 10px; align-items: center; height: 100%; padding: 4px; }
+  .region-left { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .icon-box { width: 35px; height: 35px; background: #333; border: 2px solid #40E0D0; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #40E0D0; font-size: 9px; font-weight: bold; }
+  .region-checkbox { display: flex; align-items: center; gap: 3px; font-size: 9px; color: #FFF; cursor: pointer; }
+  .checkbox-box { width: 11px; height: 11px; background: #333; border: 1px solid #40E0D0; border-radius: 2px; }
   .checkbox-box.checked { background: #40E0D0; }
-  .region-inputs { display: flex; flex-direction: column; gap: 4px; }
-  .region-input { height: 20px; background: #000; border: 1px solid #333; border-left: 3px solid #40E0D0; color: #FFF; font-size: 10px; padding: 0 4px; width: 100px; border-radius: 2px; }
-  .region-right { display: flex; gap: 4px; margin-left: auto; align-items: center; }
-  .roller { display: flex; flex-direction: column; align-items: center; background: #000; border: 1px solid #333; border-radius: 3px; }
-  .roller-label { font-size: 8px; color: #888; padding: 1px; }
-  .roller-value { font-size: 10px; color: #40E0D0; padding: 2px 4px; min-width: 30px; text-align: center; }
-  .region-hint { font-size: 8px; color: #666; text-align: right; margin-top: auto; }
+  .region-inputs { display: flex; flex-direction: column; gap: 3px; }
+  .region-input { height: 18px; background: #000; border: 1px solid #333; border-left: 3px solid #40E0D0; color: #FFF; font-size: 9px; padding: 0 3px; width: 90px; border-radius: 2px; }
+  .region-right { display: flex; gap: 3px; align-items: center; }
+  .roller { display: flex; flex-direction: column; align-items: center; background: #000; border: 1px solid #333; border-radius: 3px; width: 45px; }
+  .roller-label { font-size: 7px; color: #888; padding: 1px; }
+  .roller-value { font-size: 11px; color: #40E0D0; padding: 3px 2px; text-align: center; }
+  .region-hint { font-size: 7px; color: #666; text-align: right; }
 
   /* Fan Tab */
-  .fan-content { display: flex; gap: 8px; flex: 1; align-items: center; }
-  .fan-info { width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .fan-icon { width: 50px; height: 50px; border: 2px solid #40E0D0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #40E0D0; animation: spin 1s linear infinite; }
+  .fan-content { display: flex; gap: 6px; align-items: center; height: 100%; padding: 4px; }
+  .fan-info { width: 65px; display: flex; flex-direction: column; align-items: center; }
+  .fan-icon { width: 40px; height: 40px; border: 2px solid #40E0D0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #40E0D0; animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .fan-rpm { font-size: 11px; color: #40E0D0; font-weight: 700; margin-top: 2px; }
-  .fan-pwm { font-size: 9px; color: #666; }
-  .fan-control { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-  .fan-mode-row { display: flex; gap: 4px; }
-  .fan-mode-btn { flex: 1; height: 22px; background: #333; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; cursor: pointer; }
+  .fan-rpm { font-size: 10px; color: #40E0D0; font-weight: 700; margin-top: 1px; }
+  .fan-pwm { font-size: 8px; color: #666; }
+  .fan-control { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .fan-mode-row { display: flex; gap: 3px; }
+  .fan-mode-btn { flex: 1; height: 20px; background: #333; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; cursor: pointer; }
   .fan-mode-btn.active { background: #40E0D0; color: #000; font-weight: 600; }
   .fan-slider-area { display: flex; flex-direction: column; gap: 2px; }
-  .fan-slider-label { display: flex; justify-content: space-between; font-size: 10px; color: #888; }
-  .fan-slider-bar { height: 14px; background: #333; border-radius: 4px; position: relative; overflow: hidden; }
+  .fan-slider-label { display: flex; justify-content: space-between; font-size: 9px; color: #888; }
+  .fan-slider-bar { height: 12px; background: #333; border-radius: 4px; position: relative; overflow: hidden; cursor: pointer; }
   .fan-slider-fill { height: 100%; background: #40E0D0; border-radius: 4px; }
-  .fan-temps { display: flex; justify-content: space-around; font-size: 9px; margin-top: 2px; }
-  .fan-curve { width: 140px; display: flex; flex-direction: column; border-left: 1px solid #333; padding-left: 6px; }
-  .fan-curve-title { font-size: 9px; color: #666; margin-bottom: 2px; }
-  .fan-curve-grid { height: 50px; position: relative; background: linear-gradient(to top, #333 1px, transparent 1px); background-size: 100% 12px; }
+  .fan-slider-thumb { position: absolute; width: 14px; height: 14px; background: #fff; border-radius: 50%; top: -1px; cursor: pointer; box-shadow: 0 0 4px rgba(0,0,0,0.5); }
+  .fan-temps { display: flex; justify-content: space-around; font-size: 8px; }
+  .fan-curve { width: 110px; display: flex; flex-direction: column; border-left: 1px solid #333; padding-left: 4px; }
+  .fan-curve-title { font-size: 8px; color: #666; margin-bottom: 1px; }
+  .fan-curve-grid { height: 38px; position: relative; background: linear-gradient(to top, #333 1px, transparent 1px); background-size: 100% 10px; }
   .fan-curve-line { position: absolute; bottom: 0; left: 0; right: 0; height: 100%; background: linear-gradient(to right, #40E0D0 0%, #FF8C00 50%, #FF4500 100%); clip-path: polygon(0% 75%, 25% 70%, 50% 40%, 75% 20%, 100% 5%, 100% 100%, 0% 100%); }
-  .fan-curve-labels { display: flex; justify-content: space-between; font-size: 8px; color: #666; margin-top: 2px; }
+  .fan-curve-labels { display: flex; justify-content: space-between; font-size: 7px; color: #666; margin-top: 1px; }
 
   /* Guide Tab */
   .guide-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .guide-text { flex: 1; background: transparent; border: none; color: #FFF; font-size: 8px; line-height: 1.3; resize: none; overflow-y: auto; font-family: monospace; }
-  .guide-text::-webkit-scrollbar { width: 4px; }
-  .guide-text::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+  .guide-text { flex: 1; background: transparent; border: none; color: #FFF; font-size: 7px; line-height: 1.2; resize: none; overflow: hidden; font-family: monospace; }
 
   .screen-label { text-align: center; margin-top: 8px; color: #94a3b8; font-size: 0.8em; }
 </style>
@@ -116,63 +125,99 @@
 
 <div class="device">
   <div class="screen">
-    <div class="statusbar">
-      <div class="title">SETTINGS</div>
-      <div class="version">v1.0.0</div>
-    </div>
-
+    <div class="close-btn" onclick="closeSettings()">X</div>
     <div class="tabview">
       <!-- Tab Content: Wi-Fi -->
-      <div class="tab-content active" id="tab-wifi">
-        <div class="wifi-status" id="wifiStatus">Disconnected</div>
-        <div class="wifi-form">
-          <div class="wifi-row">
-            <span class="wifi-label">SSID:</span>
-            <select class="dropdown wifi-dropdown" id="networkList">
-              <option value="">-- Select Network --</option>
-              <option value="HomeNetwork">HomeNetwork</option>
-              <option value="Office_5G">Office_5G</option>
-            </select>
-          </div>
-          <div class="wifi-row">
-            <span class="wifi-label">Pass:</span>
-            <input type="password" class="input-field wifi-input" id="wifiPassword" placeholder="Wi-Fi Password" maxlength="32">
-          </div>
+      <div class="tab-content active wifi-content" id="tab-wifi">
+        <div class="wifi-header-info">Max 10<br/>Slot</div>
+        <div class="wifi-label-group">SSID:<br/>Pass:</div>
+        <div class="wifi-row">
+          <select class="dropdown wifi-dropdown" id="networkList">
+            <option value="">-- Select Network --</option>
+            <option value="HomeNetwork">HomeNetwork</option>
+            <option value="Office_5G">Office_5G</option>
+          </select>
+          <button class="wifi-btn-scan" onclick="scanNetwork()">W Scan</button>
         </div>
-        <div class="wifi-btn-group">
-          <button class="btn" onclick="scanNetwork()">SCAN</button>
-          <button class="btn" onclick="saveWiFi()">SAVE</button>
+        <div class="wifi-pass-row">
+          <input type="password" class="input-field wifi-input" id="wifiPassword" placeholder="Wi-Fi Password" maxlength="32">
+          <button class="wifi-btn-save" onclick="saveWiFi()">D Save</button>
+          <div class="wifi-switch" id="wifiSwitch" onclick="toggleWifi()"></div>
         </div>
-        <div class="wifi-switch" id="wifiSwitch" onclick="toggleWifi()"></div>
+        <div class="wifi-status-row">
+          <span class="status-label">Status:</span>
+          <span id="wifiStatus" class="wifi-status">Disconnected</span>
+          <span class="status-label">IP:</span>
+          <span id="wifiIP" class="wifi-ip">-</span>
+        </div>
       </div>
 
       <!-- Tab Content: Fan -->
       <div class="tab-content" id="tab-fan">
         <div class="fan-content">
           <div class="fan-info">
-            <div class="fan-icon">F</div>
-            <div class="fan-rpm">1420 RPM</div>
-            <div class="fan-pwm">45% PWM</div>
+            <div class="fan-icon" id="fanIcon">F</div>
+            <div class="fan-rpm" id="fanRpm">1420 RPM</div>
+            <div class="fan-pwm" id="fanPwm">45% PWM</div>
           </div>
           <div class="fan-control">
             <div class="fan-mode-row">
-              <div class="fan-mode-btn active" onclick="setFanMode('auto')">AUTO</div>
-              <div class="fan-mode-btn" onclick="setFanMode('manual')">MANUAL</div>
+              <div class="fan-mode-btn" id="fanModeSilent" onclick="setFanMode('silent')">SILENT</div>
+              <div class="fan-mode-btn active" id="fanModeBalanced" onclick="setFanMode('balanced')">BALANCED</div>
+              <div class="fan-mode-btn" id="fanModePerformance" onclick="setFanMode('performance')">PERF</div>
+              <div class="fan-mode-btn" id="fanModeManual" onclick="setFanMode('manual')">MANUAL</div>
             </div>
-            <div class="fan-slider-area">
-              <div class="fan-slider-label"><span>PWM</span><span>45%</span></div>
-              <div class="fan-slider-bar"><div class="fan-slider-fill" style="width:45%"></div></div>
+            <div class="fan-slider-area" id="fanSliderArea">
+              <div class="fan-slider-label"><span>PWM</span><span id="fanSliderValue">45%</span></div>
+              <div class="fan-slider-bar" onclick="setFanSlider(event)">
+                <div class="fan-slider-fill" id="fanSliderFill" style="width:45%"></div>
+                <div class="fan-slider-thumb" id="fanSliderThumb"></div>
+              </div>
             </div>
             <div class="fan-temps">
-              <span style="color:#40E0D0">CPU: 42°C</span>
-              <span style="color:#FF8C00">SYS: 45°C</span>
-              <span style="color:#22c55e">DISK: 38°C</span>
+              <span style="color:#40E0D0" id="tempCpu">CPU: 42°C</span>
+              <span style="color:#FF8C00" id="tempSys">SYS: 45°C</span>
+              <span style="color:#22c55e" id="tempDisk">DISK: 38°C</span>
             </div>
           </div>
           <div class="fan-curve">
             <div class="fan-curve-title">Fan Curve</div>
-            <div class="fan-curve-grid"><div class="fan-curve-line"></div></div>
-            <div class="fan-curve-labels"><span>25°C</span><span>45°C</span><span>65°C</span></div>
+            <div class="fan-curve-grid" id="fanCurveGrid">
+              <div class="fan-curve-line" id="fanCurveLine"></div>
+              <div class="fan-curve-point" id="curvePoint1" data-point="0" style="left: 0%; top: 75%"></div>
+              <div class="fan-curve-point" id="curvePoint2" data-point="1" style="left: 25%; top: 70%"></div>
+              <div class="fan-curve-point" id="curvePoint3" data-point="2" style="left: 50%; top: 40%"></div>
+              <div class="fan-curve-point" id="curvePoint4" data-point="3" style="left: 75%; top: 20%"></div>
+              <div class="fan-curve-point" id="curvePoint5" data-point="4" style="left: 100%; top: 5%"></div>
+            </div>
+            <div class="fan-curve-labels"><span>25°C</span><span>35°C</span><span>45°C</span><span>55°C</span><span>65°C</span></div>
+          </div>
+          <div class="fan-curve-inputs" id="fanCurveInputs">
+            <div class="curve-input-item">
+              <span class="curve-label">25°C:</span>
+              <input type="number" class="curve-input" id="curveInput1" min="0" max="100" value="20" onchange="updateCurvePoint(0, this.value)">
+              <span class="curve-unit">%</span>
+            </div>
+            <div class="curve-input-item">
+              <span class="curve-label">35°C:</span>
+              <input type="number" class="curve-input" id="curveInput2" min="0" max="100" value="25" onchange="updateCurvePoint(1, this.value)">
+              <span class="curve-unit">%</span>
+            </div>
+            <div class="curve-input-item">
+              <span class="curve-label">45°C:</span>
+              <input type="number" class="curve-input" id="curveInput3" min="0" max="100" value="50" onchange="updateCurvePoint(2, this.value)">
+              <span class="curve-unit">%</span>
+            </div>
+            <div class="curve-input-item">
+              <span class="curve-label">55°C:</span>
+              <input type="number" class="curve-input" id="curveInput4" min="0" max="100" value="80" onchange="updateCurvePoint(3, this.value)">
+              <span class="curve-unit">%</span>
+            </div>
+            <div class="curve-input-item">
+              <span class="curve-label">65°C:</span>
+              <input type="number" class="curve-input" id="curveInput5" min="0" max="100" value="100" onchange="updateCurvePoint(4, this.value)">
+              <span class="curve-unit">%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -268,37 +313,19 @@ http://radio.example.com/mp3</textarea>
       <!-- Tab Content: User Guide -->
       <div class="tab-content" id="tab-guide">
         <div class="guide-content">
-          <textarea class="guide-text" readonly>[Wi-Fi ] - Automatic Connection Setup
-- Tap SCAN to search for nearby networks.
-- Select the network from dropdown, enter password.
-- Tap SAVE to save the password.
+          <textarea class="guide-text" readonly>[Wi-Fi] SCAN networks, select, enter password, SAVE.
 
-[Fan ] - Fan Control Settings
-- AUTO: Fan speed adjusts based on temperature.
-- MANUAL: Set fixed PWM value (0-100%).
+[Fan] AUTO: auto speed by temp. MANUAL: 0-100% PWM.
 
-[ Screen ] - Display Settings
-- Brightness: Adjust display intensity.
-- Screen Off Timer: 0=always on.
+[Screen] Brightness: LOW/MED/HIGH. Timer: 0=always on.
 
-[ Radio ] - Custom Radio Station List
-- Create stations.csv (title,url) on SD card.
-- Tap LOAD to load custom station list.
+[Radio] Create stations.csv on SD, tap LOAD.
 
-[ Music ] - Update Music Library
-- Copy audio files (mp3, flac, aac, ogg) to SD.
-- Tap LOAD to build the music library.
+[Music] Copy mp3/flac/aac/ogg to SD, tap LOAD.
 
-[ Region ] - Set weather & clock region
-- Auto by IP: auto-detect location by IP
-- Manual: enter Latitude / Longitude
-- UTC offset: set timezone offset
-- Temp: set weather unit C / F
+[Region] Auto IP or manual Lat/Lon. UTC offset. Temp: C/F.
 
-[ Button Control ]
-[ RESET ] - Reset TuneBar
-[ POWER ] - Hold 1sec to on / 3sec to off
-[ LIGHT ] - Toggle screen ON/OFF</textarea>
+[Buttons] RESET: reset. POWER: 1s on/3s off. LIGHT: toggle.</textarea>
         </div>
       </div>
 
@@ -329,15 +356,86 @@ http://radio.example.com/mp3</textarea>
     event.target.classList.add('active');
   }
 
+  let fanMode = 'balanced';
+  let fanPwm = 45;
+  let manualPwm = 45;
+
   function setFanMode(mode) {
     fanMode = mode;
     document.querySelectorAll('.fan-mode-btn').forEach(el => el.classList.remove('active'));
-    event.target.classList.add('active');
+    
+    let modeId = 'fanModeSilent';
+    if (mode === 'balanced') modeId = 'fanModeBalanced';
+    else if (mode === 'performance') modeId = 'fanModePerformance';
+    else if (mode === 'manual') modeId = 'fanModeManual';
+    
+    document.getElementById(modeId).classList.add('active');
+    
+    const sliderArea = document.getElementById('fanSliderArea');
+    if (mode === 'manual') {
+      sliderArea.style.opacity = '1';
+      sliderArea.style.pointerEvents = 'auto';
+    } else {
+      sliderArea.style.opacity = '0.5';
+      sliderArea.style.pointerEvents = 'none';
+    }
+  }
+
+  function calculateFanSpeed(cpuTemp) {
+    switch(fanMode) {
+      case 'silent':
+        if (cpuTemp < 40) return 15;
+        else if (cpuTemp < 50) return 15 + Math.floor((cpuTemp - 40) * 1.5);
+        else if (cpuTemp < 60) return 30 + Math.floor((cpuTemp - 50) * 2.0);
+        else return Math.min(60, 50 + Math.floor((cpuTemp - 60) * 1.0));
+        
+      case 'balanced':
+        if (cpuTemp < 35) return 20;
+        else if (cpuTemp < 50) return 20 + Math.floor((cpuTemp - 35) * 2.0);
+        else if (cpuTemp < 65) return 50 + Math.floor((cpuTemp - 50) * 2.0);
+        else return Math.min(100, 80 + Math.floor((cpuTemp - 65) * 1.33));
+        
+      case 'performance':
+        if (cpuTemp < 30) return 40;
+        else if (cpuTemp < 45) return 40 + Math.floor((cpuTemp - 30) * 2.5);
+        else if (cpuTemp < 60) return 70 + Math.floor((cpuTemp - 45) * 2.0);
+        else return 100;
+        
+      case 'manual':
+        return manualPwm;
+        
+      default:
+        return 45;
+    }
+  }
+
+  function setFanSlider(event) {
+    if (fanMode !== 'manual') return;
+    
+    const bar = event.currentTarget;
+    const rect = bar.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const percent = Math.round((x / rect.width) * 100);
+    manualPwm = Math.max(0, Math.min(100, percent));
+    updateFanDisplay();
+  }
+
+  function updateFanDisplay() {
+    const cpuTemp = parseInt(document.getElementById('tempCpu').textContent.replace('CPU: ', '').replace('°C', ''));
+    fanPwm = calculateFanSpeed(cpuTemp);
+    
+    const rpm = 800 + fanPwm * 22;
+    document.getElementById('fanRpm').textContent = Math.round(rpm) + ' RPM';
+    document.getElementById('fanPwm').textContent = fanPwm + '% PWM';
+    document.getElementById('fanSliderValue').textContent = fanPwm + '%';
+    document.getElementById('fanSliderFill').style.width = fanPwm + '%';
+    document.getElementById('fanSliderThumb').style.left = `calc(${fanPwm}% - 7px)`;
   }
 
   function toggleWifi() {
     wifiEnabled = !wifiEnabled;
-    document.getElementById('wifiSwitch').style.background = wifiEnabled ? '#40E0D0' : '#333';
+    const switchEl = document.getElementById('wifiSwitch');
+    switchEl.classList.toggle('off', !wifiEnabled);
   }
 
   function toggleAutoIP() {
@@ -359,9 +457,11 @@ http://radio.example.com/mp3</textarea>
   function saveWiFi() {
     document.getElementById('wifiStatus').textContent = 'Connecting...';
     document.getElementById('wifiStatus').style.color = '#FFFF00';
+    document.getElementById('wifiIP').textContent = '-';
     setTimeout(() => {
       document.getElementById('wifiStatus').textContent = 'Connected';
       document.getElementById('wifiStatus').style.color = '#40E0D0';
+      document.getElementById('wifiIP').textContent = '192.168.1.108';
     }, 1500);
   }
 
@@ -374,6 +474,10 @@ http://radio.example.com/mp3</textarea>
     setTimeout(() => {
       document.getElementById('trackCount').textContent = '128 tracks found';
     }, 2000);
+  }
+
+  function closeSettings() {
+    window.location.href = 'ui_mock_overview.html';
   }
 </script>
 </body>

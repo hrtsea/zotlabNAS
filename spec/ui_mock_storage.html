@@ -61,57 +61,57 @@
   <div class="screen">
     <!-- Status bar - 35px -->
     <div class="statusbar" style="position:relative;">
-      <span class="title">BOOL NAS</span>
-      <span class="time">22:10</span>
-      <span class="speed-up">▲ 0.91MB/s</span>
-      <span class="speed-down">▼ 5.20MB/s</span>
-      <span class="ip">IP: 192.168.1.888</span>
+      <span class="title">ZotLab-NAS</span>
+      <span class="time">14:23</span>
+      <span class="speed-up">▲ 24.5MB/s</span>
+      <span class="speed-down">▼ 12.8MB/s</span>
+      <span class="ip">IP: 192.168.1.100</span>
     </div>
 
     <!-- Storage container - 130px -->
     <div class="storage-container">
       <!-- Column 0 -->
       <div class="hdd-row col0 row0">
-        <span class="hdd-name">HDD1</span>
-        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:35%"></div></div>
-        <span class="hdd-pct">35%</span>
+        <span class="hdd-name">Disk1</span>
+        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:52%"></div></div>
+        <span class="hdd-pct">52%</span>
       </div>
       <div class="hdd-row col0 row1">
-        <span class="hdd-name">HDD2</span>
-        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:68%"></div></div>
-        <span class="hdd-pct">68%</span>
+        <span class="hdd-name">Disk2</span>
+        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:54%"></div></div>
+        <span class="hdd-pct">54%</span>
       </div>
       <div class="hdd-row col0 row2">
-        <span class="hdd-name">HDD3</span>
-        <div class="hdd-bar-bg"><div class="hdd-bar-fill warn" style="width:82%"></div></div>
-        <span class="hdd-pct">82%</span>
+        <span class="hdd-name">Disk3</span>
+        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:56%"></div></div>
+        <span class="hdd-pct">56%</span>
       </div>
       <div class="hdd-row col0 row3">
-        <span class="hdd-name">HDD4</span>
-        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:10%"></div></div>
-        <span class="hdd-pct">10%</span>
+        <span class="hdd-name">Disk4</span>
+        <div class="hdd-bar-bg"><div class="hdd-bar-fill danger" style="width:0%"></div></div>
+        <span class="hdd-pct">CRIT</span>
       </div>
 
       <!-- Column 1 -->
       <div class="hdd-row col1 row0">
-        <span class="hdd-name">HDD5</span>
-        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:23%"></div></div>
-        <span class="hdd-pct">23%</span>
+        <span class="hdd-name">Disk5</span>
+        <div class="hdd-bar-bg"><div class="hdd-bar-fill danger" style="width:0%"></div></div>
+        <span class="hdd-pct">CRIT</span>
       </div>
       <div class="hdd-row col1 row1">
-        <span class="hdd-name">HDD6</span>
-        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:56%"></div></div>
-        <span class="hdd-pct">56%</span>
+        <span class="hdd-name">Disk6</span>
+        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:0%"></div></div>
+        <span class="hdd-pct">OFF</span>
       </div>
       <div class="hdd-row col1 row2">
         <span class="hdd-name">M.2-1</span>
-        <div class="hdd-bar-bg"><div class="hdd-bar-fill warn" style="width:71%"></div></div>
-        <span class="hdd-pct">71%</span>
+        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:50%"></div></div>
+        <span class="hdd-pct">50%</span>
       </div>
       <div class="hdd-row col1 row3">
         <span class="hdd-name">M.2-2</span>
-        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:69%"></div></div>
-        <span class="hdd-pct">69%</span>
+        <div class="hdd-bar-bg"><div class="hdd-bar-fill" style="width:0%"></div></div>
+        <span class="hdd-pct">OFF</span>
       </div>
 
       <!-- Legend -->
@@ -143,9 +143,81 @@ for (int col = 0; col < 2; col++) {
 }
 
 // HDD data from code
-const char *hdd_names[HDD_COUNT] = {"HDD1","HDD2","HDD3","HDD4","HDD5","HDD6","M.2-1","M.2-2"};
-const int hdd_usage[HDD_COUNT] = {35, 68, 82, 10, 23, 56, 71, 69};
-const bool hdd_active[HDD_COUNT] = {true,true,true,true,true,true,true,true};
+const char *hdd_names[HDD_COUNT] = {"Disk1","Disk2","Disk3","Disk4","Disk5","Disk6","M.2-1","M.2-2"};
+const int hdd_usage[HDD_COUNT] = {52, 54, 56, 0, 0, 0, 50, 0};
+const bool hdd_active[HDD_COUNT] = {true,true,true,false,false,false,true,false};
 </pre>
+
+<script>
+// 动态磁盘数据生成器
+class DiskMockGenerator {
+  constructor() {
+    this.counter = 0;
+    this.disks = [
+      { name: 'Disk1', size_gb: 4000, used_gb: 2080, health: 'ok' },
+      { name: 'Disk2', size_gb: 5000, used_gb: 2700, health: 'ok' },
+      { name: 'Disk3', size_gb: 6000, used_gb: 3360, health: 'ok' },
+      { name: 'Disk4', size_gb: 6000, used_gb: 0, health: 'critical' },
+      { name: 'Disk5', size_gb: 6000, used_gb: 0, health: 'critical' },
+      { name: 'Disk6', size_gb: 4000, used_gb: 0, health: 'offline' },
+      { name: 'M.2-1', size_gb: 1000, used_gb: 500, health: 'ok' },
+      { name: 'M.2-2', size_gb: 1000, used_gb: 0, health: 'offline' }
+    ];
+  }
+
+  generate() {
+    this.counter++;
+    
+    // 更新在线磁盘的使用率
+    this.disks.forEach((disk, index) => {
+      if (disk.health === 'ok') {
+        // 模拟缓慢增长
+        const baseUsed = disk.used_gb;
+        disk.used_gb = baseUsed + (this.counter % 10);
+        // 限制最大使用率在 90% 以内
+        const maxUsed = disk.size_gb * 0.9;
+        if (disk.used_gb > maxUsed) disk.used_gb = maxUsed;
+      }
+    });
+    
+    return this.disks;
+  }
+
+  getUsagePercent(disk) {
+    if (disk.health !== 'ok') return 0;
+    return Math.round((disk.used_gb / disk.size_gb) * 100);
+  }
+}
+
+function updateStorageUI() {
+  const disks = diskMock.generate();
+  const hddRows = document.querySelectorAll('.hdd-row');
+  
+  hddRows.forEach((row, index) => {
+    const disk = disks[index];
+    const barFill = row.querySelector('.hdd-bar-fill');
+    const pctSpan = row.querySelector('.hdd-pct');
+    
+    if (disk.health === 'ok') {
+      const usage = diskMock.getUsagePercent(disk);
+      barFill.style.width = usage + '%';
+      barFill.className = 'hdd-bar-fill' + (usage > 80 ? ' warn' : '');
+      pctSpan.textContent = usage + '%';
+    } else if (disk.health === 'critical') {
+      barFill.style.width = '0%';
+      barFill.className = 'hdd-bar-fill danger';
+      pctSpan.textContent = 'CRIT';
+    } else {
+      barFill.style.width = '0%';
+      barFill.className = 'hdd-bar-fill';
+      pctSpan.textContent = 'OFF';
+    }
+  });
+}
+
+const diskMock = new DiskMockGenerator();
+setInterval(updateStorageUI, 2000);
+updateStorageUI();
+</script>
 </body>
 </html>

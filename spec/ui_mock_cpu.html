@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>NAS Monitor - CPU Cores Mock (640x172)</title>
+<title>NAS Monitor - CPU Mock (640x172)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: monospace; background: #0a0a15; color: #fff; padding: 30px 20px; }
@@ -15,73 +15,219 @@
   .device { width: 640px; height: 172px; background: #000; border: 4px solid #1a1a2e; border-radius: 8px; overflow: hidden; margin: 0 auto; }
   .screen { width: 100%; height: 100%; display: flex; flex-direction: column; }
 
-  .statusbar { height: 35px; display: flex; align-items: center; padding: 0 8px; border-bottom: 2px solid #333; font-size: 14px; }
-  .statusbar .title { color: #40E0D0; font-weight: 600; width: 100px; }
+  .close-btn { width: 24px; height: 24px; background: #40E0D0; border: 2px solid #40E0D0; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #000; font-weight: bold; cursor: pointer; border-radius: 3px; position: absolute; top: 4px; right: 4px; z-index: 10; }
+  .close-btn:hover { background: #5ce1d0; }
 
-  .main-area { flex: 1; display: flex; flex-direction: row; padding: 4px; }
+  .title-bar { height: 24px; background: #000; display: flex; align-items: center; padding: 0 10px; border-bottom: 1px solid #333; }
+  .title-bar .title { color: #40E0D0; font-size: 12px; font-weight: 600; }
+  .title-bar .cpu-model { color: #888; font-size: 10px; margin-left: auto; }
 
-  .core-bars { flex: 1; display: flex; flex-direction: row; gap: 4px; padding: 4px; }
-  .core-bar-container { flex: 1; display: flex; flex-direction: column; }
-  .core-label { font-size: 10px; color: #666; text-align: center; margin-bottom: 2px; }
-  .core-bar-bg { flex: 1; background: #333; border-radius: 3px; position: relative; overflow: hidden; }
-  .core-bar-fill { width: 100%; background: #40E0D0; position: absolute; bottom: 0; left: 0; }
-  .core-bar-fill.high { background: #FF8C00; }
-  .core-bar-fill.critical { background: #FF4500; }
-  .core-pct { font-size: 10px; color: #fff; text-align: center; margin-top: 2px; }
+  .chart-area { flex: 1; background: #000; position: relative; }
+  .chart-header { position: absolute; top: 4px; left: 4px; right: 4px; display: flex; justify-content: space-between; font-size: 9px; color: #888; }
+  .chart-header .right { color: #888; }
 
-  .info-panel { width: 150px; display: flex; flex-direction: column; padding: 4px; border-left: 2px solid #333; }
-  .info-row { font-size: 12px; padding: 4px 0; border-bottom: 1px solid #333; }
-  .info-label { color: #666; }
-  .info-value { color: #40E0D0; font-weight: 600; }
-  .info-value.warn { color: #FF8C00; }
+  .chart-canvas { width: 100%; height: 100%; padding-top: 20px; padding-bottom: 20px; }
+  .chart-grid { position: relative; width: 100%; height: 100%; background-image: 
+    linear-gradient(to right, #333 1px, transparent 1px),
+    linear-gradient(to bottom, #333 1px, transparent 1px);
+    background-size: 32px 18px; }
+  
+  .chart-y-axis { position: absolute; right: 4px; top: 20px; bottom: 20px; display: flex; flex-direction: column; justify-content: space-between; font-size: 8px; color: #666; }
+  .chart-x-axis { position: absolute; left: 4px; bottom: 4px; font-size: 8px; color: #666; }
 
-  .uptime-bar { height: 30px; display: flex; align-items: center; padding: 0 8px; border-top: 2px solid #333; font-size: 12px; }
-  .uptime-label { color: #666; margin-right: 8px; }
-  .uptime-value { color: #fff; font-weight: 600; }
+  .chart-line { position: absolute; top: 20px; left: 0; right: 0; bottom: 20px; }
+  .chart-path { fill: url(#chartGradient); stroke: #40E0D0; stroke-width: 2; }
+  .chart-area-fill { fill: url(#chartGradient); }
+
+  .info-panel { height: 48px; background: #000; border-top: 1px solid #333; display: flex; padding: 4px 8px; gap: 16px; }
+  .info-section { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .info-section .label { font-size: 8px; color: #888; }
+  .info-section .value { font-size: 11px; color: #40E0D0; font-weight: 600; }
+  .info-section .value.small { font-size: 10px; }
+  .info-section.double { flex: 2; }
+  .info-section.double .value { font-size: 14px; }
+  
+  .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 8px; }
+  .grid-item { display: flex; justify-content: space-between; font-size: 9px; }
+  .grid-item .label { color: #888; }
+  .grid-item .value { color: #fff; }
 </style>
 </head>
 <body>
-<h1>🖥️ CPU Cores (640×172)</h1>
-<p class="subtitle">Per-Core Usage · Load Average · Uptime</p>
+<h1>🖥️ CPU Monitor (640×172)</h1>
+<p class="subtitle">CPU Usage & Performance</p>
 <div class="nav"><a href="ui_mock_boot.html">Boot</a> | <a href="ui_mock_overview.html">Overview</a> | <a href="ui_mock_storage.html">Storage</a> | <a href="ui_mock_settings.html">Settings</a> | <a href="project_spec.html">Spec</a></div>
 
 <div class="device">
   <div class="screen">
-    <div class="statusbar"><div class="title">CPU CORES</div><div style="margin-left:auto">Intel J4125</div></div>
-    <div class="main-area">
-      <div class="core-bars">
-        <div class="core-bar-container">
-          <div class="core-label">C0</div>
-          <div class="core-bar-bg"><div class="core-bar-fill" style="height:72%"></div></div>
-          <div class="core-pct">72%</div>
-        </div>
-        <div class="core-bar-container">
-          <div class="core-label">C1</div>
-          <div class="core-bar-bg"><div class="core-bar-fill" style="height:45%"></div></div>
-          <div class="core-pct">45%</div>
-        </div>
-        <div class="core-bar-container">
-          <div class="core-label">C2</div>
-          <div class="core-bar-bg"><div class="core-bar-fill high" style="height:88%"></div></div>
-          <div class="core-pct">88%</div>
-        </div>
-        <div class="core-bar-container">
-          <div class="core-label">C3</div>
-          <div class="core-bar-bg"><div class="core-bar-fill" style="height:32%"></div></div>
-          <div class="core-pct">32%</div>
-        </div>
+    <div class="close-btn" onclick="closeCPU()">X</div>
+    <div class="title-bar">
+      <div class="title">CPU</div>
+      <div class="cpu-model">Intel J4125</div>
+    </div>
+    <div class="chart-area">
+      <div class="chart-header">
+        <span>% 利用率</span>
+        <span class="right">100%</span>
       </div>
-      <div class="info-panel">
-        <div class="info-row"><span class="info-label">Avg:</span><span class="info-value">59%</span></div>
-        <div class="info-row"><span class="info-label">Load 1m:</span><span class="info-value">1.23</span></div>
-        <div class="info-row"><span class="info-label">Load 5m:</span><span class="info-value">0.89</span></div>
-        <div class="info-row"><span class="info-label">Load 15m:</span><span class="info-value">0.72</span></div>
-        <div class="info-row"><span class="info-label">Temp:</span><span class="info-value warn">58°C</span></div>
-        <div class="info-row"><span class="info-label">Freq:</span><span class="info-value">2.0GHz</span></div>
+      <div class="chart-canvas">
+        <div class="chart-grid"></div>
+        <svg class="chart-line" viewBox="0 0 620 80" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#40E0D0" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#40E0D0" stop-opacity="0.05"/>
+            </linearGradient>
+          </defs>
+          <path class="chart-area-fill" d="M0,80 L0,60 Q30,55 60,58 T120,52 T180,62 T240,55 T300,50 T360,65 T420,45 T480,58 T540,42 T600,50 L620,50 L620,80 Z"/>
+          <path class="chart-path" d="M0,60 Q30,55 60,58 T120,52 T180,62 T240,55 T300,50 T360,65 T420,45 T480,58 T540,42 T600,50"/>
+        </svg>
+        <div class="chart-y-axis">
+          <span>100%</span>
+          <span>50%</span>
+          <span>0%</span>
+        </div>
+        <div class="chart-x-axis">60 秒</div>
       </div>
     </div>
-    <div class="uptime-bar"><span class="uptime-label">Uptime:</span><span class="uptime-value">12d 8h 32m</span></div>
+    <div class="info-panel">
+      <div class="info-section double">
+        <div class="label">利用率</div>
+        <div class="value">59%</div>
+      </div>
+      <div class="info-section">
+        <div class="label">速度</div>
+        <div class="value">2.0 GHz</div>
+      </div>
+      <div class="info-section">
+        <div class="label">进程</div>
+        <div class="value">128</div>
+      </div>
+      <div class="info-section">
+        <div class="label">线程</div>
+        <div class="value">256</div>
+      </div>
+      <div class="info-section">
+        <div class="label">运行时间</div>
+        <div class="value small">12d 8h</div>
+      </div>
+      <div class="info-section" style="border-left: 1px solid #333; padding-left: 12px;">
+        <div class="info-grid">
+          <div class="grid-item"><span class="label">内核:</span><span class="value">4</span></div>
+          <div class="grid-item"><span class="label">逻辑:</span><span class="value">4</span></div>
+          <div class="grid-item"><span class="label">温度:</span><span class="value">58°C</span></div>
+          <div class="grid-item"><span class="label">缓存:</span><span class="value">4MB</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-</body>
-</html>
+<script>
+class CPUDataGenerator {
+  constructor() {
+    this.counter = 0;
+    this.data = {
+      cpu_pct: 25,
+      temp_cpu: 42,
+      freq: 2.0,
+      cores: 4,
+      logical: 4,
+      processes: 128,
+      threads: 256,
+      uptime: 12 * 3600 + 8 * 60,
+      cache: 4,
+      core_usages: [20, 25, 30, 35]
+    };
+  }
+
+  generate() {
+    this.counter++;
+    
+    // CPU 使用率
+    this.data.cpu_pct = 25.0 + (this.counter % 30);
+    
+    // CPU 温度
+    this.data.temp_cpu = 42 + (this.counter % 10);
+    
+    // 核心使用率
+    for (let i = 0; i < 4; i++) {
+      this.data.core_usages[i] = 20.0 + ((this.counter + i * 10) % 40);
+    }
+    
+    // 进程数
+    this.data.processes = 120 + (this.counter % 20);
+    
+    // 线程数
+    this.data.threads = this.data.processes * 2;
+    
+    // 运行时间
+    this.data.uptime += 1;
+    
+    return this.data;
+  }
+
+  formatUptime(seconds) {
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    if (days > 0) return days + 'd ' + hours + 'h';
+    const mins = Math.floor((seconds % 3600) / 60);
+    return hours + ':' + mins.toString().padStart(2, '0');
+  }
+}
+
+function updateCPUUI() {
+  const data = cpuMock.generate();
+  
+  // 更新利用率
+  const usageValue = document.querySelector('.info-section.double .value');
+  usageValue.textContent = Math.round(data.cpu_pct) + '%';
+  
+  // 更新温度
+  const tempValue = document.querySelectorAll('.info-grid .grid-item')[2].querySelector('.value');
+  tempValue.textContent = data.temp_cpu + '°C';
+  
+  // 更新进程数
+  const processValue = document.querySelectorAll('.info-section')[2].querySelector('.value');
+  processValue.textContent = data.processes;
+  
+  // 更新线程数
+  const threadValue = document.querySelectorAll('.info-section')[3].querySelector('.value');
+  threadValue.textContent = data.threads;
+  
+  // 更新运行时间
+  const uptimeValue = document.querySelectorAll('.info-section')[4].querySelector('.value');
+  uptimeValue.textContent = cpuMock.formatUptime(data.uptime);
+  
+  // 更新核心使用率
+  const coreBars = document.querySelectorAll('.chart-bar');
+  coreBars.forEach((bar, index) => {
+    const usage = data.core_usages[index % 4];
+    bar.style.height = usage + '%';
+    if (usage > 80) bar.className = 'chart-bar critical';
+    else if (usage > 60) bar.className = 'chart-bar high';
+    else bar.className = 'chart-bar';
+  });
+  
+  // 更新图表路径
+  const svgPath = document.querySelector('.chart-path');
+  const areaPath = document.querySelector('.chart-area-fill');
+  let pathData = 'M0,' + (80 - data.core_usages[0] * 0.8);
+  let areaData = 'M0,80 L0,' + (80 - data.core_usages[0] * 0.8);
+  
+  for (let i = 1; i < 18; i++) {
+    const x = (i * 620) / 17;
+    const y = 80 - (data.core_usages[i % 4] + Math.sin(i * 0.5) * 5) * 0.8;
+    pathData += ' Q' + (x - 10) + ',' + (80 - data.core_usages[(i-1) % 4] * 0.8) + ' ' + x + ',' + y;
+    areaData += ' T' + x + ',' + y;
+  }
+  
+  svgPath.setAttribute('d', pathData);
+  areaPath.setAttribute('d', areaData + ' L620,80 Z');
+}
+
+const cpuMock = new CPUDataGenerator();
+setInterval(updateCPUUI, 1000);
+updateCPUUI();
+
+  function closeCPU() {
+    window.location.href = 'ui_mock_overview.html';

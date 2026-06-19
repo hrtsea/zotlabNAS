@@ -14,6 +14,10 @@
 		}
 	],
 	"settings": {
+		"clangd.arguments": [
+			"--compile-commands-dir=c:/Users/steven/zotlabNAS/sketch/.cache/clangd",
+			"--query-driver=C:/Users/steven/.platformio/packages/toolchain-*/bin/*,C:/Users/steven/.platformio/packages/tool-*/bin/*"
+		]
 	//	"platformio-ide.workspaceDir": "sketch"
 
 	},
