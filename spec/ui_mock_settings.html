@@ -5,22 +5,22 @@
 <title>NAS Monitor - Settings Mock (640×172)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, sans-serif; background: #0a0a15; color: #e8eaed; padding: 30px 20px; min-height: 100vh; }
+  body { font-family: monospace; background: #0a0a15; color: #fff; padding: 30px 20px; }
   h1 { text-align: center; color: #60a5fa; margin-bottom: 8px; font-size: 1.4em; }
   .subtitle { text-align: center; color: #64748b; margin-bottom: 24px; font-size: 0.85em; }
   .nav { text-align: center; margin-bottom: 24px; }
   .nav a { color: #60a5fa; text-decoration: none; margin: 0 8px; font-size: 0.85em; }
   .nav a:hover { text-decoration: underline; }
 
-  .device { width: 640px; height: 172px; background: #000; border: 4px solid #1a1a2e; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.7); position: relative; }
-  .screen { width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; font-family: monospace; }
+  .device { width: 640px; height: 172px; background: #000; border: 4px solid #1a1a2e; border-radius: 8px; overflow: hidden; margin: 0 auto; }
+  .screen { width: 100%; height: 100%; display: flex; flex-direction: column; }
 
   .statusbar { height: 35px; background: #000; display: flex; align-items: center; padding: 0 8px; border-bottom: 2px solid #333; }
   .statusbar .title { color: #40E0D0; font-size: 14px; font-weight: 600; width: 100px; }
   .statusbar .version { color: #666; font-size: 12px; margin-left: auto; }
 
   /* Tab view */
-  .tabview { width: 100%; flex: 1; display: flex; flex-direction: column; }
+  .tabview { width: 100%; flex: 1; display: flex; flex-direction: column; position: relative; }
   .tab-content { flex: 1; display: none; padding: 6px 8px; overflow: hidden; }
   .tab-content.active { display: flex; flex-direction: column; }
 
