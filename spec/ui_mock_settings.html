@@ -16,88 +16,84 @@
   .screen { width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; font-family: monospace; }
 
   .statusbar { height: 35px; background: #000; display: flex; align-items: center; padding: 0 8px; border-bottom: 2px solid #333; }
-  .statusbar .title { color: #fff; font-size: 14px; font-weight: 600; width: 100px; }
-  .statusbar .ip { color: #fff; font-size: 14px; margin-left: auto; }
-
-  .close-btn { position: absolute; top: 42px; right: 8px; width: 26px; height: 26px; background: transparent; border: 2px solid #fff; color: #fff; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 10; border-radius: 4px; }
-  .close-btn:hover { background: rgba(255,255,255,0.1); }
+  .statusbar .title { color: #40E0D0; font-size: 14px; font-weight: 600; width: 100px; }
+  .statusbar .version { color: #666; font-size: 12px; margin-left: auto; }
 
   /* Tab view */
   .tabview { width: 100%; flex: 1; display: flex; flex-direction: column; }
-
   .tab-content { flex: 1; display: none; padding: 6px 8px; overflow: hidden; }
   .tab-content.active { display: flex; flex-direction: column; }
 
-  .tab-bar { height: 32px; background: linear-gradient(to bottom, #00ADFF, #025074); display: flex; align-items: stretch; border-top: 2px solid #000; }
-  .tab-btn { flex: 1; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #000; background: #FFFFFF; border-right: 2px solid #000; cursor: pointer; transition: all 0.2s; }
+  .tab-bar { height: 28px; background: #000; display: flex; align-items: stretch; border-top: 2px solid #333; }
+  .tab-btn { flex: 1; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #fff; background: #333; border-right: 2px solid #000; cursor: pointer; }
   .tab-btn:last-child { border-right: none; }
-  .tab-btn.active { background: linear-gradient(to bottom, #9D9C9C, #FFFFFF); color: #FFFFFF; }
-  .tab-btn:not(.active):hover { background: #E0E0E0; }
+  .tab-btn.active { background: #40E0D0; color: #000; font-weight: 600; }
+
+  /* Common styles */
+  .btn { padding: 4px 12px; background: transparent; border: 2px solid #40E0D0; color: #40E0D0; font-size: 10px; font-weight: bold; cursor: pointer; border-radius: 3px; }
+  .btn:hover { background: rgba(64,224,208,0.2); }
+  .label { font-size: 10px; color: #888; }
+  .value { font-size: 12px; color: #fff; }
+  .input-field { height: 22px; background: #000; border: 1px solid #333; color: #FFF; font-size: 11px; padding: 0 6px; border-radius: 3px; }
+  .dropdown { height: 22px; background: #000; border: 1px solid #333; color: #FFF; font-size: 10px; padding: 0 4px; border-radius: 3px; }
 
   /* Wi-Fi Tab */
-  .wifi-status { font-size: 11px; color: #FF0000; margin-bottom: 4px; }
+  .wifi-status { font-size: 11px; color: #FF4500; margin-bottom: 4px; }
   .wifi-form { display: flex; flex-direction: column; gap: 4px; }
   .wifi-row { display: flex; align-items: center; gap: 6px; }
   .wifi-label { font-size: 11px; color: #888; width: 40px; }
-  .wifi-dropdown, .wifi-input { height: 22px; background: #000; border: 1px solid #333; color: #FFF; font-size: 11px; padding: 0 4px; }
   .wifi-dropdown { width: 160px; }
   .wifi-input { width: 160px; }
   .wifi-btn-group { display: flex; gap: 6px; margin-top: 4px; margin-left: 40px; }
-  .wifi-btn { padding: 3px 10px; background: transparent; border: 2px solid #FFF; color: #FFF; font-size: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-  .wifi-btn:hover { background: rgba(255,255,255,0.1); }
-  .wifi-switch { position: absolute; right: 8px; bottom: 38px; width: 40px; height: 18px; background: #088CFD; border-radius: 9px; cursor: pointer; }
-  .wifi-switch::after { content: ''; position: absolute; width: 14px; height: 14px; background: #0845FA; border-radius: 50%; top: 2px; right: 2px; }
+  .wifi-switch { position: absolute; right: 8px; bottom: 38px; width: 40px; height: 18px; background: #40E0D0; border-radius: 9px; cursor: pointer; }
+  .wifi-switch::after { content: ''; position: absolute; width: 14px; height: 14px; background: #fff; border-radius: 50%; top: 2px; right: 2px; }
 
   /* Screen Tab */
   .screen-options { display: flex; gap: 16px; align-items: flex-start; }
   .screen-option { display: flex; flex-direction: column; gap: 2px; }
-  .screen-label { font-size: 9px; color: #888; }
-  .screen-dropdown { height: 22px; background: #000; border: 1px solid #444; color: #FFF; font-size: 10px; padding: 0 4px; width: 90px; border-radius: 4px; }
+  .screen-dropdown { width: 90px; }
 
   /* Radio Tab */
   .station-area { display: flex; gap: 8px; flex: 1; }
-  .station-list { flex: 1; background: #000; border: 1px solid #333; color: #FFF; font-size: 10px; padding: 4px; resize: none; border-radius: 4px; }
+  .station-list { flex: 1; background: #000; border: 1px solid #333; color: #FFF; font-size: 10px; padding: 4px; resize: none; border-radius: 3px; }
   .station-help { width: 150px; font-size: 9px; color: #888; line-height: 1.3; }
-  .station-btn { margin-top: 4px; padding: 3px 10px; background: transparent; border: 2px solid #FFF; color: #FFF; font-size: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
 
   /* Music Tab */
   .music-content { display: flex; flex-direction: column; gap: 6px; }
-  .music-btn { padding: 4px 12px; background: transparent; border: 2px solid #FFF; color: #FFF; font-size: 10px; font-weight: bold; cursor: pointer; width: 100px; border-radius: 4px; }
   .music-hint { font-size: 10px; color: #888; }
-  .music-count { font-size: 16px; color: #FFF; }
+  .music-count { font-size: 16px; color: #40E0D0; }
 
   /* Region Tab */
   .region-content { display: flex; gap: 12px; align-items: flex-start; flex: 1; }
   .region-left { display: flex; flex-direction: column; gap: 4px; }
-  .icon-globe, .icon-timezone { width: 50px; height: 50px; background: linear-gradient(135deg, #00ADFF 0%, #025074 100%); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #FFF; font-size: 8px; }
+  .icon-box { width: 40px; height: 40px; background: #333; border: 2px solid #40E0D0; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #40E0D0; font-size: 10px; font-weight: bold; }
   .region-checkbox { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #FFF; cursor: pointer; }
-  .checkbox-box { width: 12px; height: 12px; background: #FFF; border: 1px solid #333; border-radius: 2px; }
+  .checkbox-box { width: 12px; height: 12px; background: #333; border: 1px solid #40E0D0; border-radius: 2px; }
+  .checkbox-box.checked { background: #40E0D0; }
   .region-inputs { display: flex; flex-direction: column; gap: 4px; }
-  .region-input { height: 20px; background: #000; border: 1px solid #000; border-left: 3px solid #00ADFF; color: #FFF; font-size: 10px; padding: 0 4px; width: 100px; border-radius: 2px; }
-  .region-input::placeholder { color: #555; }
+  .region-input { height: 20px; background: #000; border: 1px solid #333; border-left: 3px solid #40E0D0; color: #FFF; font-size: 10px; padding: 0 4px; width: 100px; border-radius: 2px; }
   .region-right { display: flex; gap: 4px; margin-left: auto; align-items: center; }
-  .roller { display: flex; flex-direction: column; align-items: center; background: #000; border: 1px solid #333; border-radius: 4px; }
+  .roller { display: flex; flex-direction: column; align-items: center; background: #000; border: 1px solid #333; border-radius: 3px; }
   .roller-label { font-size: 8px; color: #888; padding: 1px; }
-  .roller-value { font-size: 10px; color: #00ADFF; padding: 2px 4px; min-width: 30px; text-align: center; }
+  .roller-value { font-size: 10px; color: #40E0D0; padding: 2px 4px; min-width: 30px; text-align: center; }
   .region-hint { font-size: 8px; color: #666; text-align: right; margin-top: auto; }
 
   /* Fan Tab */
   .fan-content { display: flex; gap: 8px; flex: 1; align-items: center; }
   .fan-info { width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .fan-icon { width: 50px; height: 50px; border: 2px solid #40E0D0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; animation: spin 1s linear infinite; }
+  .fan-icon { width: 50px; height: 50px; border: 2px solid #40E0D0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #40E0D0; animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .fan-rpm { font-size: 11px; color: #40E0D0; font-weight: 700; margin-top: 2px; }
   .fan-pwm { font-size: 9px; color: #666; }
   .fan-control { flex: 1; display: flex; flex-direction: column; gap: 4px; }
   .fan-mode-row { display: flex; gap: 4px; }
   .fan-mode-btn { flex: 1; height: 22px; background: #333; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; cursor: pointer; }
-  .fan-mode-btn.active { background: #40E0D0; color: #000; }
+  .fan-mode-btn.active { background: #40E0D0; color: #000; font-weight: 600; }
   .fan-slider-area { display: flex; flex-direction: column; gap: 2px; }
   .fan-slider-label { display: flex; justify-content: space-between; font-size: 10px; color: #888; }
   .fan-slider-bar { height: 14px; background: #333; border-radius: 4px; position: relative; overflow: hidden; }
   .fan-slider-fill { height: 100%; background: #40E0D0; border-radius: 4px; }
   .fan-temps { display: flex; justify-content: space-around; font-size: 9px; margin-top: 2px; }
-  .fan-temp-item { text-align: center; }
   .fan-curve { width: 140px; display: flex; flex-direction: column; border-left: 1px solid #333; padding-left: 6px; }
   .fan-curve-title { font-size: 9px; color: #666; margin-bottom: 2px; }
   .fan-curve-grid { height: 50px; position: relative; background: linear-gradient(to top, #333 1px, transparent 1px); background-size: 100% 12px; }
@@ -122,10 +118,8 @@
   <div class="screen">
     <div class="statusbar">
       <div class="title">SETTINGS</div>
-      <div class="ip">v1.0.0</div>
+      <div class="version">v1.0.0</div>
     </div>
-
-    <button class="close-btn" onclick="alert('Close settings')">X</button>
 
     <div class="tabview">
       <!-- Tab Content: Wi-Fi -->
@@ -134,7 +128,7 @@
         <div class="wifi-form">
           <div class="wifi-row">
             <span class="wifi-label">SSID:</span>
-            <select class="wifi-dropdown" id="networkList">
+            <select class="dropdown wifi-dropdown" id="networkList">
               <option value="">-- Select Network --</option>
               <option value="HomeNetwork">HomeNetwork</option>
               <option value="Office_5G">Office_5G</option>
@@ -142,102 +136,14 @@
           </div>
           <div class="wifi-row">
             <span class="wifi-label">Pass:</span>
-            <input type="password" class="wifi-input" id="wifiPassword" placeholder="Wi-Fi Password" maxlength="32">
+            <input type="password" class="input-field wifi-input" id="wifiPassword" placeholder="Wi-Fi Password" maxlength="32">
           </div>
         </div>
         <div class="wifi-btn-group">
-          <button class="wifi-btn" onclick="scanNetwork()">W Scan</button>
-          <button class="wifi-btn" onclick="saveWiFi()">D Save</button>
+          <button class="btn" onclick="scanNetwork()">SCAN</button>
+          <button class="btn" onclick="saveWiFi()">SAVE</button>
         </div>
         <div class="wifi-switch" id="wifiSwitch" onclick="toggleWifi()"></div>
-      </div>
-
-      <!-- Tab Content: Screen -->
-      <div class="tab-content" id="tab-screen">
-        <div class="screen-options">
-          <div class="screen-option">
-            <span class="screen-label">Brightness</span>
-            <select class="screen-dropdown" id="brightness">
-              <option>LOW</option>
-              <option selected>MEDIUM</option>
-              <option>HIGH</option>
-            </select>
-          </div>
-          <div class="screen-option">
-            <span class="screen-label">Screen off (sec)</span>
-            <select class="screen-dropdown" id="sleepTimer">
-              <option>0</option>
-              <option>15</option>
-              <option selected>30</option>
-              <option>60</option>
-            </select>
-          </div>
-          <div class="screen-option">
-            <span class="screen-label">Wallpaper</span>
-            <select class="screen-dropdown" id="wallpaper">
-              <option value="">Default</option>
-              <option value="1">Nature</option>
-              <option value="2">Abstract</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab Content: Radio -->
-      <div class="tab-content" id="tab-radio">
-        <div class="station-area">
-          <textarea class="station-list" placeholder="Station URL List (one per line)">http://stream.example.com/live
-http://radio.example.com/mp3</textarea>
-          <div class="station-help">
-            Insert a microSD card with filename<br>
-            [ stations.csv ] click Load.<br><br>
-            Defaults will be used<br>
-            if the file is unavailable.
-            <button class="station-btn" onclick="loadStation()">D Load</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab Content: Music -->
-      <div class="tab-content" id="tab-music">
-        <div class="music-content">
-          <button class="music-btn" onclick="scanMusic()">D Load</button>
-          <div class="music-hint">Tap LOAD to refresh the music library from the SD card</div>
-          <div class="music-count" id="trackCount">Card Mount Failed</div>
-        </div>
-      </div>
-
-      <!-- Tab Content: Region -->
-      <div class="tab-content" id="tab-region">
-        <div class="region-content">
-          <div class="region-left">
-            <div class="icon-globe">GL</div>
-            <label class="region-checkbox" onclick="toggleAutoIP()">
-              <div class="checkbox-box" id="autoIPBox"></div>
-              <span>Auto by IP</span>
-            </label>
-            <div class="region-inputs" id="latLonInputs">
-              <input type="text" class="region-input" id="latitude" placeholder="Latitude" maxlength="12">
-              <input type="text" class="region-input" id="longitude" placeholder="Longitude" maxlength="12">
-            </div>
-          </div>
-          <div class="icon-timezone">TZ</div>
-          <div class="region-right">
-            <div class="roller">
-              <span class="roller-label">Hour</span>
-              <div class="roller-value" id="hourRoller">+8</div>
-            </div>
-            <div class="roller">
-              <span class="roller-label">Min</span>
-              <div class="roller-value" id="minRoller">0</div>
-            </div>
-            <div class="roller">
-              <span class="roller-label">Unit</span>
-              <div class="roller-value" id="unitRoller">C</div>
-            </div>
-          </div>
-        </div>
-        <div class="region-hint">UTC Offset :Hour   Minute   Unit</div>
       </div>
 
       <!-- Tab Content: Fan -->
@@ -258,9 +164,9 @@ http://radio.example.com/mp3</textarea>
               <div class="fan-slider-bar"><div class="fan-slider-fill" style="width:45%"></div></div>
             </div>
             <div class="fan-temps">
-              <div class="fan-temp-item"><span style="color:#40E0D0">CPU: 42°C</span></div>
-              <div class="fan-temp-item"><span style="color:#FF8C00">SYS: 45°C</span></div>
-              <div class="fan-temp-item"><span style="color:#22c55e">DISK: 38°C</span></div>
+              <span style="color:#40E0D0">CPU: 42°C</span>
+              <span style="color:#FF8C00">SYS: 45°C</span>
+              <span style="color:#22c55e">DISK: 38°C</span>
             </div>
           </div>
           <div class="fan-curve">
@@ -271,6 +177,94 @@ http://radio.example.com/mp3</textarea>
         </div>
       </div>
 
+      <!-- Tab Content: Screen -->
+      <div class="tab-content" id="tab-screen">
+        <div class="screen-options">
+          <div class="screen-option">
+            <span class="label">Brightness</span>
+            <select class="dropdown screen-dropdown" id="brightness">
+              <option>LOW</option>
+              <option selected>MEDIUM</option>
+              <option>HIGH</option>
+            </select>
+          </div>
+          <div class="screen-option">
+            <span class="label">Screen off (sec)</span>
+            <select class="dropdown screen-dropdown" id="sleepTimer">
+              <option>0</option>
+              <option>15</option>
+              <option selected>30</option>
+              <option>60</option>
+            </select>
+          </div>
+          <div class="screen-option">
+            <span class="label">Wallpaper</span>
+            <select class="dropdown screen-dropdown" id="wallpaper">
+              <option value="">Default</option>
+              <option value="1">Nature</option>
+              <option value="2">Abstract</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Radio -->
+      <div class="tab-content" id="tab-radio">
+        <div class="station-area">
+          <textarea class="station-list" placeholder="Station URL List (one per line)">http://stream.example.com/live
+http://radio.example.com/mp3</textarea>
+          <div class="station-help">
+            Insert a microSD card with filename<br>
+            [ stations.csv ] click Load.<br><br>
+            Defaults will be used<br>
+            if the file is unavailable.
+            <button class="btn" onclick="loadStation()" style="margin-top:4px">LOAD</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Music -->
+      <div class="tab-content" id="tab-music">
+        <div class="music-content">
+          <button class="btn" onclick="scanMusic()">LOAD</button>
+          <div class="music-hint">Tap LOAD to refresh the music library from the SD card</div>
+          <div class="music-count" id="trackCount">Card Mount Failed</div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Region -->
+      <div class="tab-content" id="tab-region">
+        <div class="region-content">
+          <div class="region-left">
+            <div class="icon-box">GL</div>
+            <label class="region-checkbox" onclick="toggleAutoIP()">
+              <div class="checkbox-box checked" id="autoIPBox"></div>
+              <span>Auto by IP</span>
+            </label>
+            <div class="region-inputs" id="latLonInputs" style="display:none">
+              <input type="text" class="region-input" id="latitude" placeholder="Latitude" maxlength="12">
+              <input type="text" class="region-input" id="longitude" placeholder="Longitude" maxlength="12">
+            </div>
+          </div>
+          <div class="icon-box">TZ</div>
+          <div class="region-right">
+            <div class="roller">
+              <span class="roller-label">Hour</span>
+              <div class="roller-value" id="hourRoller">+8</div>
+            </div>
+            <div class="roller">
+              <span class="roller-label">Min</span>
+              <div class="roller-value" id="minRoller">0</div>
+            </div>
+            <div class="roller">
+              <span class="roller-label">Unit</span>
+              <div class="roller-value" id="unitRoller">C</div>
+            </div>
+          </div>
+        </div>
+        <div class="region-hint">UTC Offset :Hour   Minute   Unit</div>
+      </div>
+
       <!-- Tab Content: User Guide -->
       <div class="tab-content" id="tab-guide">
         <div class="guide-content">
@@ -278,6 +272,10 @@ http://radio.example.com/mp3</textarea>
 - Tap SCAN to search for nearby networks.
 - Select the network from dropdown, enter password.
 - Tap SAVE to save the password.
+
+[Fan ] - Fan Control Settings
+- AUTO: Fan speed adjusts based on temperature.
+- MANUAL: Set fixed PWM value (0-100%).
 
 [ Screen ] - Display Settings
 - Brightness: Adjust display intensity.
@@ -339,12 +337,13 @@ http://radio.example.com/mp3</textarea>
 
   function toggleWifi() {
     wifiEnabled = !wifiEnabled;
-    document.getElementById('wifiSwitch').style.background = wifiEnabled ? '#088CFD' : '#333';
+    document.getElementById('wifiSwitch').style.background = wifiEnabled ? '#40E0D0' : '#333';
   }
 
   function toggleAutoIP() {
     autoIP = !autoIP;
-    document.getElementById('autoIPBox').style.background = autoIP ? '#00ADFF' : '#FFF';
+    const box = document.getElementById('autoIPBox');
+    box.classList.toggle('checked', autoIP);
     document.getElementById('latLonInputs').style.display = autoIP ? 'none' : 'flex';
   }
 
@@ -353,7 +352,7 @@ http://radio.example.com/mp3</textarea>
     document.getElementById('wifiStatus').style.color = '#FFFF00';
     setTimeout(() => {
       document.getElementById('wifiStatus').textContent = 'Found 2 networks';
-      document.getElementById('wifiStatus').style.color = '#00FF00';
+      document.getElementById('wifiStatus').style.color = '#40E0D0';
     }, 1000);
   }
 
@@ -362,7 +361,7 @@ http://radio.example.com/mp3</textarea>
     document.getElementById('wifiStatus').style.color = '#FFFF00';
     setTimeout(() => {
       document.getElementById('wifiStatus').textContent = 'Connected';
-      document.getElementById('wifiStatus').style.color = '#00FF00';
+      document.getElementById('wifiStatus').style.color = '#40E0D0';
     }, 1500);
   }
 
@@ -376,12 +375,6 @@ http://radio.example.com/mp3</textarea>
       document.getElementById('trackCount').textContent = '128 tracks found';
     }, 2000);
   }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('wifiSwitch').style.background = '#088CFD';
-    document.getElementById('autoIPBox').style.background = '#00ADFF';
-    document.getElementById('latLonInputs').style.display = 'none';
-  });
 </script>
 </body>
 </html>
