@@ -51,6 +51,26 @@ lv_obj_t * ui_MainMenu_Label_Label9 = NULL;
 lv_obj_t * ui_MainMenu_Keyboard_Keyboard1 = NULL;
 lv_obj_t * ui_MainMenu_Keyboard_Number = NULL;
 lv_obj_t * ui_MainMenu_Panel_blindPanel = NULL;
+
+// NAS Tab 页面 UI 变量
+lv_obj_t * ui_MainMenu_Tabpage_nas = NULL;
+lv_obj_t * ui_MainMenu_Dropdown_NasType = NULL;
+lv_obj_t * ui_MainMenu_Textarea_NasIP = NULL;
+lv_obj_t * ui_MainMenu_Textarea_NasPort = NULL;
+lv_obj_t * ui_MainMenu_Textarea_NasUser = NULL;
+lv_obj_t * ui_MainMenu_Textarea_NasPass = NULL;
+lv_obj_t * ui_MainMenu_Switch_NasHttps = NULL;
+lv_obj_t * ui_MainMenu_Panel_NasAuth = NULL;
+lv_obj_t * ui_MainMenu_Label_NasStatus = NULL;
+lv_obj_t * ui_MainMenu_Button_NasSave = NULL;
+lv_obj_t * ui_MainMenu_Panel_NasExtra = NULL;
+lv_obj_t * ui_MainMenu_Textarea_NasExtra1 = NULL;
+lv_obj_t * ui_MainMenu_Textarea_NasExtra2 = NULL;
+
+// 存储配置（SATA/M.2 数量）
+lv_obj_t * ui_MainMenu_Dropdown_SataCount = NULL;
+lv_obj_t * ui_MainMenu_Dropdown_M2Count = NULL;
+
 // event funtions
 
 void ui_event_MainMenu_Tabview_ConfigPanel(lv_event_t * e)
@@ -338,8 +358,9 @@ void ui_Screen_Settings_screen_init(void)
     lv_obj_set_width(ui_MainMenu_Tabview_ConfigPanel, lv_pct(100));
     lv_obj_set_height(ui_MainMenu_Tabview_ConfigPanel, lv_pct(100));
     lv_obj_set_align(ui_MainMenu_Tabview_ConfigPanel, LV_ALIGN_CENTER);
+    // 保留 GESTURE_BUBBLE 让手势能传递到父对象
     lv_obj_clear_flag(ui_MainMenu_Tabview_ConfigPanel,
-                      LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC |
+                      LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC |
                       LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
     lv_obj_set_style_bg_color(ui_MainMenu_Tabview_ConfigPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_MainMenu_Tabview_ConfigPanel, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -377,6 +398,295 @@ void ui_Screen_Settings_screen_init(void)
                                 LV_PART_ITEMS | LV_STATE_CHECKED);
     lv_obj_set_style_text_opa(lv_tabview_get_tab_btns(ui_MainMenu_Tabview_ConfigPanel), 255,
                               LV_PART_ITEMS | LV_STATE_CHECKED);
+
+    // ============================================================
+    // NAS Tab 页面 - NAS 类型选择和连接配置
+    // ============================================================
+    ui_MainMenu_Tabpage_nas = lv_tabview_add_tab(ui_MainMenu_Tabview_ConfigPanel, "NAS");
+    lv_obj_set_scrollbar_mode(ui_MainMenu_Tabpage_nas, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scroll_dir(ui_MainMenu_Tabpage_nas, LV_DIR_VER);
+
+    // NAS 类型标签
+    lv_obj_t * ui_Label_NasType = lv_label_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_Label_NasType, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_NasType, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_NasType, 8);
+    lv_obj_set_y(ui_Label_NasType, 8);
+    lv_label_set_text(ui_Label_NasType, "NAS Type:");
+    lv_obj_set_style_text_font(ui_Label_NasType, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_NasType, lv_color_hex(0xAAAAAA), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // NAS 类型下拉选择
+    ui_MainMenu_Dropdown_NasType = lv_dropdown_create(ui_MainMenu_Tabpage_nas);
+    lv_dropdown_set_options(ui_MainMenu_Dropdown_NasType,
+        "Synology DSM\n"
+        "QNAP QTS\n"
+        "TrueNAS\n"
+        "FNOS\n"
+        "Unraid\n"
+        "Netdata\n"
+        "SNMP\n"
+        "Linux (HTTP)\n"
+        "Linux (Serial)\n"
+        "Windows\n"
+        "Mock (Test)");
+    lv_obj_set_width(ui_MainMenu_Dropdown_NasType, 200);
+    lv_obj_set_height(ui_MainMenu_Dropdown_NasType, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Dropdown_NasType, 100);
+    lv_obj_set_y(ui_MainMenu_Dropdown_NasType, 4);
+    lv_obj_add_flag(ui_MainMenu_Dropdown_NasType, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+
+    // ============================================================
+    // 存储配置区域（SATA/M.2 数量）- 暂时注释以排查白屏问题
+    // ============================================================
+    #if 0
+    lv_obj_t * ui_Label_Storage = lv_label_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_Label_Storage, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_Storage, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_Storage, 320);
+    lv_obj_set_y(ui_Label_Storage, 8);
+    lv_label_set_text(ui_Label_Storage, "Storage:");
+    lv_obj_set_style_text_font(ui_Label_Storage, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_Storage, lv_color_hex(0x888888), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // SATA 数量标签
+    lv_obj_t * ui_Label_Sata = lv_label_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_Label_Sata, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_Sata, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_Sata, 400);
+    lv_obj_set_y(ui_Label_Sata, 8);
+    lv_label_set_text(ui_Label_Sata, "SATA:");
+    lv_obj_set_style_text_font(ui_Label_Sata, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_Sata, lv_color_hex(0xAAAAAA), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // SATA 数量下拉
+    ui_MainMenu_Dropdown_SataCount = lv_dropdown_create(ui_MainMenu_Tabpage_nas);
+    lv_dropdown_set_options(ui_MainMenu_Dropdown_SataCount,
+        "0\n1\n2\n3\n4\n5\n6\n7\n8");
+    lv_obj_set_width(ui_MainMenu_Dropdown_SataCount, 70);
+    lv_obj_set_height(ui_MainMenu_Dropdown_SataCount, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Dropdown_SataCount, 455);
+    lv_obj_set_y(ui_MainMenu_Dropdown_SataCount, 4);
+    // lv_dropdown_set_selected(ui_MainMenu_Dropdown_SataCount, 6);  // 默认 6 个
+
+    // M.2 数量标签
+    lv_obj_t * ui_Label_M2 = lv_label_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_Label_M2, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_M2, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_M2, 535);
+    lv_obj_set_y(ui_Label_M2, 8);
+    lv_label_set_text(ui_Label_M2, "M.2:");
+    lv_obj_set_style_text_font(ui_Label_M2, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_M2, lv_color_hex(0xAAAAAA), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // M.2 数量下拉
+    ui_MainMenu_Dropdown_M2Count = lv_dropdown_create(ui_MainMenu_Tabpage_nas);
+    lv_dropdown_set_options(ui_MainMenu_Dropdown_M2Count,
+        "0\n1\n2\n3\n4\n5\n6\n7\n8");
+    lv_obj_set_width(ui_MainMenu_Dropdown_M2Count, 60);
+    lv_obj_set_height(ui_MainMenu_Dropdown_M2Count, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Dropdown_M2Count, 575);
+    lv_obj_set_y(ui_MainMenu_Dropdown_M2Count, 4);
+    // lv_dropdown_set_selected(ui_MainMenu_Dropdown_M2Count, 3);  // 默认 3 个
+    #endif
+
+    // IP 地址标签
+    lv_obj_t * ui_Label_NasIP = lv_label_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_Label_NasIP, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_NasIP, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_NasIP, 8);
+    lv_obj_set_y(ui_Label_NasIP, 38);
+    lv_label_set_text(ui_Label_NasIP, "IP:");
+    lv_obj_set_style_text_font(ui_Label_NasIP, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_NasIP, lv_color_hex(0xAAAAAA), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // IP 地址输入框
+    ui_MainMenu_Textarea_NasIP = lv_textarea_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_MainMenu_Textarea_NasIP, 200);
+    lv_obj_set_height(ui_MainMenu_Textarea_NasIP, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Textarea_NasIP, 100);
+    lv_obj_set_y(ui_MainMenu_Textarea_NasIP, 34);
+    lv_textarea_set_placeholder_text(ui_MainMenu_Textarea_NasIP, "192.168.1.100");
+    lv_textarea_set_max_length(ui_MainMenu_Textarea_NasIP, 40);
+    lv_textarea_set_one_line(ui_MainMenu_Textarea_NasIP, true);
+    lv_obj_set_style_text_font(ui_MainMenu_Textarea_NasIP, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 端口标签
+    lv_obj_t * ui_Label_NasPort = lv_label_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_Label_NasPort, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_NasPort, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_NasPort, 320);
+    lv_obj_set_y(ui_Label_NasPort, 38);
+    lv_label_set_text(ui_Label_NasPort, "Port:");
+    lv_obj_set_style_text_font(ui_Label_NasPort, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_NasPort, lv_color_hex(0xAAAAAA), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 端口输入框
+    ui_MainMenu_Textarea_NasPort = lv_textarea_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_MainMenu_Textarea_NasPort, 80);
+    lv_obj_set_height(ui_MainMenu_Textarea_NasPort, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Textarea_NasPort, 370);
+    lv_obj_set_y(ui_MainMenu_Textarea_NasPort, 34);
+    lv_textarea_set_placeholder_text(ui_MainMenu_Textarea_NasPort, "5000");
+    lv_textarea_set_max_length(ui_MainMenu_Textarea_NasPort, 5);
+    lv_textarea_set_one_line(ui_MainMenu_Textarea_NasPort, true);
+    lv_obj_set_style_text_font(ui_MainMenu_Textarea_NasPort, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // HTTPS 开关
+    ui_MainMenu_Switch_NasHttps = lv_switch_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_MainMenu_Switch_NasHttps, 50);
+    lv_obj_set_height(ui_MainMenu_Switch_NasHttps, 24);
+    lv_obj_set_x(ui_MainMenu_Switch_NasHttps, 470);
+    lv_obj_set_y(ui_MainMenu_Switch_NasHttps, 36);
+    lv_obj_set_style_bg_color(ui_MainMenu_Switch_NasHttps, lv_color_hex(0x333333), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_MainMenu_Switch_NasHttps, lv_color_hex(0x088CFD), LV_PART_INDICATOR | LV_STATE_CHECKED);
+
+    // HTTPS 标签
+    lv_obj_t * ui_Label_Https = lv_label_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_Label_Https, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_Https, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_Https, 530);
+    lv_obj_set_y(ui_Label_Https, 38);
+    lv_label_set_text(ui_Label_Https, "HTTPS");
+    lv_obj_set_style_text_font(ui_Label_Https, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 认证信息面板（用户名/密码）
+    ui_MainMenu_Panel_NasAuth = lv_obj_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_MainMenu_Panel_NasAuth, lv_pct(100));
+    lv_obj_set_height(ui_MainMenu_Panel_NasAuth, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Panel_NasAuth, 0);
+    lv_obj_set_y(ui_MainMenu_Panel_NasAuth, 64);
+    lv_obj_set_scrollbar_mode(ui_MainMenu_Panel_NasAuth, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_clear_flag(ui_MainMenu_Panel_NasAuth, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_opa(ui_MainMenu_Panel_NasAuth, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_MainMenu_Panel_NasAuth, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 用户名标签
+    lv_obj_t * ui_Label_NasUser = lv_label_create(ui_MainMenu_Panel_NasAuth);
+    lv_obj_set_width(ui_Label_NasUser, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_NasUser, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_NasUser, 8);
+    lv_obj_set_y(ui_Label_NasUser, 0);
+    lv_label_set_text(ui_Label_NasUser, "User:");
+    lv_obj_set_style_text_font(ui_Label_NasUser, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_NasUser, lv_color_hex(0xAAAAAA), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 用户名输入框
+    ui_MainMenu_Textarea_NasUser = lv_textarea_create(ui_MainMenu_Panel_NasAuth);
+    lv_obj_set_width(ui_MainMenu_Textarea_NasUser, 150);
+    lv_obj_set_height(ui_MainMenu_Textarea_NasUser, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Textarea_NasUser, 60);
+    lv_obj_set_y(ui_MainMenu_Textarea_NasUser, -4);
+    lv_textarea_set_placeholder_text(ui_MainMenu_Textarea_NasUser, "admin");
+    lv_textarea_set_max_length(ui_MainMenu_Textarea_NasUser, 32);
+    lv_textarea_set_one_line(ui_MainMenu_Textarea_NasUser, true);
+    lv_obj_set_style_text_font(ui_MainMenu_Textarea_NasUser, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 密码标签
+    lv_obj_t * ui_Label_NasPass = lv_label_create(ui_MainMenu_Panel_NasAuth);
+    lv_obj_set_width(ui_Label_NasPass, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_NasPass, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_NasPass, 230);
+    lv_obj_set_y(ui_Label_NasPass, 0);
+    lv_label_set_text(ui_Label_NasPass, "Pass:");
+    lv_obj_set_style_text_font(ui_Label_NasPass, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_NasPass, lv_color_hex(0xAAAAAA), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 密码输入框
+    ui_MainMenu_Textarea_NasPass = lv_textarea_create(ui_MainMenu_Panel_NasAuth);
+    lv_obj_set_width(ui_MainMenu_Textarea_NasPass, 180);
+    lv_obj_set_height(ui_MainMenu_Textarea_NasPass, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Textarea_NasPass, 290);
+    lv_obj_set_y(ui_MainMenu_Textarea_NasPass, -4);
+    lv_textarea_set_placeholder_text(ui_MainMenu_Textarea_NasPass, "password");
+    lv_textarea_set_max_length(ui_MainMenu_Textarea_NasPass, 65);
+    lv_textarea_set_one_line(ui_MainMenu_Textarea_NasPass, true);
+    lv_textarea_set_password_mode(ui_MainMenu_Textarea_NasPass, true);
+    lv_obj_set_style_text_font(ui_MainMenu_Textarea_NasPass, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 额外配置面板（SNMP/Serial等）
+    ui_MainMenu_Panel_NasExtra = lv_obj_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_MainMenu_Panel_NasExtra, lv_pct(100));
+    lv_obj_set_height(ui_MainMenu_Panel_NasExtra, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Panel_NasExtra, 0);
+    lv_obj_set_y(ui_MainMenu_Panel_NasExtra, 100);
+    lv_obj_set_scrollbar_mode(ui_MainMenu_Panel_NasExtra, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_clear_flag(ui_MainMenu_Panel_NasExtra, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_opa(ui_MainMenu_Panel_NasExtra, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_MainMenu_Panel_NasExtra, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_flag(ui_MainMenu_Panel_NasExtra, LV_OBJ_FLAG_HIDDEN);
+
+    // 额外配置标签1
+    lv_obj_t * ui_Label_NasExtra1 = lv_label_create(ui_MainMenu_Panel_NasExtra);
+    lv_obj_set_width(ui_Label_NasExtra1, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_NasExtra1, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_NasExtra1, 8);
+    lv_obj_set_y(ui_Label_NasExtra1, 0);
+    lv_label_set_text(ui_Label_NasExtra1, "SNMP Community:");
+    lv_obj_set_style_text_font(ui_Label_NasExtra1, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_NasExtra1, lv_color_hex(0xAAAAAA), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 额外配置输入1
+    ui_MainMenu_Textarea_NasExtra1 = lv_textarea_create(ui_MainMenu_Panel_NasExtra);
+    lv_obj_set_width(ui_MainMenu_Textarea_NasExtra1, 200);
+    lv_obj_set_height(ui_MainMenu_Textarea_NasExtra1, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Textarea_NasExtra1, 130);
+    lv_obj_set_y(ui_MainMenu_Textarea_NasExtra1, -4);
+    lv_textarea_set_placeholder_text(ui_MainMenu_Textarea_NasExtra1, "public");
+    lv_textarea_set_max_length(ui_MainMenu_Textarea_NasExtra1, 32);
+    lv_textarea_set_one_line(ui_MainMenu_Textarea_NasExtra1, true);
+    lv_obj_set_style_text_font(ui_MainMenu_Textarea_NasExtra1, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 额外配置标签2
+    lv_obj_t * ui_Label_NasExtra2 = lv_label_create(ui_MainMenu_Panel_NasExtra);
+    lv_obj_set_width(ui_Label_NasExtra2, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_NasExtra2, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_Label_NasExtra2, 350);
+    lv_obj_set_y(ui_Label_NasExtra2, 0);
+    lv_label_set_text(ui_Label_NasExtra2, "SNMP Ver:");
+    lv_obj_set_style_text_font(ui_Label_NasExtra2, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_NasExtra2, lv_color_hex(0xAAAAAA), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 额外配置输入2 (SNMP版本下拉)
+    ui_MainMenu_Textarea_NasExtra2 = lv_dropdown_create(ui_MainMenu_Panel_NasExtra);
+    lv_dropdown_set_options(ui_MainMenu_Textarea_NasExtra2, "v1\nv2c\nv3");
+    lv_obj_set_width(ui_MainMenu_Textarea_NasExtra2, 100);
+    lv_obj_set_height(ui_MainMenu_Textarea_NasExtra2, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Textarea_NasExtra2, 430);
+    lv_obj_set_y(ui_MainMenu_Textarea_NasExtra2, -2);
+
+    // 状态标签
+    ui_MainMenu_Label_NasStatus = lv_label_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_MainMenu_Label_NasStatus, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_MainMenu_Label_NasStatus, LV_SIZE_CONTENT);
+    lv_obj_set_x(ui_MainMenu_Label_NasStatus, 8);
+    lv_obj_set_y(ui_MainMenu_Label_NasStatus, 110);
+    lv_label_set_text(ui_MainMenu_Label_NasStatus, "Not configured");
+    lv_obj_set_style_text_font(ui_MainMenu_Label_NasStatus, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_MainMenu_Label_NasStatus, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 保存按钮
+    ui_MainMenu_Button_NasSave = lv_btn_create(ui_MainMenu_Tabpage_nas);
+    lv_obj_set_width(ui_MainMenu_Button_NasSave, 120);
+    lv_obj_set_height(ui_MainMenu_Button_NasSave, 44);
+    lv_obj_set_x(ui_MainMenu_Button_NasSave, 490);
+    lv_obj_set_y(ui_MainMenu_Button_NasSave, 100);
+    lv_obj_add_flag(ui_MainMenu_Button_NasSave, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_clear_flag(ui_MainMenu_Button_NasSave, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(ui_MainMenu_Button_NasSave, lv_color_hex(0x00ADFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_MainMenu_Button_NasSave, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_MainMenu_Button_NasSave, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_MainMenu_Button_NasSave, 6, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_t * ui_Label_NasSave = lv_label_create(ui_MainMenu_Button_NasSave);
+    lv_obj_set_width(ui_Label_NasSave, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_Label_NasSave, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_Label_NasSave, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Label_NasSave, "D Save");
+    lv_obj_set_style_text_font(ui_Label_NasSave, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Label_NasSave, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // NAS Tab UI 创建结束
 
     ui_MainMenu_Tabpage_network = lv_tabview_add_tab(ui_MainMenu_Tabview_ConfigPanel, "Wi-Fi");
     lv_obj_set_scrollbar_mode(ui_MainMenu_Tabpage_network, LV_SCROLLBAR_MODE_OFF);
@@ -849,9 +1159,15 @@ void ui_Screen_Settings_screen_init(void)
     lv_obj_add_event_cb(ui_MainMenu_Keyboard_Number, ui_event_MainMenu_Keyboard_Number, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MainMenu_Panel_blindPanel, ui_event_MainMenu_Panel_blindPanel, LV_EVENT_ALL, NULL);
 
-    // 注册手势事件回调到 tabview - 下边缘上滑返回 Overview
-    // 重新启用 GESTURE_BUBBLE，确保手势事件能传递到 tabview
-    lv_obj_add_flag(ui_MainMenu_Tabview_ConfigPanel, LV_OBJ_FLAG_GESTURE_BUBBLE);
+    // NAS Tab 事件注册
+    lv_obj_add_event_cb(ui_MainMenu_Tabpage_nas, ui_event_MainMenu_Tabpage_nas, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_MainMenu_Dropdown_NasType, ui_event_MainMenu_Dropdown_NasType, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_MainMenu_Switch_NasHttps, ui_event_MainMenu_Switch_NasHttps, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_MainMenu_Button_NasSave, ui_event_MainMenu_Button_NasSave, LV_EVENT_ALL, NULL);
+
+    // 注册手势事件回调 - 下边缘上滑返回 Overview
+    // 同时注册到整个屏幕和 tabview，确保手势能正确响应
+    lv_obj_add_event_cb(ui_Screen_Settings, ui_event_Screen_Settings_gesture, LV_EVENT_GESTURE, NULL);
     lv_obj_add_event_cb(ui_MainMenu_Tabview_ConfigPanel, ui_event_Screen_Settings_gesture, LV_EVENT_GESTURE, NULL);
 
 }
@@ -906,5 +1222,24 @@ void ui_Screen_Settings_screen_destroy(void)
     ui_MainMenu_Keyboard_Keyboard1 = NULL;
     ui_MainMenu_Keyboard_Number = NULL;
     ui_MainMenu_Panel_blindPanel = NULL;
+
+    // NAS Tab 变量销毁
+    ui_MainMenu_Tabpage_nas = NULL;
+    ui_MainMenu_Dropdown_NasType = NULL;
+    ui_MainMenu_Textarea_NasIP = NULL;
+    ui_MainMenu_Textarea_NasPort = NULL;
+    ui_MainMenu_Textarea_NasUser = NULL;
+    ui_MainMenu_Textarea_NasPass = NULL;
+    ui_MainMenu_Switch_NasHttps = NULL;
+    ui_MainMenu_Panel_NasAuth = NULL;
+    ui_MainMenu_Label_NasStatus = NULL;
+    ui_MainMenu_Button_NasSave = NULL;
+    ui_MainMenu_Panel_NasExtra = NULL;
+    ui_MainMenu_Textarea_NasExtra1 = NULL;
+    ui_MainMenu_Textarea_NasExtra2 = NULL;
+
+    // 存储配置
+    ui_MainMenu_Dropdown_SataCount = NULL;
+    ui_MainMenu_Dropdown_M2Count = NULL;
 
 }

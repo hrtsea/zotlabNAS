@@ -645,3 +645,370 @@ void data_poll_task(void *param) {
         vTaskDelayUntil(&last_wake_time, poll_interval);
     }
 }
+
+// ============================================================================
+// NAS Tab 事件处理函数
+// ============================================================================
+
+// NAS 类型索引到字符串ID的映射
+static const char* NAS_TYPE_IDS[] = {
+    "synology",      // 0: Synology DSM
+    "qnap",          // 1: QNAP QTS
+    "truenas",       // 2: TrueNAS
+    "fnos",          // 3: FNOS
+    "unraid",        // 4: Unraid
+    "netdata",       // 5: Netdata
+    "snmp",          // 6: SNMP
+    "linux_http",    // 7: Linux (HTTP)
+    "linux_serial",  // 8: Linux (Serial)
+    "windows",       // 9: Windows
+    "mock"           // 10: Mock (Test)
+};
+
+// NAS 类型的默认端口
+static const uint32_t NAS_DEFAULT_PORTS[] = {
+    5000,    // Synology DSM (5000 HTTP, 5001 HTTPS)
+    8080,    // QNAP QTS
+    80,      // TrueNAS
+    80,      // FNOS
+    80,      // Unraid
+    19999,   // Netdata
+    161,     // SNMP (UDP)
+    8080,    // Linux HTTP
+    115200,  // Linux Serial (Baud)
+    80       // Windows
+};
+
+// NAS 类型是否需要认证（用户名/密码）
+static const bool NAS_NEEDS_AUTH[] = {
+    true,   // Synology DSM - 需要认证
+    true,   // QNAP QTS - 需要认证
+    true,   // TrueNAS - 需要认证
+    true,   // FNOS - 需要认证
+    true,   // Unraid - 需要认证
+    false,  // Netdata - 不需要认证
+    false,  // SNMP - 不需要密码（使用 community）
+    true,   // Linux HTTP - 需要认证
+    false,  // Linux Serial - 不需要认证
+    true,   // Windows - 可能需要认证
+    false   // Mock - 不需要认证
+};
+
+// NAS 类型是否需要 HTTPS
+static const bool NAS_SUPPORTS_HTTPS[] = {
+    true,   // Synology DSM
+    true,   // QNAP QTS
+    true,   // TrueNAS
+    false,  // FNOS (不确定)
+    false,  // Unraid
+    false,  // Netdata
+    false,  // SNMP
+    true,   // Linux HTTP
+    false,  // Linux Serial
+    true,   // Windows
+    false   // Mock
+};
+
+// NAS 类型是否需要额外配置面板（SNMP/Serial）
+static const bool NAS_NEEDS_EXTRA[] = {
+    false,  // Synology DSM
+    false,  // QNAP QTS
+    false,  // TrueNAS
+    false,  // FNOS
+    false,  // Unraid
+    false,  // Netdata
+    true,   // SNMP - 需要 community 和版本
+    false,  // Linux HTTP
+    true,   // Linux Serial - 需要设备名和波特率
+    false,  // Windows
+    false   // Mock
+};
+
+// Tab page 事件处理 - 重置屏幕关闭定时器
+void ui_event_MainMenu_Tabpage_nas(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_PRESSED) {
+        resetScreenOffTimer(e);
+        // 加载 NAS 配置到 UI
+        loadNasConfigToUI();
+    }
+}
+
+// NAS 类型下拉选择事件
+void ui_event_MainMenu_Dropdown_NasType(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_VALUE_CHANGED) {
+        resetScreenOffTimer(e);
+        
+        lv_obj_t *dropdown = lv_event_get_target(e);
+        int selected_index = lv_dropdown_get_selected(dropdown);
+        
+        // 更新默认端口
+        if (ui_MainMenu_Textarea_NasPort != NULL) {
+            char port_str[8];
+            snprintf(port_str, sizeof(port_str), "%d", NAS_DEFAULT_PORTS[selected_index]);
+            lv_textarea_set_text(ui_MainMenu_Textarea_NasPort, port_str);
+        }
+        
+        // 更新字段可见性
+        updateNasFieldsVisibility(selected_index);
+        
+        log_i("NAS type changed to index %d: %s", selected_index, NAS_TYPE_IDS[selected_index]);
+    }
+}
+
+// HTTPS 开关事件
+void ui_event_MainMenu_Switch_NasHttps(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_VALUE_CHANGED) {
+        resetScreenOffTimer(e);
+        
+        lv_obj_t *sw = lv_event_get_target(e);
+        bool https_enabled = lv_obj_has_state(sw, LV_STATE_CHECKED);
+        
+        // 调整端口（如果是 HTTPS 端口）
+        if (https_enabled && ui_MainMenu_Textarea_NasPort != NULL) {
+            lv_obj_t *dropdown = lv_event_get_target(e);
+            // 获取当前选中的类型
+            if (ui_MainMenu_Dropdown_NasType != NULL) {
+                int selected_index = lv_dropdown_get_selected(ui_MainMenu_Dropdown_NasType);
+                if (selected_index == 0) {  // Synology
+                    lv_textarea_set_text(ui_MainMenu_Textarea_NasPort, "5001");
+                }
+            }
+        }
+        
+        log_i("HTTPS switch: %s", https_enabled ? "ON" : "OFF");
+    }
+}
+
+// 保存按钮事件
+void ui_event_MainMenu_Button_NasSave(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_CLICKED) {
+        saveNasConfig(e);
+    }
+}
+
+// 更新 NAS 字段可见性
+void updateNasFieldsVisibility(int nas_type_index) {
+    bool needs_auth = NAS_NEEDS_AUTH[nas_type_index];
+    bool supports_https = NAS_SUPPORTS_HTTPS[nas_type_index];
+    bool needs_extra = NAS_NEEDS_EXTRA[nas_type_index];
+    
+    // 更新认证面板可见性
+    if (ui_MainMenu_Panel_NasAuth != NULL) {
+        if (needs_auth) {
+            lv_obj_clear_flag(ui_MainMenu_Panel_NasAuth, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_add_flag(ui_MainMenu_Panel_NasAuth, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+    
+    // 更新 HTTPS 开关可见性
+    if (ui_MainMenu_Switch_NasHttps != NULL) {
+        if (supports_https) {
+            lv_obj_clear_flag(ui_MainMenu_Switch_NasHttps, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_add_flag(ui_MainMenu_Switch_NasHttps, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+    
+    // 更新额外配置面板可见性
+    if (ui_MainMenu_Panel_NasExtra != NULL) {
+        if (needs_extra) {
+            lv_obj_clear_flag(ui_MainMenu_Panel_NasExtra, LV_OBJ_FLAG_HIDDEN);
+            
+            // 根据类型更新额外配置标签
+            lv_obj_t *label1 = lv_obj_get_child(ui_MainMenu_Panel_NasExtra, 0);  // 第一个 label
+            lv_obj_t *label2 = lv_obj_get_child(ui_MainMenu_Panel_NasExtra, 2); // 第二个 label
+            
+            if (nas_type_index == 6) {  // SNMP
+                lv_label_set_text(label1, "SNMP Community:");
+                lv_label_set_text(label2, "SNMP Ver:");
+            } else if (nas_type_index == 8) {  // Linux Serial
+                lv_label_set_text(label1, "Device:");
+                lv_label_set_text(label2, "Baud:");
+            }
+        } else {
+            lv_obj_add_flag(ui_MainMenu_Panel_NasExtra, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+}
+
+// 加载 NAS 配置到 UI
+void loadNasConfigToUI(void) {
+    if (ui_MainMenu_Dropdown_NasType == NULL || ui_MainMenu_Textarea_NasIP == NULL) {
+        log_w("[NAS] Settings UI not ready, skipping config load");
+        return;
+    }
+    
+    // 查找 NAS 类型索引
+    int nas_type_index = 0;
+    for (int i = 0; i < 11; i++) {
+        if (strcmp(g_config.nas_type, NAS_TYPE_IDS[i]) == 0) {
+            nas_type_index = i;
+            break;
+        }
+    }
+    
+    // 设置 NAS 类型下拉
+    lv_dropdown_set_selected(ui_MainMenu_Dropdown_NasType, nas_type_index);
+    
+    // 设置 IP 地址
+    if (strlen(g_config.nas_ip) > 0) {
+        lv_textarea_set_text(ui_MainMenu_Textarea_NasIP, g_config.nas_ip);
+    }
+    
+    // 设置端口
+    if (g_config.nas_port > 0) {
+        char port_str[8];
+        snprintf(port_str, sizeof(port_str), "%d", g_config.nas_port);
+        lv_textarea_set_text(ui_MainMenu_Textarea_NasPort, port_str);
+    } else {
+        // 使用默认端口
+        char port_str[8];
+        snprintf(port_str, sizeof(port_str), "%d", NAS_DEFAULT_PORTS[nas_type_index]);
+        lv_textarea_set_text(ui_MainMenu_Textarea_NasPort, port_str);
+    }
+    
+    // 设置用户名
+    if (strlen(g_config.nas_user) > 0) {
+        lv_textarea_set_text(ui_MainMenu_Textarea_NasUser, g_config.nas_user);
+    }
+    
+    // 设置密码
+    if (strlen(g_config.nas_pass) > 0) {
+        lv_textarea_set_text(ui_MainMenu_Textarea_NasPass, g_config.nas_pass);
+    }
+    
+    // 设置 HTTPS 开关
+    if (g_config.nas_https) {
+        lv_obj_add_state(ui_MainMenu_Switch_NasHttps, LV_STATE_CHECKED);
+    } else {
+        lv_obj_clear_state(ui_MainMenu_Switch_NasHttps, LV_STATE_CHECKED);
+    }
+    
+    // 设置 SNMP community
+    if (strlen(g_config.snmp_comm) > 0 && ui_MainMenu_Textarea_NasExtra1 != NULL) {
+        lv_textarea_set_text(ui_MainMenu_Textarea_NasExtra1, g_config.snmp_comm);
+    }
+
+    // 设置 SATA/M.2 数量
+    if (ui_MainMenu_Dropdown_SataCount != NULL) {
+        lv_dropdown_set_selected(ui_MainMenu_Dropdown_SataCount, g_config.sata_disk_count);
+        lv_dropdown_set_selected(ui_MainMenu_Dropdown_M2Count, g_config.m2_disk_count);
+    }
+
+    // 设置字段可见性
+    updateNasFieldsVisibility(nas_type_index);
+    
+    // 更新状态标签
+    if (strlen(g_config.nas_ip) > 0) {
+        lv_label_set_text(ui_MainMenu_Label_NasStatus, "Configured");
+        lv_obj_set_style_text_color(ui_MainMenu_Label_NasStatus, lv_color_hex(0x00FF00), 0);
+    } else {
+        lv_label_set_text(ui_MainMenu_Label_NasStatus, "Not configured");
+        lv_obj_set_style_text_color(ui_MainMenu_Label_NasStatus, lv_color_hex(0xFF0000), 0);
+    }
+    
+    log_i("[NAS] Loaded NAS config: type=%s, ip=%s, port=%d",
+          g_config.nas_type, g_config.nas_ip, g_config.nas_port);
+}
+
+// 保存 NAS 配置
+void saveNasConfig(lv_event_t * e) {
+    (void)e;
+    
+    if (ui_MainMenu_Dropdown_NasType == NULL) {
+        log_e("[NAS] UI not ready");
+        return;
+    }
+    
+    SCREEN_OFF_TIMER = millis();  // 重置定时器
+    
+    // 获取 NAS 类型
+    int nas_type_index = lv_dropdown_get_selected(ui_MainMenu_Dropdown_NasType);
+    const char *nas_type = NAS_TYPE_IDS[nas_type_index];
+    
+    // 获取 IP 地址
+    const char *nas_ip = lv_textarea_get_text(ui_MainMenu_Textarea_NasIP);
+    if (nas_ip == NULL || strlen(nas_ip) == 0) {
+        lv_label_set_text(ui_MainMenu_Label_NasStatus, "IP required!");
+        lv_obj_set_style_text_color(ui_MainMenu_Label_NasStatus, lv_color_hex(0xFF0000), 0);
+        log_w("[NAS] IP address is required");
+        return;
+    }
+    
+    // 获取端口
+    const char *port_str = lv_textarea_get_text(ui_MainMenu_Textarea_NasPort);
+    uint16_t nas_port = atoi(port_str);
+    if (nas_port == 0) {
+        nas_port = NAS_DEFAULT_PORTS[nas_type_index];
+    }
+    
+    // 获取用户名和密码
+    const char *nas_user = "";
+    const char *nas_pass = "";
+    if (NAS_NEEDS_AUTH[nas_type_index]) {
+        nas_user = lv_textarea_get_text(ui_MainMenu_Textarea_NasUser);
+        nas_pass = lv_textarea_get_text(ui_MainMenu_Textarea_NasPass);
+    }
+    
+    // 获取 HTTPS 状态
+    bool nas_https = lv_obj_has_state(ui_MainMenu_Switch_NasHttps, LV_STATE_CHECKED);
+    
+    // 获取额外配置（SNMP/Serial）
+    const char *snmp_comm = "";
+    uint8_t snmp_ver = 1;
+    if (NAS_NEEDS_EXTRA[nas_type_index]) {
+        if (ui_MainMenu_Textarea_NasExtra1 != NULL) {
+            snmp_comm = lv_textarea_get_text(ui_MainMenu_Textarea_NasExtra1);
+        }
+        // 获取 SNMP 版本
+        if (ui_MainMenu_Textarea_NasExtra2 != NULL) {
+            int ver_idx = lv_dropdown_get_selected(ui_MainMenu_Textarea_NasExtra2);
+            snmp_ver = ver_idx + 1;  // v1=1, v2c=2, v3=3
+        }
+    }
+    
+    // 调用 config_save_nas 保存配置
+    config_save_nas(nas_type, nas_ip, nas_port, nas_user, nas_pass, nas_https);
+
+    // 保存 SATA/M.2 数量配置
+    if (ui_MainMenu_Dropdown_SataCount != NULL) {
+        uint8_t sata_count = lv_dropdown_get_selected(ui_MainMenu_Dropdown_SataCount);
+        uint8_t m2_count = lv_dropdown_get_selected(ui_MainMenu_Dropdown_M2Count);
+        config_save_disk_config(sata_count, m2_count);
+        g_config.sata_disk_count = sata_count;
+        g_config.m2_disk_count = m2_count;
+        log_i("[NAS] Disk config saved: SATA=%d, M.2=%d", sata_count, m2_count);
+    }
+
+    // 保存 SNMP 配置
+    pref.begin(NVS_NAMESPACE, false);
+    pref.putString(NVS_SNMP_COMM, snmp_comm);
+    pref.putUChar(NVS_SNMP_VER, snmp_ver);
+    pref.end();
+    
+    // 更新全局配置
+    g_config.snmp_ver = snmp_ver;
+    strncpy(g_config.snmp_comm, snmp_comm, sizeof(g_config.snmp_comm) - 1);
+    
+    // 更新状态标签
+    char status[64];
+    snprintf(status, sizeof(status), "Saved: %s@%s:%d", nas_user, nas_ip, nas_port);
+    lv_label_set_text(ui_MainMenu_Label_NasStatus, status);
+    lv_obj_set_style_text_color(ui_MainMenu_Label_NasStatus, lv_color_hex(0x00FF00), 0);
+    
+    // 尝试切换数据源
+    if (switchDataSource(nas_type)) {
+        log_i("[NAS] Data source switched to %s", nas_type);
+        lv_label_set_text(ui_MainMenu_Label_NasStatus, status);
+    } else {
+        log_w("[NAS] Failed to switch data source to %s", nas_type);
+    }
+    
+    log_i("[NAS] Config saved: type=%s, ip=%s, port=%d, https=%d",
+          nas_type, nas_ip, nas_port, nas_https);
+}

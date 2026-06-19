@@ -13,7 +13,7 @@
   .nav a:hover { text-decoration: underline; }
 
   .device { width: 640px; height: 172px; background: #000; border: 4px solid #1a1a2e; border-radius: 8px; overflow: hidden; margin: 0 auto; }
-  .screen { width: 100%; height: 100%; display: flex; flex-direction: column; }
+  .screen { width: 100%; height: 100%; display: flex; flex-direction: column; position: relative; }
 
   .close-btn { width: 24px; height: 24px; background: #40E0D0; border: 2px solid #40E0D0; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #000; font-weight: bold; cursor: pointer; border-radius: 3px; position: absolute; top: 4px; right: 4px; z-index: 10; }
   .close-btn:hover { background: #5ce1d0; }
@@ -27,6 +27,27 @@
   .tab-btn { flex: 1; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #fff; background: #333; border-right: 2px solid #000; cursor: pointer; }
   .tab-btn:last-child { border-right: none; }
   .tab-btn.active { background: #40E0D0; color: #000; font-weight: 600; }
+
+  /* NAS Tab */
+  .nas-content { display: flex; flex-direction: column; height: 100%; padding: 4px; gap: 4px; }
+  .nas-row { display: flex; align-items: center; gap: 8px; }
+  .nas-label { font-size: 10px; color: #888; white-space: nowrap; }
+  .nas-dropdown { width: 180px; height: 24px; background: #000; border: 1px solid #333; color: #FFF; font-size: 10px; padding: 0 4px; border-radius: 3px; }
+  .nas-input { height: 24px; background: #000; border: 1px solid #333; color: #FFF; font-size: 10px; padding: 0 6px; border-radius: 3px; }
+  .nas-input-ip { width: 150px; }
+  .nas-input-port { width: 60px; }
+  .nas-input-user { width: 100px; }
+  .nas-input-pass { width: 140px; }
+  .nas-switch { width: 45px; height: 22px; background: #333; border-radius: 11px; cursor: pointer; position: relative; }
+  .nas-switch::after { content: ''; position: absolute; width: 18px; height: 18px; background: #40E0D0; border-radius: 50%; top: 2px; right: 2px; }
+  .nas-switch.on { background: #088CFD; }
+  .nas-switch.on::after { right: 25px; }
+  .nas-extra-panel { display: none; flex-direction: column; gap: 4px; padding: 4px; background: rgba(64,224,208,0.1); border: 1px solid #333; border-radius: 3px; }
+  .nas-extra-panel.visible { display: flex; }
+  .nas-status { font-size: 10px; color: #FF0000; margin-top: 4px; }
+  .nas-status.ok { color: #00FF00; }
+  .nas-save-btn { background: #00ADFF; color: #fff; border: none; padding: 6px 20px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+  .nas-save-btn:hover { background: #0088CC; }
 
   /* Common styles */
   .btn { padding: 4px 12px; background: transparent; border: 2px solid #40E0D0; color: #40E0D0; font-size: 10px; font-weight: bold; cursor: pointer; border-radius: 3px; }
@@ -122,7 +143,7 @@
 
   /* Guide Tab */
   .guide-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .guide-text { flex: 1; background: transparent; border: none; color: #FFF; font-size: 7px; line-height: 1.2; resize: none; overflow: hidden; font-family: monospace; }
+  .guide-text { flex: 1; background: transparent; border: none; color: #FFF; font-size: 7px; line-height: 1.2; resize: none; overflow: hidden; font-family: monospace; padding: 4px; }
 
   .screen-label { text-align: center; margin-top: 8px; color: #94a3b8; font-size: 0.8em; }
 </style>
@@ -136,8 +157,91 @@
   <div class="screen">
     <div class="close-btn" onclick="closeSettings()">X</div>
     <div class="tabview">
+      <!-- Tab Content: NAS -->
+      <div class="tab-content active" id="tab-nas">
+        <div class="nas-content">
+          <!-- 第一行: 类型选择 -->
+          <div class="nas-row">
+            <span class="nas-label">NAS Type:</span>
+            <select class="nas-dropdown" id="nasType" onchange="onNasTypeChange()">
+              <option value="0">Synology DSM</option>
+              <option value="1">QNAP QTS</option>
+              <option value="2">TrueNAS</option>
+              <option value="3">FNOS</option>
+              <option value="4">Unraid</option>
+              <option value="5">Netdata</option>
+              <option value="6">SNMP</option>
+              <option value="7">Linux (HTTP)</option>
+              <option value="8">Linux (Serial)</option>
+              <option value="9">Windows</option>
+              <option value="10">Mock (Test)</option>
+            </select>
+            <span style="margin-left: 8px;"></span>
+            <span class="nas-label">Storage:</span>
+            <span class="nas-label" style="color:#40E0D0">SATA:</span>
+            <select class="nas-dropdown" id="sataCount" style="width:50px">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6" selected>6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+            <span class="nas-label" style="color:#40E0D0">M.2:</span>
+            <select class="nas-dropdown" id="m2Count" style="width:50px">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+          </div>
+          <!-- 第二行: IP + Port + HTTPS -->
+          <div class="nas-row">
+            <span class="nas-label">IP:</span>
+            <input type="text" class="nas-input nas-input-ip" id="nasIP" placeholder="192.168.1.100">
+            <span class="nas-label">Port:</span>
+            <input type="text" class="nas-input nas-input-port" id="nasPort" placeholder="5000">
+            <div class="nas-switch" id="nasHttps" onclick="toggleNasHttps()"></div>
+            <span class="nas-label">HTTPS</span>
+          </div>
+          <!-- 第三行: 用户名密码 -->
+          <div class="nas-row" id="nasAuthRow">
+            <span class="nas-label">User:</span>
+            <input type="text" class="nas-input nas-input-user" id="nasUser" placeholder="admin">
+            <span class="nas-label">Pass:</span>
+            <input type="password" class="nas-input nas-input-pass" id="nasPass" placeholder="password">
+          </div>
+          <!-- 额外配置面板 (SNMP/Serial) -->
+          <div class="nas-extra-panel" id="nasExtraPanel">
+            <div class="nas-row">
+              <span class="nas-label" id="nasExtraLabel1">SNMP Community:</span>
+              <input type="text" class="nas-input nas-input-user" id="nasExtra1" placeholder="public">
+              <span class="nas-label" id="nasExtraLabel2">Ver:</span>
+              <select class="nas-dropdown" id="nasExtra2" style="width:70px">
+                <option value="1">v1</option>
+                <option value="2">v2c</option>
+                <option value="3">v3</option>
+              </select>
+            </div>
+          </div>
+          <!-- 状态 + 保存 -->
+          <div class="nas-row" style="margin-top: auto;">
+            <span class="nas-status" id="nasStatus">Not configured</span>
+            <button class="nas-save-btn" onclick="saveNasConfig()">D Save</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Tab Content: Wi-Fi -->
-      <div class="tab-content active wifi-content" id="tab-wifi">
+      <div class="tab-content wifi-content" id="tab-wifi">
         <div class="wifi-header-info">Max 10<br/>Slot</div>
         <div class="wifi-label-group">SSID:<br/>Pass:</div>
         <div class="wifi-row">
@@ -322,7 +426,12 @@ http://radio.example.com/mp3</textarea>
       <!-- Tab Content: User Guide -->
       <div class="tab-content" id="tab-guide">
         <div class="guide-content">
-          <textarea class="guide-text" readonly>[Wi-Fi] SCAN networks, select, enter password, SAVE.
+          <textarea class="guide-text" readonly>[NAS] Select NAS type, enter IP/Port, toggle HTTPS.
+Authentication (User/Pass) required for: Synology, QNAP, TrueNAS, FNOS, Unraid, Linux HTTP, Windows.
+SNMP needs Community + Version. Serial needs Device + Baud.
+Supported: Synology DSM, QNAP QTS, TrueNAS, FNOS, Unraid, Netdata, SNMP, Linux HTTP/Serial, Windows, Mock.
+
+[Wi-Fi] SCAN networks, select, enter password, SAVE.
 
 [Fan] AUTO: auto speed by temp. MANUAL: 0-100% PWM.
 
@@ -340,7 +449,8 @@ http://radio.example.com/mp3</textarea>
 
       <!-- Tab Bar -->
       <div class="tab-bar">
-        <div class="tab-btn active" onclick="switchTab('wifi')">Wi-Fi</div>
+        <div class="tab-btn active" onclick="switchTab('nas')">NAS</div>
+        <div class="tab-btn" onclick="switchTab('wifi')">Wi-Fi</div>
         <div class="tab-btn" onclick="switchTab('fan')">Fan</div>
         <div class="tab-btn" onclick="switchTab('screen')">Screen</div>
         <div class="tab-btn" onclick="switchTab('radio')">Radio</div>
@@ -351,12 +461,162 @@ http://radio.example.com/mp3</textarea>
     </div>
   </div>
 </div>
-<div class="screen-label">Settings - WiFi / Fan / Screen / Radio / Music / Region / Guide</div>
+<div class="screen-label">Settings - NAS / WiFi / Fan / Screen / Radio / Music / Region / Guide</div>
 
 <script>
+  // NAS 类型配置数据
+  const NAS_TYPE_IDS = [
+    'synology', 'qnap', 'truenas', 'fnos', 'unraid',
+    'netdata', 'snmp', 'linux_http', 'linux_serial', 'windows', 'mock'
+  ];
+
+  const NAS_DEFAULT_PORTS = [
+    5000, 8080, 80, 80, 80, 19999, 161, 8080, 115200, 80, 0
+  ];
+
+  const NAS_NEEDS_AUTH = [
+    true, true, true, true, true,
+    false, false, true, false, true, false
+  ];
+
+  const NAS_SUPPORTS_HTTPS = [
+    true, true, true, false, false,
+    false, false, true, false, true, false
+  ];
+
+  const NAS_NEEDS_EXTRA = [
+    false, false, false, false, false,
+    false, true, false, true, false, false
+  ];
+
+  let nasHttpsEnabled = false;
+
+  // NAS 类型切换事件
+  function onNasTypeChange() {
+    const nasTypeSelect = document.getElementById('nasType');
+    const nasTypeIndex = parseInt(nasTypeSelect.value);
+
+    // 更新默认端口
+    document.getElementById('nasPort').placeholder = NAS_DEFAULT_PORTS[nasTypeIndex];
+
+    // 更新字段可见性
+    updateNasFieldsVisibility(nasTypeIndex);
+
+    console.log('NAS type changed to:', NAS_TYPE_IDS[nasTypeIndex]);
+  }
+
+  // 更新 NAS 字段可见性
+  function updateNasFieldsVisibility(nasTypeIndex) {
+    const authRow = document.getElementById('nasAuthRow');
+    const httpsSwitch = document.getElementById('nasHttps');
+    const extraPanel = document.getElementById('nasExtraPanel');
+
+    // 认证面板
+    if (NAS_NEEDS_AUTH[nasTypeIndex]) {
+      authRow.style.display = 'flex';
+    } else {
+      authRow.style.display = 'none';
+    }
+
+    // HTTPS 开关
+    if (NAS_SUPPORTS_HTTPS[nasTypeIndex]) {
+      httpsSwitch.style.display = 'block';
+      httpsSwitch.nextSibling.textContent = ' HTTPS';
+    } else {
+      httpsSwitch.style.display = 'none';
+      httpsSwitch.nextSibling.textContent = '';
+    }
+
+    // 额外配置面板
+    if (NAS_NEEDS_EXTRA[nasTypeIndex]) {
+      extraPanel.classList.add('visible');
+      const extraLabel1 = document.getElementById('nasExtraLabel1');
+      const extraLabel2 = document.getElementById('nasExtraLabel2');
+
+      if (nasTypeIndex === 6) { // SNMP
+        extraLabel1.textContent = 'SNMP Community:';
+        extraLabel2.textContent = 'Ver:';
+        document.getElementById('nasExtra1').placeholder = 'public';
+      } else if (nasTypeIndex === 8) { // Linux Serial
+        extraLabel1.textContent = 'Device:';
+        extraLabel2.textContent = 'Baud:';
+        document.getElementById('nasExtra1').placeholder = '/dev/ttyUSB0';
+      }
+    } else {
+      extraPanel.classList.remove('visible');
+    }
+  }
+
+  // HTTPS 开关切换
+  function toggleNasHttps() {
+    nasHttpsEnabled = !nasHttpsEnabled;
+    const httpsSwitch = document.getElementById('nasHttps');
+    httpsSwitch.classList.toggle('on', nasHttpsEnabled);
+
+    // Synology HTTPS 端口切换
+    if (nasHttpsEnabled) {
+      const nasTypeIndex = parseInt(document.getElementById('nasType').value);
+      if (nasTypeIndex === 0) { // Synology
+        document.getElementById('nasPort').placeholder = '5001';
+      }
+    } else {
+      document.getElementById('nasPort').placeholder = NAS_DEFAULT_PORTS[parseInt(document.getElementById('nasType').value)];
+    }
+
+    console.log('HTTPS:', nasHttpsEnabled ? 'ON' : 'OFF');
+  }
+
+  // 保存 NAS 配置
+  function saveNasConfig() {
+    const nasTypeSelect = document.getElementById('nasType');
+    const nasTypeIndex = parseInt(nasTypeSelect.value);
+    const nasType = NAS_TYPE_IDS[nasTypeIndex];
+    const nasIP = document.getElementById('nasIP').value;
+    const nasPort = document.getElementById('nasPort').value || NAS_DEFAULT_PORTS[nasTypeIndex];
+    const nasUser = document.getElementById('nasUser').value;
+    const nasPass = document.getElementById('nasPass').value;
+    const nasStatus = document.getElementById('nasStatus');
+
+    if (!nasIP) {
+      nasStatus.textContent = 'IP required!';
+      nasStatus.classList.remove('ok');
+      return;
+    }
+
+    const config = {
+      type: nasType,
+      ip: nasIP,
+      port: nasPort,
+      https: nasHttpsEnabled,
+      sataCount: parseInt(document.getElementById('sataCount').value),
+      m2Count: parseInt(document.getElementById('m2Count').value)
+    };
+
+    if (NAS_NEEDS_AUTH[nasTypeIndex]) {
+      config.user = nasUser;
+      config.pass = nasPass;
+    }
+
+    if (NAS_NEEDS_EXTRA[nasTypeIndex]) {
+      config.extra1 = document.getElementById('nasExtra1').value;
+      config.extra2 = document.getElementById('nasExtra2').value;
+    }
+
+    nasStatus.textContent = `Saved: ${nasUser || 'anonymous'}@${nasIP}:${nasPort}`;
+    nasStatus.classList.add('ok');
+
+    console.log('NAS Config saved:', config);
+    alert(`NAS 配置已保存!\n\n类型: ${nasType}\nIP: ${nasIP}\n端口: ${nasPort}\nHTTPS: ${nasHttpsEnabled ? 'ON' : 'OFF'}\n存储: SATA ${config.sataCount} + M.2 ${config.m2Count}`);
+  }
+
+  // 初始化 NAS 字段可见性
+  updateNasFieldsVisibility(0);
+
   let wifiEnabled = true;
   let autoIP = true;
-  let fanMode = 'auto';
+  let fanMode = 'balanced';
+  let fanPwm = 45;
+  let manualPwm = 45;
 
   function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -365,24 +625,20 @@ http://radio.example.com/mp3</textarea>
     event.target.classList.add('active');
   }
 
-  let fanMode = 'balanced';
-  let fanPwm = 45;
-  let manualPwm = 45;
-
   function setFanMode(mode) {
     fanMode = mode;
     document.querySelectorAll('.fan-mode-btn').forEach(el => el.classList.remove('active'));
-    
+
     let modeId = 'fanModeSilent';
     if (mode === 'balanced') modeId = 'fanModeBalanced';
     else if (mode === 'performance') modeId = 'fanModePerformance';
     else if (mode === 'manual') modeId = 'fanModeManual';
-    
+
     document.getElementById(modeId).classList.add('active');
-    
+
     const sliderArea = document.getElementById('fanSliderArea');
     const curveInputs = document.getElementById('fanCurveInputs');
-    
+
     if (mode === 'manual') {
       sliderArea.style.opacity = '1';
       sliderArea.style.pointerEvents = 'auto';

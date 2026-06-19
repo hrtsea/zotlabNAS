@@ -52,6 +52,16 @@ void ui_event_Screen_Settings_gesture(lv_event_t * e);
 void ui_event_Screen_Storage_gesture(lv_event_t * e);
 void loadWiFiConfigToUI(void);
 
+// NAS Tab 事件处理函数
+void ui_event_MainMenu_Tabpage_nas(lv_event_t * e);
+void ui_event_MainMenu_Dropdown_NasType(lv_event_t * e);
+void ui_event_MainMenu_Switch_NasHttps(lv_event_t * e);
+void ui_event_MainMenu_Button_NasSave(lv_event_t * e);
+void saveNasConfig(lv_event_t * e);
+void loadNasConfigToUI(void);
+void updateNasFieldsVisibility(int nas_type_index);
+void saveDiskConfig(lv_event_t * e);
+
 #ifdef __cplusplus
 }
 #endif

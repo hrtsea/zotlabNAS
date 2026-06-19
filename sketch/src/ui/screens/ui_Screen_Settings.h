@@ -85,6 +85,30 @@ extern void ui_event_MainMenu_Keyboard_Number(lv_event_t * e);
 extern lv_obj_t * ui_MainMenu_Keyboard_Number;
 extern void ui_event_MainMenu_Panel_blindPanel(lv_event_t * e);
 extern lv_obj_t * ui_MainMenu_Panel_blindPanel;
+
+// NAS Tab 页面 UI 变量
+extern void ui_event_MainMenu_Tabpage_nas(lv_event_t * e);
+extern lv_obj_t * ui_MainMenu_Tabpage_nas;
+extern void ui_event_MainMenu_Dropdown_NasType(lv_event_t * e);
+extern lv_obj_t * ui_MainMenu_Dropdown_NasType;
+extern lv_obj_t * ui_MainMenu_Textarea_NasIP;
+extern lv_obj_t * ui_MainMenu_Textarea_NasPort;
+extern lv_obj_t * ui_MainMenu_Textarea_NasUser;
+extern lv_obj_t * ui_MainMenu_Textarea_NasPass;
+extern void ui_event_MainMenu_Switch_NasHttps(lv_event_t * e);
+extern lv_obj_t * ui_MainMenu_Switch_NasHttps;
+extern lv_obj_t * ui_MainMenu_Panel_NasAuth;      // 认证信息面板
+extern lv_obj_t * ui_MainMenu_Label_NasStatus;
+extern void ui_event_MainMenu_Button_NasSave(lv_event_t * e);
+extern lv_obj_t * ui_MainMenu_Button_NasSave;
+extern lv_obj_t * ui_MainMenu_Panel_NasExtra;     // 额外配置面板（SNMP/Serial等）
+extern lv_obj_t * ui_MainMenu_Textarea_NasExtra1; // SNMP Community / Serial Device
+extern lv_obj_t * ui_MainMenu_Textarea_NasExtra2; // Serial Baudrate / SNMP Version
+
+// 存储配置（SATA/M.2 数量）
+extern lv_obj_t * ui_MainMenu_Dropdown_SataCount;
+extern lv_obj_t * ui_MainMenu_Dropdown_M2Count;
+
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

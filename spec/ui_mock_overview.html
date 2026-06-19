@@ -28,12 +28,19 @@
 
   .cpu-area { width: 240px; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; }
 
-  .meter { width: 90px; height: 90px; position: relative; }
-  .meter-bg { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 210deg, #333 0deg, #333 240deg); }
+  .meter { width: 95px; height: 65px; position: relative; overflow: hidden; }
+  .meter-container { width: 95px; height: 95px; position: absolute; top: -15px; left: 0; }
+  .meter-bg { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 210deg, #1a1a2e 0deg, #1a1a2e 240deg); border: 3px solid #333; }
+  .meter-scale { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; }
+  .meter-scale::before { content: ''; position: absolute; top: 8px; left: 50%; width: 2px; height: 6px; background: #666; transform: translateX(-50%); }
+  .meter-scale::after { content: ''; position: absolute; bottom: 8px; left: 50%; width: 2px; height: 4px; background: #555; transform: translateX(-50%); }
   .meter-arc { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; }
-  .meter-value { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+  .meter-pointer { position: absolute; top: 50%; left: 50%; width: 35px; height: 3px; background: #40E0D0; transform-origin: left center; transform: rotate(-105deg); transition: transform 0.3s ease; border-radius: 2px; }
+  .meter-pointer::after { content: ''; position: absolute; right: -3px; top: 50%; width: 6px; height: 6px; background: #40E0D0; border-radius: 50%; transform: translateY(-50%); }
+  .meter-center { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #40E0D0; border-radius: 50%; transform: translate(-50%, -50%); }
+  .meter-value { position: absolute; bottom: 0; left: 0; width: 100%; text-align: center; }
   .meter-label { font-size: 14px; color: #fff; font-weight: 600; }
-  .meter-sub { font-size: 10px; color: #666; }
+  .meter-sub { font-size: 9px; color: #666; }
 
   .mem-disk-area { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; padding: 0 8px; }
 
@@ -72,16 +79,26 @@
     <div class="main-area">
       <div class="cpu-area">
         <div class="meter">
-          <div class="meter-bg"></div>
-          <div class="meter-arc" style="background: conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 108deg, transparent 108deg);"></div>
+          <div class="meter-container">
+            <div class="meter-bg"></div>
+            <div class="meter-scale"></div>
+            <div class="meter-arc" style="background: conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 108deg, transparent 108deg);"></div>
+            <div class="meter-pointer" style="transform: rotate(-15deg);"></div>
+            <div class="meter-center"></div>
+          </div>
           <div class="meter-value">
             <div class="meter-label">45%</div>
             <div class="meter-sub">CPU</div>
           </div>
         </div>
         <div class="meter">
-          <div class="meter-bg"></div>
-          <div class="meter-arc" style="background: conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 100deg, transparent 100deg);"></div>
+          <div class="meter-container">
+            <div class="meter-bg"></div>
+            <div class="meter-scale"></div>
+            <div class="meter-arc" style="background: conic-gradient(from 210deg, #40E0D0 0deg, #40E0D0 100deg, transparent 100deg);"></div>
+            <div class="meter-pointer" style="transform: rotate(-25deg);"></div>
+            <div class="meter-center"></div>
+          </div>
           <div class="meter-value">
             <div class="meter-label">42°C</div>
             <div class="meter-sub">TEMP</div>
@@ -102,11 +119,11 @@
       </div>
     </div>
     <div class="hdd-bar">
-      <div class="hdd-btn"><div class="hdd-label">Disk1</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">Disk2</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">Disk3</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">Disk4</div><div class="hdd-led off"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">Disk5</div><div class="hdd-led off"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD1</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD2</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD3</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD4</div><div class="hdd-led off"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD5</div><div class="hdd-led off"></div></div>
       <div class="hdd-btn"><div class="hdd-label">M.2</div><div class="hdd-led on"></div></div>
     </div>
   </div>
@@ -127,16 +144,26 @@
     <div class="main-area">
       <div class="cpu-area">
         <div class="meter">
-          <div class="meter-bg"></div>
-          <div class="meter-arc" style="background: conic-gradient(from 210deg, #FF8C00 0deg, #FF8C00 211deg, transparent 211deg);"></div>
+          <div class="meter-container">
+            <div class="meter-bg"></div>
+            <div class="meter-scale"></div>
+            <div class="meter-arc" style="background: conic-gradient(from 210deg, #FF8C00 0deg, #FF8C00 211deg, transparent 211deg);"></div>
+            <div class="meter-pointer" style="transform: rotate(96deg); background: #FF8C00;"></div>
+            <div class="meter-center" style="background: #FF8C00;"></div>
+          </div>
           <div class="meter-value">
             <div class="meter-label" style="color:#FF8C00">88%</div>
             <div class="meter-sub">CPU</div>
           </div>
         </div>
         <div class="meter">
-          <div class="meter-bg"></div>
-          <div class="meter-arc" style="background: conic-gradient(from 210deg, #FF4500 0deg, #FF4500 168deg, transparent 168deg);"></div>
+          <div class="meter-container">
+            <div class="meter-bg"></div>
+            <div class="meter-scale"></div>
+            <div class="meter-arc" style="background: conic-gradient(from 210deg, #FF4500 0deg, #FF4500 168deg, transparent 168deg);"></div>
+            <div class="meter-pointer" style="transform: rotate(51deg); background: #FF4500;"></div>
+            <div class="meter-center" style="background: #FF4500;"></div>
+          </div>
           <div class="meter-value">
             <div class="meter-label" style="color:#FF4500">70°C</div>
             <div class="meter-sub">TEMP</div>
@@ -157,11 +184,11 @@
       </div>
     </div>
     <div class="hdd-bar">
-      <div class="hdd-btn"><div class="hdd-label">Disk1</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">Disk2</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">Disk3</div><div class="hdd-led on"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">Disk4</div><div class="hdd-led off"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">Disk5</div><div class="hdd-led off"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD1</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD2</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD3</div><div class="hdd-led on"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD4</div><div class="hdd-led off"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">HDD5</div><div class="hdd-led off"></div></div>
       <div class="hdd-btn"><div class="hdd-label">M.2</div><div class="hdd-led on"></div></div>
     </div>
   </div>
@@ -188,7 +215,7 @@
       <div class="hdd-btn"><div class="hdd-label">HDD3</div><div class="hdd-led off"></div></div>
       <div class="hdd-btn"><div class="hdd-label">HDD4</div><div class="hdd-led off"></div></div>
       <div class="hdd-btn"><div class="hdd-label">HDD5</div><div class="hdd-led off"></div></div>
-      <div class="hdd-btn"><div class="hdd-label">HDD6</div><div class="hdd-led off"></div></div>
+      <div class="hdd-btn"><div class="hdd-label">M.2</div><div class="hdd-led off"></div></div>
     </div>
   </div>
 </div>
