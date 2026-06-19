@@ -163,11 +163,13 @@ void audio_loop_task(void *param) {
 static volatile uint64_t s_idle_count[2] = {0, 0};
 
 bool IRAM_ATTR idle_hook0(void) {
-  s_idle_count[0]++;
+  // 避免 C++ volatile 弃用警告：使用显式赋值替代 ++ 运算符
+  s_idle_count[0] = s_idle_count[0] + 1;
   return false;
 }
 bool IRAM_ATTR idle_hook1(void) {
-  s_idle_count[1]++;
+  // 避免 C++ volatile 弃用警告：使用显式赋值替代 ++ 运算符
+  s_idle_count[1] = s_idle_count[1] + 1;
   return false;
 }
 

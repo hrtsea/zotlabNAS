@@ -2,11 +2,8 @@
 
 #include <Arduino.h>
 #include <lvgl.h> 
-  // SD CARD
-#define SD_CS 38
-#define SPI_MOSI 39
-#define SPI_MISO 40
-#define SPI_SCK 41
+// SD CARD - 引脚定义统一来自 user_config.h
+#include "user_config.h"
 
 #define STATION_LIST_FILENAME "/stations.csv"
 #define STRINGIFY(x) #x
@@ -37,7 +34,7 @@ void initSongList();
 
 //------------ RADIO
 
-#define MAX_STATION_LIST_LENGTH 50 //Note! too large station list lenght will reduce LB heap. this make problem with wifi 
+#define MAX_STATION_LIST_LENGTH 50 //Note! too long station list lenght will reduce LB heap. this make problem with wifi 
 #define RADIO_NAME_LEN 64
 #define RADIO_URL_LEN  128
 #define LINE_BUF_LEN   512

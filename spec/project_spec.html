@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>NAS Monitor - Project Specification</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, sans-serif; background: #0a0a15; color: #e8eaed; padding: 30px; max-width: 1200px; margin: 0 auto; }
+  h1 { color: #60a5fa; text-align: center; margin-bottom: 8px; }
+  h2 { color: #60a5fa; border-bottom: 2px solid #1e293b; padding-bottom: 6px; margin: 24px 0 12px; font-size: 1.3em; }
+  h3 { color: #94a3b8; margin: 16px 0 8px; font-size: 1.1em; }
+  p { line-height: 1.6; color: #cbd5e1; margin-bottom: 10px; }
+  code { background: #1e293b; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #fbbf24; }
+  pre { background: #1e293b; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+  pre code { background: none; padding: 0; color: #e2e8f0; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  th, td { border: 1px solid #334155; padding: 8px; text-align: left; }
+  th { background: #1e293b; color: #94a3b8; font-weight: 600; }
+  tr:nth-child(even) { background: rgba(30,41,59,0.3); }
+  .section { background: rgba(30,41,59,0.2); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .nav { text-align: center; margin-bottom: 24px; }
+  .nav a { color: #60a5fa; text-decoration: none; margin: 0 8px; font-size: 0.9em; }
+  .nav a:hover { text-decoration: underline; }
+  .color-box { display: inline-block; width: 20px; height: 20px; border-radius: 4px; vertical-align: middle; margin-right: 8px; }
+  .badge { background: #3b82f6; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75em; margin-left: 4px; }
+  .warn { color: #f59e0b; }
+  .danger { color: #ef4444; }
+  .success { color: #22c55e; }
+  .arch-diagram { background: #0f172a; border-radius: 8px; padding: 16px; margin: 16px 0; }
+  .arch-layer { margin: 12px 0; }
+  .arch-layer-label { color: #60a5fa; font-weight: 700; font-size: 0.85em; margin-bottom: 6px; }
+  .arch-items { display: flex; flex-wrap: wrap; gap: 6px; }
+  .arch-item { background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3); padding: 4px 10px; border-radius: 4px; font-size: 0.85em; }
+</style>
+</head>
+<body>
+<h1>📊 NAS Monitor - Project Specification</h1>
+<p style="text-align:center;color:#64748b">Waveshare ESP32-S3-Touch-LCD-3.49 · 640×172 Landscape · LVGL 8.4.0</p>
+
+<div class="nav">
+  <a href="ui_mock_overview.html">Overview Mock</a> |
+  <a href="ui_mock_storage.html">Storage Mock</a> |
+  <a href="ui_mock_fan.html">Fan Control Mock</a> |
+  <a href="ui_mock_settings.html">Settings Mock</a> |
+  <a href="ui_mock_cpu.html">CPU Mock</a> |
+  <a href="ui_mock_wifi.html">WiFi Mock</a>
+</div>
+
+<h2>1. Hardware Specification</h2>
+<div class="section">
+  <h3>Display</h3>
+  <table>
+    <tr><th>Item</th><th>Value</th></tr>
+    <tr><td>Resolution</td><td>640 × 172 (Landscape)</td></tr>
+    <tr><td>Interface</td><td>SPI</td></tr>
+    <tr><td>Touch</td><td>Resistive</td></tr>
+    <tr><td>Controller</td><td>GC9076</td></tr>
+  </table>
+
+  <h3>ESP32-S3 Features</h3>
+  <table>
+    <tr><th>Item</th><th>Value</th></tr>
+    <tr><td>RAM</td><td>8MB PSRAM + 512KB SRAM</td></tr>
+    <tr><td>Flash</td><td>16MB</td></tr>
+    <tr><td>WiFi</td><td>802.11 b/g/n</td></tr>
+    <tr><td>BLE</td><td>5.0</td></tr>
+    <tr><td>I2C</td><td>2 ports</td></tr>
+    <tr><td>PWM</td><td>Fan control</td></tr>
+  </table>
+</div>
+
+<h2>2. Color Scheme</h2>
+<div class="section">
+  <table>
+    <tr><th>Name</th><th>Color</th><th>Hex</th><th>Usage</th></tr>
+    <tr><td>Background</td><td><div class="color-box" style="background:#000000"></div></td><td>#000000</td><td>Screen background</td></tr>
+    <tr><td>Text</td><td><div class="color-box" style="background:#FFFFFF"></div></td><td>#FFFFFF</td><td>Primary text</td></tr>
+    <tr><td>Primary</td><td><div class="color-box" style="background:#40E0D0"></div></td><td>#40E0D0</td><td>Accent, progress bars, indicators</td></tr>
+    <tr><td>Inactive</td><td><div class="color-box" style="background:#333333"></div></td><td>#333333</td><td>Background bars, borders</td></tr>
+    <tr><td>LED Green</td><td><div class="color-box" style="background:#00FF00"></div></td><td>#00FF00</td><td>Active disk indicator</td></tr>
+    <tr><td>LED Gray</td><td><div class="color-box" style="background:#666666"></div></td><td>#666666</td><td>Inactive disk indicator</td></tr>
+    <tr><td>Temperature</td><td><div class="color-box" style="background:#FF8C00"></div></td><td>#FF8C00</td><td>Temperature gauge</td></tr>
+  </table>
+</div>
+
+<h2>3. Software Architecture</h2>
+<div class="arch-diagram">
+  <div class="arch-layer">
+    <div class="arch-layer-label">APPLICATION LAYER</div>
+    <div class="arch-items">
+      <span class="arch-item">main.cpp (setup/loop)</span>
+      <span class="arch-item">xtask.cpp (FreeRTOS tasks)</span>
+      <span class="arch-item">config.cpp (NVS config)</span>
+    </div>
+  </div>
+  <div class="arch-layer">
+    <div class="arch-layer-label">UI LAYER (LVGL)</div>
+    <div class="arch-items">
+      <span class="arch-item">ui_Screen_Overview.cpp</span>
+      <span class="arch-item">ui_Screen_Storage.cpp</span>
+      <span class="arch-item">ui_Screen_Settings.cpp</span>
+      <span class="arch-item">ui_events.cpp</span>
+      <span class="arch-item">ui_helpers.cpp</span>
+    </div>
+  </div>
+  <div class="arch-layer">
+    <div class="arch-layer-label">DATA SOURCE LAYER</div>
+    <div class="arch-items">
+      <span class="arch-item">data_source.cpp</span>
+      <span class="arch-item">synology_client.cpp</span>
+      <span class="arch-item">qnap_client.cpp</span>
+      <span class="arch-item">truenas_client.cpp</span>
+      <span class="arch-item">mock_client.cpp</span>
+      <span class="arch-item">netdata_client.cpp</span>
+      <span class="arch-item">snmp_client.cpp</span>
+    </div>
+  </div>
+  <div class="arch-layer">
+    <div class="arch-layer-label">HARDWARE BSP</div>
+    <div class="arch-items">
+      <span class="arch-item">lvgl_port.cpp</span>
+      <span class="arch-item">wifi_manager.cpp</span>
+      <span class="arch-item">lcd_bl_pwm_bsp.cpp</span>
+      <span class="arch-item">i2c_bsp.cpp</span>
+      <span class="arch-item">touch driver</span>
+    </div>
+  </div>
+</div>
+
+<h2>4. Data Structures</h2>
+<div class="section">
+  <h3>NasData (Main Data Model)</h3>
+  <pre><code>struct NasData {
+    NasSystemInfo   system;       // CPU, Memory, Temp, Uptime
+    NasDiskInfo     disks[MAX_DISKS];   // Disk status (up to 6 SATA + 3 M.2)
+    NasVolumeInfo   volumes[MAX_VOLUMES]; // RAID volumes
+    NasServiceInfo  services[MAX_SERVICES]; // Running services
+    NasInterfaceInfo interfaces[MAX_NETWORK_INTERFACES]; // Network interfaces
+    FanStatus       fan;          // Fan RPM, PWM, temp
+    bool            is_online;    // NAS connection status
+};</code></pre>
+
+  <h3>AppConfig (NVS Configuration)</h3>
+  <pre><code>struct AppConfig {
+    // WiFi
+    char ssid[33];
+    char wifipass[65];
+    
+    // NAS
+    char nas_type[16];    // synology/qnap/truenas/...
+    char nas_ip[40];
+    uint16_t nas_port;
+    char nas_user[32];
+    char nas_pass[65];
+    bool nas_https;
+    
+    // Display
+    uint8_t rotation_angle;  // 0=0°, 1=90°, 2=180°, 3=270°
+    uint8_t brightness;
+    bool autodim;
+    
+    // Hardware
+    uint8_t sata_disk_count;
+    uint8_t m2_disk_count;
+    
+    // Fan
+    FanConfig fan;
+};</code></pre>
+</div>
+
+<h2>5. Supported NAS Types</h2>
+<div class="section">
+  <table>
+    <tr><th>Type</th><th>API</th><th>Features</th></tr>
+    <tr><td>Synology</td><td>DSM API</td><td>CPU, Mem, Disk, Network, Fan</td></tr>
+    <tr><td>QNAP</td><td>QTS API</td><td>CPU, Mem, Disk, Network</td></tr>
+    <tr><td>TrueNAS</td><td>REST API</td><td>Full system monitoring</td></tr>
+    <tr><td>Unraid</td><td>WebUI API</td><td>Disk, Array, Docker</td></tr>
+    <tr><td>FNOS</td><td>Custom API</td><td>飞牛NAS支持</td></tr>
+    <tr><td>Netdata</td><td>Netdata API</td><td>Any Linux server</td></tr>
+    <tr><td>SNMP</td><td>SNMP v1/v2c/v3</td><td>Generic monitoring</td></tr>
+    <tr><td>Mock</td><td>Simulated</td><td>Development/testing</td></tr>
+  </table>
+</div>
+
+<h2>6. UI Screens</h2>
+<div class="section">
+  <h3>Overview Screen</h3>
+  <p><strong>Layout:</strong> 640×172 landscape</p>
+  <ul>
+    <li>Top status bar (35px): NAS name, Time, Network speeds (↑/↓), IP</li>
+    <li>Left: CPU usage meter (90×90), CPU temp meter (90×90)</li>
+    <li>Right: Memory bar (72%), Disk bar (50%)</li>
+    <li>Bottom: 6 HDD indicators (LED + label)</li>
+  </ul>
+
+  <h3>Storage Screen</h3>
+  <ul>
+    <li>Volume list with RAID status</li>
+    <li>Disk details: temp, health, usage</li>
+    <li>Read/write speed indicators</li>
+  </ul>
+
+  <h3>Fan Control Screen</h3>
+  <ul>
+    <li>Current fan RPM and PWM</li>
+    <li>Auto/manual mode toggle</li>
+    <li>Fan curve visualization</li>
+    <li>Manual PWM slider</li>
+  </ul>
+
+  <h3>Settings Screen</h3>
+  <ul>
+    <li>NAS type selection</li>
+    <li>Network configuration</li>
+    <li>Display settings (brightness, rotation)</li>
+    <li>Disk configuration (SATA/M.2 count)</li>
+  </ul>
+
+  <h3>CPU Cores Screen</h3>
+  <ul>
+    <li>Per-core usage bars</li>
+    <li>Load average</li>
+    <li>System uptime</li>
+  </ul>
+
+  <h3>WiFi Screen</h3>
+  <ul>
+    <li>SSID list with signal strength</li>
+    <li>Connection status</li>
+    <li>IP address display</li>
+  </ul>
+</div>
+
+<h2>7. FreeRTOS Tasks</h2>
+<div class="section">
+  <table>
+    <tr><th>Task</th><th>Priority</th><th>Stack Size</th><th>Function</th></tr>
+    <tr><td>lvgl_task</td><td>1</td><td>4096</td><td>LVGL event loop</td></tr>
+    <tr><td>network_task</td><td>2</td><td>8192</td><td>Network polling</td></tr>
+    <tr><td>fan_task</td><td>3</td><td>2048</td><td>Fan control</td></tr>
+    <tr><td>weather_task</td><td>4</td><td>4096</td><td>Weather update</td></tr>
+    <tr><td>updater_task</td><td>5</td><td>8192</td><td>OTA updates</td></tr>
+    <tr><td>touch_task</td><td>1</td><td>2048</td><td>Touch processing</td></tr>
+  </table>
+</div>
+
+<h2>8. Key APIs</h2>
+<div class="section">
+  <h3>Data Source APIs</h3>
+  <pre><code>// Get current data
+const NasData* data_source_get_data();
+
+// Get specific metrics
+float data_source_get_cpu_pct();
+float data_source_get_ram_pct();
+float data_source_get_tx_speed_mbps();
+float data_source_get_rx_speed_mbps();
+
+// Network status
+bool data_source_is_online();
+
+// Update data
+void data_source_update();</code></pre>
+
+  <h3>Configuration APIs</h3>
+  <pre><code>// Global config
+extern AppConfig g_config;
+
+// Load/save config
+void config_load();
+void config_save();
+void config_reset();
+
+// Save specific sections
+void config_save_wifi(const char* ssid, const char* pass);
+void config_save_nas(const char* type, const char* ip, ...);
+void config_save_display(uint8_t rotation, uint8_t brightness, bool autodim);</code></pre>
+</div>
+
+<h2>9. Mock Data Generator</h2>
+<div class="section">
+  <p>The <code>mock_client.cpp</code> generates realistic simulated data for development and testing:</p>
+  <ul>
+    <li>CPU: 20-85% random variation</li>
+    <li>Memory: 40-80% baseline</li>
+    <li>Network: 0-50 MB/s random spikes</li>
+    <li>Disks: 30-90% usage, random health states</li>
+    <li>Fan: 1200-2500 RPM based on "temp"</li>
+  </ul>
+</div>
+</body>
+</html>

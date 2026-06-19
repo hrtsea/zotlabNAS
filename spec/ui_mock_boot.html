@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=640, height=172">
+    <title>Splash Screen - TuneBar Zotlabnas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            width: 640px;
+            height: 172px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden;
+        }
+
+        .splash-container {
+            width: 640px;
+            height: 172px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo-label {
+            font-size: 48px;
+            font-weight: bold;
+            color: #00E676;
+            position: absolute;
+            top: 20px;
+            letter-spacing: 2px;
+        }
+
+        .version-label {
+            font-size: 16px;
+            color: #888888;
+            position: absolute;
+            top: 85px;
+        }
+
+        .progress-container {
+            position: absolute;
+            top: 105px;
+            width: 200px;
+            height: 8px;
+            background-color: #333333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #00E676;
+            border-radius: 4px;
+            transition: width 0.5s ease-out;
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: #FFFFFF;
+            position: absolute;
+            top: 125px;
+            text-align: center;
+            width: 300px;
+        }
+
+        /* Boot animation stages */
+        .stage-0 .progress-bar { width: 0%; }
+        .stage-1 .progress-bar { width: 25%; }
+        .stage-2 .progress-bar { width: 50%; }
+        .stage-3 .progress-bar { width: 75%; }
+        .stage-4 .progress-bar { width: 100%; }
+
+        /* Subtle logo glow effect */
+        @keyframes logoGlow {
+            0%, 100% { text-shadow: 0 0 10px #00E67640; }
+            50% { text-shadow: 0 0 20px #00E67660, 0 0 30px #00E67630; }
+        }
+
+        .logo-label {
+            animation: logoGlow 2s ease-in-out infinite;
+        }
+
+        /* Progress bar pulse when complete */
+        @keyframes progressPulse {
+            0%, 100% { box-shadow: 0 0 5px #00E67640; }
+            50% { box-shadow: 0 0 15px #00E67660; }
+        }
+
+        .stage-4 .progress-container {
+            animation: progressPulse 1s ease-in-out 3;
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-container stage-0" id="splashContainer">
+        <div class="logo-label" id="logoLabel">TuneBar Zotlabnas</div>
+        <div class="version-label" id="versionLabel">v1.0.0</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="status-label" id="statusLabel">Initializing system...</div>
+    </div>
+
+    <script>
+        const bootStages = [
+            { stage: 1, message: "Loading system components..." },
+            { stage: 2, message: "Initializing storage subsystem..." },
+            { stage: 3, message: "Starting network services..." },
+            { stage: 4, message: "Boot complete!" }
+        ];
+
+        let currentStage = 0;
+        const splashContainer = document.getElementById('splashContainer');
+        const progressBar = document.getElementById('progressBar');
+        const statusLabel = document.getElementById('statusLabel');
+
+        function updateBootStage(stage, message) {
+            currentStage = stage;
+            splashContainer.className = 'splash-container stage-' + stage;
+            if (message) {
+                statusLabel.textContent = message;
+            }
+        }
+
+        // Auto-run boot sequence animation
+        function runBootSequence() {
+            let index = 0;
+
+            function nextStage() {
+                if (index < bootStages.length) {
+                    const { stage, message } = bootStages[index];
+                    updateBootStage(stage, message);
+                    index++;
+                    setTimeout(nextStage, 750); // 750ms per stage
+                }
+            }
+
+            // Start after initial delay
+            setTimeout(nextStage, 500);
+        }
+
+        // Initialize with stage 0
+        updateBootStage(0, "Initializing system...");
+
+        // Start boot animation after page loads
+        window.addEventListener('load', function() {
+            setTimeout(runBootSequence, 300);
+        });
+    </script>
+</body>
+</html>

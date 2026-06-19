@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>NAS Monitor - CPU Cores Mock (640x172)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: monospace; background: #0a0a15; color: #fff; padding: 30px 20px; }
+  h1 { text-align: center; color: #60a5fa; margin-bottom: 8px; font-size: 1.4em; }
+  .subtitle { text-align: center; color: #64748b; margin-bottom: 24px; font-size: 0.85em; }
+  .nav { text-align: center; margin-bottom: 24px; }
+  .nav a { color: #60a5fa; text-decoration: none; margin: 0 8px; font-size: 0.85em; }
+  .nav a:hover { text-decoration: underline; }
+
+  .device { width: 640px; height: 172px; background: #000; border: 4px solid #1a1a2e; border-radius: 8px; overflow: hidden; margin: 0 auto; }
+  .screen { width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+  .statusbar { height: 35px; display: flex; align-items: center; padding: 0 8px; border-bottom: 2px solid #333; font-size: 14px; }
+  .statusbar .title { color: #40E0D0; font-weight: 600; width: 100px; }
+
+  .main-area { flex: 1; display: flex; flex-direction: row; padding: 4px; }
+
+  .core-bars { flex: 1; display: flex; flex-direction: row; gap: 4px; padding: 4px; }
+  .core-bar-container { flex: 1; display: flex; flex-direction: column; }
+  .core-label { font-size: 10px; color: #666; text-align: center; margin-bottom: 2px; }
+  .core-bar-bg { flex: 1; background: #333; border-radius: 3px; position: relative; overflow: hidden; }
+  .core-bar-fill { width: 100%; background: #40E0D0; position: absolute; bottom: 0; left: 0; }
+  .core-bar-fill.high { background: #FF8C00; }
+  .core-bar-fill.critical { background: #FF4500; }
+  .core-pct { font-size: 10px; color: #fff; text-align: center; margin-top: 2px; }
+
+  .info-panel { width: 150px; display: flex; flex-direction: column; padding: 4px; border-left: 2px solid #333; }
+  .info-row { font-size: 12px; padding: 4px 0; border-bottom: 1px solid #333; }
+  .info-label { color: #666; }
+  .info-value { color: #40E0D0; font-weight: 600; }
+  .info-value.warn { color: #FF8C00; }
+
+  .uptime-bar { height: 30px; display: flex; align-items: center; padding: 0 8px; border-top: 2px solid #333; font-size: 12px; }
+  .uptime-label { color: #666; margin-right: 8px; }
+  .uptime-value { color: #fff; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>🖥️ CPU Cores (640×172)</h1>
+<p class="subtitle">Per-Core Usage · Load Average · Uptime</p>
+<div class="nav"><a href="ui_mock_overview.html">&larr; Overview</a> | <a href="project_spec.html">Back to Spec</a></div>
+
+<div class="device">
+  <div class="screen">
+    <div class="statusbar"><div class="title">CPU CORES</div><div style="margin-left:auto">Intel J4125</div></div>
+    <div class="main-area">
+      <div class="core-bars">
+        <div class="core-bar-container">
+          <div class="core-label">C0</div>
+          <div class="core-bar-bg"><div class="core-bar-fill" style="height:72%"></div></div>
+          <div class="core-pct">72%</div>
+        </div>
+        <div class="core-bar-container">
+          <div class="core-label">C1</div>
+          <div class="core-bar-bg"><div class="core-bar-fill" style="height:45%"></div></div>
+          <div class="core-pct">45%</div>
+        </div>
+        <div class="core-bar-container">
+          <div class="core-label">C2</div>
+          <div class="core-bar-bg"><div class="core-bar-fill high" style="height:88%"></div></div>
+          <div class="core-pct">88%</div>
+        </div>
+        <div class="core-bar-container">
+          <div class="core-label">C3</div>
+          <div class="core-bar-bg"><div class="core-bar-fill" style="height:32%"></div></div>
+          <div class="core-pct">32%</div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <div class="info-row"><span class="info-label">Avg:</span><span class="info-value">59%</span></div>
+        <div class="info-row"><span class="info-label">Load 1m:</span><span class="info-value">1.23</span></div>
+        <div class="info-row"><span class="info-label">Load 5m:</span><span class="info-value">0.89</span></div>
+        <div class="info-row"><span class="info-label">Load 15m:</span><span class="info-value">0.72</span></div>
+        <div class="info-row"><span class="info-label">Temp:</span><span class="info-value warn">58°C</span></div>
+        <div class="info-row"><span class="info-label">Freq:</span><span class="info-value">2.0GHz</span></div>
+      </div>
+    </div>
+    <div class="uptime-bar"><span class="uptime-label">Uptime:</span><span class="uptime-value">12d 8h 32m</span></div>
+  </div>
+</div>
+</body>
+</html>

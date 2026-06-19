@@ -5,9 +5,19 @@
 lv_obj_t * ui_Screen_Storage = NULL;
 
 // 颜色定义
+// 注意：COLOR_BG 和 COLOR_TEXT 在 nas_config.h 中已有定义（整数值）
+// 此处重新定义为 LVGL 颜色类型，用于 UI 渲染
+#ifdef COLOR_BG
+#undef COLOR_BG
+#endif
 #define COLOR_BG        lv_color_hex(0x000000)      // 背景黑色
-#define COLOR_PRIMARY   lv_color_hex(0x40E0D0)      // 主色：青绿色
+
+#ifdef COLOR_TEXT
+#undef COLOR_TEXT
+#endif
 #define COLOR_TEXT      lv_color_hex(0xFFFFFF)      // 文本白色
+
+#define COLOR_PRIMARY   lv_color_hex(0x40E0D0)      // 主色：青绿色
 #define COLOR_INACTIVE  lv_color_hex(0x333333)      // 未激活/背景条灰色
 
 // 硬盘数量常量
