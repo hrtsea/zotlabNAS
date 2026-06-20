@@ -4,6 +4,7 @@
 #include "screens/ui_Screen_Boot.h"
 #include "screens/ui_Screen_Overview.h"
 #include "screens/ui_Screen_Settings.h"
+#include "screens/ui_Screen_Storage.h"
 #include "lcd_bl_bsp/lcd_bl_pwm_bsp.h"
 #include "data/config.h"
 #include "net/network.h"
@@ -157,7 +158,7 @@ void ui_event_Screen_Overview_gesture(lv_event_t *e) {
         lv_indev_wait_release(lv_indev_get_act());
         log_i("Overview: swipe left detected (Storage page not implemented yet)");
     }
-    // 上边缘下滑（LV_DIR_BOTTOM）- 进入 Settings 页面
+    // 顶部下滑（LV_DIR_BOTTOM）- 进入 Settings 页面
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_BOTTOM) {
         lv_indev_wait_release(lv_indev_get_act());
         log_i("Overview: swipe down from top, switching to Settings");
@@ -173,7 +174,7 @@ void ui_event_Screen_Overview_gesture(lv_event_t *e) {
 void ui_event_Screen_Settings_gesture(lv_event_t *e) {
     lv_event_code_t event_code = lv_event_get_code(e);
 
-    // 下边缘上滑（LV_DIR_TOP）- 返回 Overview 页面
+    // 底部上滑（LV_DIR_TOP）- 返回 Overview 页面
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP) {
         lv_indev_wait_release(lv_indev_get_act());
         log_i("Settings: swipe up from bottom, switching back to Overview");
@@ -650,6 +651,22 @@ void data_poll_task(void *param) {
 // NAS Tab 事件处理函数
 // ============================================================================
 
+// NAS 类型枚举
+typedef enum {
+    NAS_TYPE_SYNOLOGY = 0,    // Synology DSM
+    NAS_TYPE_QNAP = 1,         // QNAP QTS
+    NAS_TYPE_TRUENAS = 2,      // TrueNAS
+    NAS_TYPE_FNOS = 3,          // FNOS
+    NAS_TYPE_UNRAID = 4,       // Unraid
+    NAS_TYPE_NETDATA = 5,      // Netdata
+    NAS_TYPE_SNMP = 6,         // SNMP
+    NAS_TYPE_LINUX_HTTP = 7,   // Linux (HTTP)
+    NAS_TYPE_LINUX_SERIAL = 8, // Linux (Serial)
+    NAS_TYPE_WINDOWS = 9,      // Windows
+    NAS_TYPE_MOCK = 10,        // Mock (Test)
+    NAS_TYPE_COUNT = 11         // 类型总数
+} NasType_t;
+
 // NAS 类型索引到字符串ID的映射
 static const char* NAS_TYPE_IDS[] = {
     "synology",      // 0: Synology DSM
@@ -762,22 +779,24 @@ void ui_event_MainMenu_Switch_NasHttps(lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);
     if (event_code == LV_EVENT_VALUE_CHANGED) {
         resetScreenOffTimer(e);
-        
+
         lv_obj_t *sw = lv_event_get_target(e);
         bool https_enabled = lv_obj_has_state(sw, LV_STATE_CHECKED);
-        
-        // 调整端口（如果是 HTTPS 端口）
-        if (https_enabled && ui_MainMenu_Textarea_NasPort != NULL) {
-            lv_obj_t *dropdown = lv_event_get_target(e);
-            // 获取当前选中的类型
-            if (ui_MainMenu_Dropdown_NasType != NULL) {
-                int selected_index = lv_dropdown_get_selected(ui_MainMenu_Dropdown_NasType);
-                if (selected_index == 0) {  // Synology
+
+        // 调整端口（如果是支持 HTTPS 的类型）
+        if (ui_MainMenu_Textarea_NasPort != NULL && ui_MainMenu_Dropdown_NasType != NULL) {
+            int selected_index = lv_dropdown_get_selected(ui_MainMenu_Dropdown_NasType);
+            if (NAS_SUPPORTS_HTTPS[selected_index]) {
+                if (https_enabled) {
                     lv_textarea_set_text(ui_MainMenu_Textarea_NasPort, "5001");
+                } else {
+                    char port_str[8];
+                    snprintf(port_str, sizeof(port_str), "%d", NAS_DEFAULT_PORTS[selected_index]);
+                    lv_textarea_set_text(ui_MainMenu_Textarea_NasPort, port_str);
                 }
             }
         }
-        
+
         log_i("HTTPS switch: %s", https_enabled ? "ON" : "OFF");
     }
 }
@@ -822,11 +841,11 @@ void updateNasFieldsVisibility(int nas_type_index) {
             // 根据类型更新额外配置标签
             lv_obj_t *label1 = lv_obj_get_child(ui_MainMenu_Panel_NasExtra, 0);  // 第一个 label
             lv_obj_t *label2 = lv_obj_get_child(ui_MainMenu_Panel_NasExtra, 2); // 第二个 label
-            
-            if (nas_type_index == 6) {  // SNMP
+
+            if (nas_type_index == NAS_TYPE_SNMP) {
                 lv_label_set_text(label1, "SNMP Community:");
                 lv_label_set_text(label2, "SNMP Ver:");
-            } else if (nas_type_index == 8) {  // Linux Serial
+            } else if (nas_type_index == NAS_TYPE_LINUX_SERIAL) {
                 lv_label_set_text(label1, "Device:");
                 lv_label_set_text(label2, "Baud:");
             }
@@ -975,16 +994,6 @@ void saveNasConfig(lv_event_t * e) {
     // 调用 config_save_nas 保存配置
     config_save_nas(nas_type, nas_ip, nas_port, nas_user, nas_pass, nas_https);
 
-    // 保存 SATA/M.2 数量配置
-    if (ui_MainMenu_Dropdown_SataCount != NULL) {
-        uint8_t sata_count = lv_dropdown_get_selected(ui_MainMenu_Dropdown_SataCount);
-        uint8_t m2_count = lv_dropdown_get_selected(ui_MainMenu_Dropdown_M2Count);
-        config_save_disk_config(sata_count, m2_count);
-        g_config.sata_disk_count = sata_count;
-        g_config.m2_disk_count = m2_count;
-        log_i("[NAS] Disk config saved: SATA=%d, M.2=%d", sata_count, m2_count);
-    }
-
     // 保存 SNMP 配置
     pref.begin(NVS_NAMESPACE, false);
     pref.putString(NVS_SNMP_COMM, snmp_comm);
@@ -1011,4 +1020,45 @@ void saveNasConfig(lv_event_t * e) {
     
     log_i("[NAS] Config saved: type=%s, ip=%s, port=%d, https=%d",
           nas_type, nas_ip, nas_port, nas_https);
+}
+
+// 保存硬盘数量配置（选择后立即保存）
+void saveDiskConfig(lv_event_t * e)
+{
+    if (ui_MainMenu_Dropdown_SataCount == NULL || ui_MainMenu_Dropdown_M2Count == NULL) {
+        return;
+    }
+
+    uint8_t sata_count = lv_dropdown_get_selected(ui_MainMenu_Dropdown_SataCount);
+    uint8_t m2_count = lv_dropdown_get_selected(ui_MainMenu_Dropdown_M2Count);
+
+    config_save_disk_config(sata_count, m2_count);
+
+    g_config.sata_disk_count = sata_count;
+    g_config.m2_disk_count = m2_count;
+
+    // 更新 Overview 页面的 HDD 指示灯（仅此处需要，Sorage数据来自NAS系统）
+    update_hdd_indicators();
+
+    log_i("[Disk] Config saved: SATA=%d, M.2=%d", sata_count, m2_count);
+}
+
+// SATA 硬盘数量下拉框事件
+void ui_event_MainMenu_Dropdown_SataCount(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    // LV_EVENT_CLICKED (25) 在下拉框关闭时触发，此时值已改变
+    if (event_code == LV_EVENT_CLICKED) {
+        resetScreenOffTimer(e);
+        saveDiskConfig(e);
+    }
+}
+
+// M.2 硬盘数量下拉框事件
+void ui_event_MainMenu_Dropdown_M2Count(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    // LV_EVENT_CLICKED (25) 在下拉框关闭时触发，此时值已改变
+    if (event_code == LV_EVENT_CLICKED) {
+        resetScreenOffTimer(e);
+        saveDiskConfig(e);
+    }
 }

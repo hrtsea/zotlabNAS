@@ -101,19 +101,17 @@ void setup() {
   // Initialize IO expander
   io = new TCA9554(tca9554_dev_handle);
   if (io == nullptr) {
-    Serial.println("[ERROR] Failed to allocate TCA9554!");
-  } else {
-    io->begin();
-    io->setPinMode(EXIO6_BIT, 0);  // Output: power hold
-    io->setPinMode(EXIO7_BIT, 0);  // Output: power amp
+    Serial.println("[ERROR] Failed to allocate TCA9554! System halted.");
+    while (1) { vTaskDelay(pdMS_TO_TICKS(1000)); }  // 安全停止
   }
+  io->begin();
+  io->setPinMode(EXIO6_BIT, 0);  // Output: power hold
+  io->setPinMode(EXIO7_BIT, 0);  // Output: power amp
 
   // Power on hold
   if (digitalRead(SYS_OUT) == LOW) {
     Serial.println("Power ON");
-    if (io != nullptr) {
-      io->digitalWrite(EXIO6_BIT, 1);
-    }
+    io->digitalWrite(EXIO6_BIT, 1);
   }
 
   // Initialize LVGL (display + touch)
@@ -132,16 +130,12 @@ void setup() {
   lcd_bl_pwm_bsp_init(LCD_PWM_MODE_255);
 
   // Enable power amplifier
-  if (io != nullptr) {
-    io->digitalWrite(EXIO7_BIT, 1);
-    delay(100);
-    if (io->digitalRead(EXIO7_BIT) == 0)
-      Serial.println("Power Amp ERROR!");
-    else
-      Serial.println("Power Amp OK");
-  } else {
-    Serial.println("Power Amp skipped (IO expander not available)");
-  }
+  io->digitalWrite(EXIO7_BIT, 1);
+  delay(100);
+  if (io->digitalRead(EXIO7_BIT) == 0)
+    Serial.println("Power Amp ERROR!");
+  else
+    Serial.println("Power Amp OK");
 
   // Initialize ES8311 (audio DAC)
   speaker.setVolume(80);
@@ -173,7 +167,8 @@ void setup() {
   }
 
   // Create FreeRTOS tasks
-  xTaskCreatePinnedToCore(audio_loop_task, "audio_loop", 5 * 1024, NULL, 4, NULL, 1);
+  // 创建任务（栈大小已优化：音频任务增大以支持解码）
+  xTaskCreatePinnedToCore(audio_loop_task, "audio_loop", 8 * 1024, NULL, 4, NULL, 1);
   xTaskCreatePinnedToCore(rtc_read_task, "rtc_read", 3 * 1024, NULL, 3, NULL, 1);
   xTaskCreatePinnedToCore(button_input_task, "button_input", 4 * 1024, NULL, 2, NULL, 1);
   xTaskCreatePinnedToCore(batt_level_read_task, "batt_read", 4 * 1024, NULL, 1, NULL, 1);
@@ -182,6 +177,8 @@ void setup() {
 
   // Load configuration from NVS
   config_load();
+  Serial.printf("[Main] After config_load(): SATA=%d, M2=%d\n",
+                g_config.sata_disk_count, g_config.m2_disk_count);
   Serial.printf("[Config] Loaded SSID: '%s', Pass length: %d\n",
                 g_config.ssid, strlen(g_config.wifipass));
 
