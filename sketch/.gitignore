@@ -4,10 +4,12 @@
 *.bin
 *.map
 .pio/
+.cache/
+.vscode/
+.clangd/
 build/
 compile_commands.json
 build_errors.txt
 build_output.txt
 link_errors.txt
 temp_test.cpp
-*.txt
