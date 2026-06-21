@@ -1037,9 +1037,6 @@ void saveDiskConfig(lv_event_t * e)
     g_config.sata_disk_count = sata_count;
     g_config.m2_disk_count = m2_count;
 
-    // 更新 Overview 页面的 HDD 指示灯（仅此处需要，Sorage数据来自NAS系统）
-    update_hdd_indicators();
-
     log_i("[Disk] Config saved: SATA=%d, M.2=%d", sata_count, m2_count);
 }
 
